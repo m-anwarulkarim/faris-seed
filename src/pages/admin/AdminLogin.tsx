@@ -61,7 +61,7 @@ export default function AdminLogin() {
           <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-400 to-emerald-600 shadow-lg shadow-emerald-500/30 ring-4 ring-emerald-400/20">
             <Sprout className="h-8 w-8 text-emerald-950" />
           </div>
-          <h1 className="text-2xl font-bold tracking-tight text-white">AB Seed অ্যাডমিন</h1>
+          <h1 className="text-2xl font-bold tracking-tight text-white">Faris Seed Admin</h1>
           <p className="mt-1 text-sm text-emerald-200/70">কন্ট্রোল প্যানেলে প্রবেশ করতে লগইন করুন</p>
         </div>
 

@@ -10,12 +10,6 @@ export function useCustomerAuth() {
   useEffect(() => {
     let isMounted = true;
 
-    // Check if the current URL contains OAuth tokens or auth code
-    const hasAuthHashOrCode =
-      window.location.hash.includes("access_token") ||
-      window.location.hash.includes("error") ||
-      window.location.search.includes("code=");
-
     const { data: sub } = supabase.auth.onAuthStateChange((_event, s) => {
       if (!isMounted) return;
       setSession(s);
@@ -29,23 +23,26 @@ export function useCustomerAuth() {
         setSession(data.session);
         setUser(data.session.user);
         setLoading(false);
-      } else if (!hasAuthHashOrCode) {
-        // Only mark loading false if there are no OAuth tokens being processed in the URL
-        setLoading(false);
+      } else {
+        const isOAuthCallback =
+          window.location.hash.includes("access_token") ||
+          window.location.hash.includes("error") ||
+          window.location.search.includes("code=");
+
+        if (!isOAuthCallback) {
+          setLoading(false);
+        }
       }
     });
 
-    // Safety timeout in case URL has OAuth params but auth state takes time to resolve
-    const timeout = setTimeout(() => {
-      if (isMounted) {
-        setLoading(false);
-      }
-    }, 3000);
+    const timer = setTimeout(() => {
+      if (isMounted) setLoading(false);
+    }, 2500);
 
     return () => {
       isMounted = false;
       sub.subscription.unsubscribe();
-      clearTimeout(timeout);
+      clearTimeout(timer);
     };
   }, []);
 

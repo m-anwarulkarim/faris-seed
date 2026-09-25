@@ -135,14 +135,81 @@ function OAuthCallbackListener() {
   return null;
 }
 
+function installContentProtection() {
+  const handleContextMenu = (e: MouseEvent) => {
+    if (window.location.pathname.startsWith("/admin")) return;
+    const target = e.target as HTMLElement | null;
+    if (target && (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable)) return;
+    e.preventDefault();
+  };
+
+  const handleDragStart = (e: DragEvent) => {
+    const target = e.target as HTMLElement | null;
+    if (target && target.tagName === "IMG") {
+      e.preventDefault();
+    }
+  };
+
+  const handleCopyCut = (e: ClipboardEvent) => {
+    if (window.location.pathname.startsWith("/admin")) return;
+    const target = e.target as HTMLElement | null;
+    if (target && (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable)) return;
+    e.preventDefault();
+  };
+
+  const handleKeyDown = (e: KeyboardEvent) => {
+    if (window.location.pathname.startsWith("/admin")) return;
+    const target = e.target as HTMLElement | null;
+    const isInput = target && (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable);
+
+    if (e.key === "F12") {
+      e.preventDefault();
+      return;
+    }
+
+    if (e.ctrlKey && e.shiftKey && ["I", "i", "J", "j", "C", "c"].includes(e.key)) {
+      e.preventDefault();
+      return;
+    }
+
+    if (e.ctrlKey && ["u", "U", "s", "S"].includes(e.key) && !isInput) {
+      e.preventDefault();
+      return;
+    }
+
+    if (e.ctrlKey && ["c", "C", "x", "X"].includes(e.key) && !isInput) {
+      e.preventDefault();
+      return;
+    }
+  };
+
+  document.addEventListener("contextmenu", handleContextMenu);
+  document.addEventListener("dragstart", handleDragStart);
+  document.addEventListener("copy", handleCopyCut);
+  document.addEventListener("cut", handleCopyCut);
+  document.addEventListener("keydown", handleKeyDown);
+
+  return () => {
+    document.removeEventListener("contextmenu", handleContextMenu);
+    document.removeEventListener("dragstart", handleDragStart);
+    document.removeEventListener("copy", handleCopyCut);
+    document.removeEventListener("cut", handleCopyCut);
+    document.removeEventListener("keydown", handleKeyDown);
+  };
+}
+
 const App = () => {
   useEffect(() => {
     installGlobalErrorHandlers();
+    const cleanupProtection = installContentProtection();
     if (!window.location.pathname.startsWith("/admin")) {
       import("@/lib/visitorTracking")
         .then((m) => m.ensureVisitorTracked())
         .catch(() => {});
     }
+    return () => {
+      cleanupProtection();
+    };
   }, []);
 
   return (

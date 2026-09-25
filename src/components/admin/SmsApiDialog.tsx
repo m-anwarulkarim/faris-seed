@@ -112,10 +112,15 @@ export function SmsApiDialog({ open, onOpenChange }: { open: boolean; onOpenChan
       const { data, error } = await supabase.functions.invoke("sms-api", {
         body: { action: "check_balance" },
       });
-      if (error) throw error;
-      setBalance(data?.balance);
-    } catch {
-      toast.error(t("ব্যালেন্স চেক ব্যর্থ", "Balance check failed"));
+      if (error) {
+        toast.error(error.message || t("ব্যালেন্স চেক ব্যর্থ", "Balance check failed"));
+        setBalance({ error: error.message || "Balance check failed" });
+        return;
+      }
+      setBalance(data?.balance || data);
+    } catch (err: any) {
+      toast.error(err?.message || t("ব্যালেন্স চেক ব্যর্থ", "Balance check failed"));
+      setBalance({ error: err?.message || "Balance check failed" });
     } finally {
       setCheckingBalance(false);
     }
@@ -242,7 +247,12 @@ export function SmsApiDialog({ open, onOpenChange }: { open: boolean; onOpenChan
               </Button>
               {balance && (
                 <div className="w-full rounded-lg border bg-card p-4 space-y-3">
-                  {balance.success ? (
+                  {balance.error ? (
+                    <div className="space-y-1 text-xs text-destructive">
+                      <p className="font-semibold">{t("ব্যালেন্স চেক ব্যর্থ:", "Balance check error:")}</p>
+                      <p className="text-muted-foreground">{String(balance.error)}</p>
+                    </div>
+                  ) : balance.sms || balance.fraud ? (
                     <>
                       <div className="flex items-center gap-2 text-sm font-medium text-primary">
                         <Check className="w-4 h-4" />
@@ -252,7 +262,7 @@ export function SmsApiDialog({ open, onOpenChange }: { open: boolean; onOpenChan
                         {balance.sms && (
                           <div className="rounded-md bg-primary/10 p-3 space-y-1">
                             <p className="text-[10px] text-muted-foreground uppercase tracking-wider">SMS</p>
-                            <p className="text-lg font-bold text-primary">{balance.sms.remaining ?? "—"}</p>
+                            <p className="text-lg font-bold text-primary">{balance.sms.remaining ?? balance.sms.balance ?? "—"}</p>
                             <p className="text-[10px] text-muted-foreground">
                               {t("ব্যবহৃত", "Used")}: {balance.sms.used ?? 0} / {balance.sms.limit ?? 0}
                             </p>
@@ -261,7 +271,7 @@ export function SmsApiDialog({ open, onOpenChange }: { open: boolean; onOpenChan
                         {balance.fraud && (
                           <div className="rounded-md bg-muted p-3 space-y-1">
                             <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Fraud Check</p>
-                            <p className="text-lg font-bold text-foreground">{balance.fraud.remaining ?? "—"}</p>
+                            <p className="text-lg font-bold text-foreground">{balance.fraud.remaining ?? balance.fraud.balance ?? "—"}</p>
                             <p className="text-[10px] text-muted-foreground">
                               {t("ব্যবহৃত", "Used")}: {balance.fraud.used ?? 0} / {balance.fraud.limit ?? 0}
                             </p>
@@ -270,9 +280,28 @@ export function SmsApiDialog({ open, onOpenChange }: { open: boolean; onOpenChan
                       </div>
                     </>
                   ) : (
-                    <pre className="text-xs text-muted-foreground whitespace-pre-wrap">
-                      {JSON.stringify(balance, null, 2)}
-                    </pre>
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2 text-sm font-medium text-primary">
+                        <Check className="w-4 h-4" />
+                        {balance.label || t("সংযুক্ত", "Connected")}
+                      </div>
+                      {(() => {
+                        const val = balance.remaining_balance ?? balance.balance ?? balance.credit ?? balance.data?.remaining_balance ?? balance.data?.balance ?? balance.data?.credit;
+                        if (val !== undefined) {
+                          return (
+                            <div className="rounded-md bg-primary/10 p-3 space-y-1 inline-block min-w-[140px]">
+                              <p className="text-[10px] text-muted-foreground uppercase tracking-wider">{t("ব্যালেন্স", "Balance")}</p>
+                              <p className="text-xl font-bold text-primary">{String(val)}</p>
+                            </div>
+                          );
+                        }
+                        return (
+                          <pre className="text-xs text-muted-foreground whitespace-pre-wrap bg-muted p-2 rounded">
+                            {JSON.stringify(balance, null, 2)}
+                          </pre>
+                        );
+                      })()}
+                    </div>
                   )}
                 </div>
               )}

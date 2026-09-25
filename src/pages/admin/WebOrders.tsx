@@ -201,7 +201,7 @@ export default function WebOrders() {
     queryFn: async () => {
       let query = supabase
         .from("orders")
-        .select("*, visitors(traffic_source, admin_notes)", { count: "exact" })
+        .select("*, order_items(*, products(product_image)), visitors(traffic_source, admin_notes)", { count: "exact" })
         .eq("is_deleted", false)
         .or(WEB_ORDER_SOURCE_FILTER)
         .order("created_at", { ascending: false })
@@ -664,9 +664,12 @@ export default function WebOrders() {
                 </TableHeader>
                 <TableBody>
                   {orders.map((order) => {
-                    const si = getStatusInfo(order.status);
-                    const StatusIcon = si.icon;
-                    const items = itemsByOrder[order.id] || [];
+                    const rawItems = (order as any).order_items && (order as any).order_items.length > 0 ? (order as any).order_items : (itemsByOrder[order.id] || []);
+                    const items = rawItems.map((i: any) => {
+                      const snap = i.product_image as string | null;
+                      const isBroken = !snap || /bij-bd\.com/i.test(snap);
+                      return { ...i, product_image: (isBroken ? i.products?.product_image : snap) || i.products?.product_image || null };
+                    });
                     const timeAgo = formatDistanceToNow(new Date(order.created_at), { addSuffix: true });
 
                     return (
@@ -693,7 +696,7 @@ export default function WebOrders() {
                             className="font-bold text-primary hover:underline cursor-pointer text-left"
                             onClick={() => setSelectedOrder(order)}
                           >
-                            {order.customer_facing_id || order.order_id}
+                            {order.customer_facing_id || order.order_id || (order.id ? `#${order.id.slice(0, 8).toUpperCase()}` : "—")}
                           </button>
                           {minaLockedIds.has(order.order_id) && (
                             <Badge className="ml-1 bg-amber-100 text-amber-700 border-amber-300 text-[10px] px-1.5 py-0 animate-pulse">

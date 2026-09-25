@@ -116,20 +116,51 @@ Deno.serve(async (req) => {
     if (action === "check_balance") {
       const ecomahKey = await loadApiKey();
       if (!ecomahKey) {
-        return new Response(JSON.stringify({ error: "API key not configured" }), {
-          status: 400,
+        return new Response(JSON.stringify({ success: false, error: "API key not configured" }), {
+          status: 200,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
 
-      const res = await fetch("https://api.ecomah.com/manage-external-api", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "check_balance", api_key: ecomahKey }),
-      });
-      const text = await res.text();
-      let balanceData;
-      try { balanceData = JSON.parse(text); } catch { balanceData = { raw: text }; }
+      let balanceData: any = null;
+      let res: Response | null = null;
+
+      try {
+        res = await fetch("https://api.ecomah.com/manage-external-api", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-api-key": ecomahKey,
+          },
+          body: JSON.stringify({ action: "check_balance", api_key: ecomahKey }),
+        });
+        const text = await res.text();
+        try { balanceData = JSON.parse(text); } catch { balanceData = { raw: text }; }
+      } catch (err) {
+        console.error("Primary balance check error:", err);
+      }
+
+      // Fallback endpoint if primary fails or returns raw non-JSON/error
+      if (!res?.ok || !balanceData || balanceData.raw || balanceData.error || balanceData.success === false) {
+        try {
+          const res2 = await fetch("https://api.ecomah.com/sms-api", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "x-api-key": ecomahKey,
+            },
+            body: JSON.stringify({ action: "check_balance", api_key: ecomahKey }),
+          });
+          const text2 = await res2.text();
+          let balanceData2: any;
+          try { balanceData2 = JSON.parse(text2); } catch { balanceData2 = { raw: text2 }; }
+          if (res2.ok && balanceData2 && !balanceData2.raw && balanceData2.success !== false) {
+            balanceData = balanceData2;
+          }
+        } catch (err2) {
+          console.error("Secondary balance check error:", err2);
+        }
+      }
 
       return new Response(JSON.stringify({ success: true, balance: balanceData }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },

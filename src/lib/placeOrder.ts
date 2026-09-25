@@ -33,15 +33,18 @@ export async function placeOrder(input: PlaceOrderInput) {
   const { data: order, error: orderErr } = await supabase
     .from("orders")
     .insert({
-      order_number: orderNumber,
+      order_id: orderNumber,
+      customer_facing_id: orderNumber,
       customer_name: input.customerName.trim(),
       phone: input.phone.trim(),
+      alt_phone: input.altPhone?.trim() || null,
       address: input.address.trim(),
       total_amount: grandTotal,
       delivery_charge: input.deliveryCharge,
+      discount: discount,
       status: "pending",
-      notes: input.note?.trim() || null,
-    })
+      note: input.note?.trim() || null,
+    } as any)
     .select()
     .single();
 
@@ -72,7 +75,7 @@ export async function placeOrder(input: PlaceOrderInput) {
       "last_order_invoice",
       JSON.stringify({
         order_id: order.id,
-        invoice_no: order.order_number || order.id.slice(0, 8).toUpperCase(),
+        invoice_no: order.customer_facing_id || order.order_id || order.id.slice(0, 8).toUpperCase(),
         created_at: new Date().toISOString(),
         customer_name: input.customerName,
         phone: input.phone,

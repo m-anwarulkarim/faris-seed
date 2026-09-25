@@ -86,7 +86,7 @@ export default function ConfirmedOrders() {
     queryFn: async () => {
       let query = supabase
         .from("orders")
-        .select("*, visitors(traffic_source)", { count: "exact" })
+        .select("*, order_items(*, products(product_image)), visitors(traffic_source)", { count: "exact" })
         .in("status", VISIBLE_STATUSES)
         .eq("is_deleted", false)
         .order("created_at", { ascending: false })
@@ -469,9 +469,12 @@ export default function ConfirmedOrders() {
                 </TableHeader>
                 <TableBody>
                   {orders.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE).map((order) => {
-                    const si = getStatusInfo(order.status);
-                    const StatusIcon = si.icon;
-                    const items = itemsByOrder[order.id] || [];
+                    const rawItems = (order as any).order_items && (order as any).order_items.length > 0 ? (order as any).order_items : (itemsByOrder[order.id] || []);
+                    const items = rawItems.map((i: any) => {
+                      const snap = i.product_image as string | null;
+                      const isBroken = !snap || /bij-bd\.com/i.test(snap);
+                      return { ...i, product_image: (isBroken ? i.products?.product_image : snap) || i.products?.product_image || null };
+                    });
                     const isPrinted = (order as any).is_printed;
                     const isCourierEntered = (order as any).is_courier_entered;
 

@@ -16,16 +16,35 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 export default function AuthPage() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [authError, setAuthError] = useState<string | null>(null);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   useEffect(() => {
+    const hash = window.location.hash;
+    const search = window.location.search;
+    const hashParams = new URLSearchParams(hash.replace(/^#/, "?"));
+    const searchParams = new URLSearchParams(search);
+    const errDesc =
+      hashParams.get("error_description") ||
+      searchParams.get("error_description") ||
+      hashParams.get("error") ||
+      searchParams.get("error");
+
+    if (errDesc) {
+      setAuthError(decodeURIComponent(errDesc.replace(/\+/g, " ")));
+    }
+
     const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => {
       if (s) navigate("/account", { replace: true });
     });
-    supabase.auth.getSession().then(({ data }) => {
-      if (data.session) navigate("/account", { replace: true });
+    supabase.auth.getSession().then(({ data, error }) => {
+      if (error) {
+        setAuthError(error.message);
+      } else if (data.session) {
+        navigate("/account", { replace: true });
+      }
     });
     return () => sub.subscription.unsubscribe();
   }, [navigate]);
@@ -33,13 +52,16 @@ export default function AuthPage() {
   async function handleSignIn(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
+    setAuthError(null);
     const { error } = await supabase.auth.signInWithPassword({
       email: email.trim(),
       password,
     });
     setLoading(false);
     if (error) {
-      toast.error("ইমেইল বা পাসওয়ার্ড ভুল হয়েছে।");
+      const msg = error.message || "ইমেইল বা পাসওয়ার্ড ভুল হয়েছে।";
+      setAuthError(msg);
+      toast.error(msg);
       return;
     }
     toast.success("সফলভাবে লগইন হয়েছে!");
@@ -49,10 +71,13 @@ export default function AuthPage() {
   async function handleSignUp(e: React.FormEvent) {
     e.preventDefault();
     if (password.length < 6) {
-      toast.error("পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে।");
+      const msg = "পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে।";
+      setAuthError(msg);
+      toast.error(msg);
       return;
     }
     setLoading(true);
+    setAuthError(null);
     const { data, error } = await supabase.auth.signUp({
       email: email.trim(),
       password,
@@ -63,11 +88,11 @@ export default function AuthPage() {
     });
     setLoading(false);
     if (error) {
-      toast.error(
-        error.message.includes("already")
-          ? "এই ইমেইলে অ্যাকাউন্ট আছে — লগইন করুন।"
-          : "অ্যাকাউন্ট তৈরি করতে সমস্যা হয়েছে।"
-      );
+      const msg = error.message.includes("already")
+        ? "এই ইমেইলে অ্যাকাউন্ট আছে — লগইন করুন।"
+        : error.message || "অ্যাকাউন্ট তৈরি করতে সমস্যা হয়েছে।";
+      setAuthError(msg);
+      toast.error(msg);
       return;
     }
     if (!data.session) {
@@ -79,6 +104,7 @@ export default function AuthPage() {
 
   async function handleGoogle() {
     setLoading(true);
+    setAuthError(null);
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
@@ -88,7 +114,9 @@ export default function AuthPage() {
     if (error) {
       setLoading(false);
       console.error("Google OAuth error:", error);
-      toast.error(error.message || "Google দিয়ে লগইন করা যায়নি।");
+      const msg = error.message || "Google দিয়ে লগইন করা যায়নি।";
+      setAuthError(msg);
+      toast.error(msg);
       return;
     }
     if (data?.url) {
@@ -107,6 +135,26 @@ export default function AuthPage() {
               <p className="mt-1 text-center text-sm text-muted-foreground">
                 ইমেইল অথবা Google দিয়ে লগইন করুন
               </p>
+
+              {authError && (
+                <div className="mt-4 rounded-lg border border-destructive/40 bg-destructive/10 p-3.5 text-xs text-destructive space-y-2">
+                  <div className="flex items-start gap-2 font-medium">
+                    <span className="font-semibold text-sm">❌ লগইন ত্রুটি:</span>
+                    <span className="flex-1 leading-relaxed">{authError}</span>
+                  </div>
+                  <div className="pt-1 flex justify-end">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="h-7 text-[11px] text-destructive hover:bg-destructive/20 underline"
+                      onClick={() => navigate(`/auth-error${window.location.search}${window.location.hash}`)}
+                    >
+                      ডায়াগনস্টিক রিপোর্ট ও এরর বিস্তারিত দেখুন →
+                    </Button>
+                  </div>
+                </div>
+              )}
 
               <Button
                 type="button"

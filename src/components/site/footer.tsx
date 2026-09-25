@@ -97,8 +97,7 @@ export function Footer() {
           <p>© {year} FARIS SEED. সর্বস্বত্ব সংরক্ষিত।</p>
 
           <div className="flex items-center justify-center gap-1.5 font-medium">
-            <span>Crafted with</span>
-            <span className="inline-block animate-bounce text-red-400">❤️</span>
+
             <span>Developed by</span>
             <a
               href="https://wa.me/8801560007231?text=Hello%20HAQPLUS%20IT"

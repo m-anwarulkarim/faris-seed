@@ -84,7 +84,7 @@ export default function FacebookCatalog() {
           <ul className="text-sm space-y-1 list-disc pl-5 text-muted-foreground">
             <li>id, title, description, price (BDT), link, image_link</li>
             <li>availability (auto in/out of stock), condition: new</li>
-            <li>brand: Griha Nova, product_type (category)</li>
+            <li>brand: Faris Seed, product_type (category)</li>
             <li>Hidden products (<code>is_hidden=true</code>) excluded</li>
             <li>Max 5,000 products per feed</li>
           </ul>

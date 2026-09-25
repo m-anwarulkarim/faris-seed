@@ -358,10 +358,10 @@ function ApiCard({ icon: Icon, title, description, status, onClick }: ApiCardPro
 }
 
 const SMS_STATUS_OPTIONS = [
-  { key: "sms_on_pending", msgKey: "sms_msg_pending", labelBn: "পেন্ডিং (অর্ডার তৈরি)", labelEn: "Pending (Order Created)", defaultMsg: "{order_id} অর্ডার সফল হয়েছে, টোটাল {total} টাকা। ধন্যবাদ! - Griha Nova", placeholders: "{order_id}, {total}" },
+  { key: "sms_on_pending", msgKey: "sms_msg_pending", labelBn: "পেন্ডিং (অর্ডার তৈরি)", labelEn: "Pending (Order Created)", defaultMsg: "{order_id} অর্ডার সফল হয়েছে, টোটাল {total} টাকা। ধন্যবাদ! - Faris Seed", placeholders: "{order_id}, {total}" },
   { key: "sms_on_no_response", msgKey: "sms_msg_no_response", labelBn: "নো রেসপন্স / বিজি", labelEn: "No Response / Busy", defaultMsg: "আপনাকে কল করে পাওয়া যায়নি, অনুগ্রহ করে 09617443377 নাম্বারে যোগাযোগ করুন", placeholders: "" },
   { key: "sms_on_confirmed", msgKey: "sms_msg_confirmed", labelBn: "কনফার্ম", labelEn: "Confirmed", defaultMsg: "অভিনন্দন! অর্ডারটি কনফার্ম হয়েছে। টোটাল {total} টাকা।", placeholders: "{order_id}, {total}" },
-  { key: "sms_on_entry_done", msgKey: "sms_msg_entry_done", labelBn: "কুরিয়ার এন্ট্রি", labelEn: "Courier Entry", defaultMsg: "যেকোনো প্রয়োজনে মেসেজ করুন- grihanova.com/help", placeholders: "{order_id}, {tracking_link}" },
+  { key: "sms_on_entry_done", msgKey: "sms_msg_entry_done", labelBn: "কুরিয়ার এন্ট্রি", labelEn: "Courier Entry", defaultMsg: "যেকোনো প্রয়োজনে মেসেজ করুন- farisshop.com/help", placeholders: "{order_id}, {tracking_link}" },
 ];
 
 function SmsNotificationSettings() {

@@ -1,9 +1,9 @@
 /**
- * Add "Griha Nova Company" watermark to images using Canvas API.
+ * Add "FARIS SEED" watermark to images using Canvas API.
  * Places watermark text at multiple positions with varying opacity.
  */
 
-const WATERMARK_TEXT = "Griha Nova Company";
+const WATERMARK_TEXT = "FARIS SEED";
 
 export async function addWatermarkToImage(file: File): Promise<File> {
   if (!file.type.startsWith("image/")) return file;

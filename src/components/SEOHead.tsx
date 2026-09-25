@@ -9,9 +9,9 @@ interface SEOHeadProps {
   jsonLd?: Record<string, any> | Record<string, any>[];
 }
 
-const SITE_NAME = "Griha Nova";
-const SITE_URL = "https://grihanova.com";
-const DEFAULT_DESC = "GrihaNova — ফ্যাশন, এক্সেসরিজ, ইলেকট্রনিক্স, হোম ও কিডস পণ্যের আধুনিক অনলাইন শপ। সারাদেশে ক্যাশ অন ডেলিভারি।";
+const SITE_NAME = "Faris Seed";
+const SITE_URL = "https://farisshop.com";
+const DEFAULT_DESC = "Faris Seed — প্রিমিয়াম বীজ, গার্ডেনিং ও সবজি বীজের বিশ্বস্ত অনলাইন শপ। সারাদেশে ক্যাশ অন ডেলিভারি।";
 const DEFAULT_IMAGE = "https://storage.googleapis.com/gpt-engineer-file-uploads/zPJGgdf73cObI0yzP8Qljf2mgRs2/social-images/social-1774167712019-10206070.webp";
 const JSON_LD_ID = "seo-json-ld";
 

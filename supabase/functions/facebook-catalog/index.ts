@@ -3,7 +3,7 @@
 // Also exposes ?format=csv for CSV upload.
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 
-const SITE = "https://grihanova.com";
+const SITE = "https://farisshop.com";
 
 const cors = {
   "Access-Control-Allow-Origin": "*",
@@ -70,7 +70,7 @@ Deno.serve(async (req) => {
       price: `${price.toFixed(2)} BDT`,
       link,
       image_link: image,
-      brand: "Griha Nova",
+      brand: "Faris Seed",
       product_type: p.category || "General",
       google_product_category: "Apparel & Accessories",
     };
@@ -116,7 +116,7 @@ Deno.serve(async (req) => {
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:g="http://base.google.com/ns/1.0">
   <channel>
-    <title>Griha Nova Catalog</title>
+    <title>Faris Seed Catalog</title>
     <link>${SITE}</link>
     <description>Product catalog for Facebook / Meta Commerce</description>
 ${items}

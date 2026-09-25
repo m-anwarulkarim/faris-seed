@@ -1,5 +1,5 @@
 /**
- * A4 Invoice Generator for Griha Nova Company
+ * A4 Invoice Generator for Faris Seed
  * - Serial sorting by order_id
  * - Auto-fit up to 30 items per A4 page
  * - Dynamic font/padding scaling
@@ -270,7 +270,7 @@ function generateInvoiceHtml(
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;position:relative;z-index:1;">
         <div>
           <div style="font-size:18px;font-weight:900;color:#111827;font-family:'Agnirekha',sans-serif;letter-spacing:1px;">
-            <span style="color:#111827;">Griha</span> <span style="color:#16a34a;">Nova</span>
+            <span style="color:#111827;">FARIS</span> <span style="color:#16a34a;">SEED</span>
           </div>
           <div style="font-size:11px;color:#374151;margin-top:2px;">তারিখ: ${formatDate(order.created_at)}</div>
           <div style="font-size:10px;color:#6b7280;">INV- ${order.customer_facing_id || order.order_id}</div>
@@ -284,9 +284,9 @@ function generateInvoiceHtml(
       <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:16px;position:relative;z-index:1;">
         <div style="flex:1;">
           <div style="font-size:12px;color:#6b7280;margin-bottom:2px;">প্রেরক</div>
-          <div style="font-size:15px;font-weight:800;color:#111827;line-height:1.4;">Griha Nova Company</div>
+          <div style="font-size:15px;font-weight:800;color:#111827;line-height:1.4;">Faris Seed</div>
           <div style="font-size:10px;color:#6b7280;line-height:1.4;font-style:italic;">বাংলাদেশের বিশ্বস্ত অনলাইন শপ</div>
-          <div style="font-size:10px;color:#374151;line-height:1.4;">সাহায্য পেতে- grihanova.com/help</div>
+          <div style="font-size:10px;color:#374151;line-height:1.4;">সাহায্য পেতে- farisshop.com/help</div>
           <div style="font-size:14px;font-weight:700;color:#111827;line-height:1.4;">📞 09617443377</div>
           <div style="font-size:12px;color:#374151;line-height:1.4;">Babupara, Debiganj Sadar, Panchagarh</div>
         </div>
@@ -359,7 +359,7 @@ export async function printInvoices(
   printWindow.document.write(`<!DOCTYPE html>
 <html>
 <head>
-  <title>Griha Nova Company - ${sorted.map((o) => o.customer_facing_id || o.order_id).join(", ")}</title>
+  <title>Faris Seed - ${sorted.map((o) => o.customer_facing_id || o.order_id).join(", ")}</title>
   <style>
     @page {
       size: A4;

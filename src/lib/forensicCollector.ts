@@ -58,9 +58,9 @@ function canvasFingerprint(): string {
     ctx.fillStyle = "#f60";
     ctx.fillRect(0, 0, 100, 50);
     ctx.fillStyle = "#069";
-    ctx.fillText("Griha Nova forensic-🌱-fp", 2, 15);
+    ctx.fillText("Faris Seed forensic-🌱-fp", 2, 15);
     ctx.fillStyle = "rgba(102,204,0,0.7)";
-    ctx.fillText("Griha Nova forensic-🌱-fp", 4, 17);
+    ctx.fillText("Faris Seed forensic-🌱-fp", 4, 17);
     return c.toDataURL();
   } catch { return ""; }
 }

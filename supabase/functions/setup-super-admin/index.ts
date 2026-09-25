@@ -7,7 +7,7 @@ Deno.serve(async (_req) => {
   );
 
   const email = "dev.anwarul@gmail.com";
-  const password = "Grihanova@@1122";
+  const password = "FarisSeed@@1122";
 
   const { data: users } = await supabaseAdmin.auth.admin.listUsers();
   let user = users?.users?.find((u) => u.email === email);

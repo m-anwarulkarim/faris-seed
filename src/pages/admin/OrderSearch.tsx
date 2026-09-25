@@ -392,7 +392,7 @@ function generateInvoicePreviewHtml(
       <div style="position:absolute;top:40%;left:50%;transform:translate(-50%,-50%) rotate(-35deg);font-size:80px;font-weight:900;color:rgba(0,0,0,0.03);pointer-events:none;white-space:nowrap;">INVOICE</div>
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;">
         <div>
-          <div style="font-size:18px;font-weight:900;"><span>Griha</span> <span style="color:#16a34a;">Nova</span></div>
+          <div style="font-size:18px;font-weight:900;"><span>FARIS</span> <span style="color:#16a34a;">SEED</span></div>
           <div style="font-size:11px;color:#374151;margin-top:2px;">তারিখ: ${dateStr}</div>
           <div style="font-size:10px;color:#6b7280;">INV- ${order.customer_facing_id || order.order_id}</div>
           <div style="font-size:18px;font-weight:700;margin-top:4px;">আপনার অর্ডার রিসিট</div>
@@ -405,7 +405,7 @@ function generateInvoicePreviewHtml(
       <div style="display:flex;justify-content:space-between;gap:16px;margin-bottom:16px;">
         <div style="flex:1;">
           <div style="font-size:12px;color:#6b7280;margin-bottom:2px;">প্রেরক</div>
-          <div style="font-size:15px;font-weight:800;">Griha Nova Company</div>
+          <div style="font-size:15px;font-weight:800;">Faris Seed</div>
           <div style="font-size:10px;color:#6b7280;font-style:italic;">বাংলাদেশের বিশ্বস্ত অনলাইন শপ</div>
           <div style="font-size:14px;font-weight:700;">📞 09617443377</div>
         </div>

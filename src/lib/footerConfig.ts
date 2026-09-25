@@ -15,11 +15,11 @@ export type FooterConfig = {
 
 export const DEFAULT_FOOTER_CONFIG: FooterConfig = {
   brandTagline: "বাংলাদেশের অন্যতম সেরা অনলাইন শপ। সব পণ্য অনলাইনে অর্ডার করুন সাশ্রয়ী মূল্যে।",
-  contactEmail: "store.grihanova@gmail.com",
+  contactEmail: "farisseed.bd@gmail.com",
   contactPhone: "+8801708356800",
   contactAddress: "Dhaka, Bangladesh",
   socials: [
-    { icon: "Facebook", href: "https://www.facebook.com/grihanova.bd", enabled: true },
+    { icon: "Facebook", href: "https://www.facebook.com/farisshop", enabled: true },
     { icon: "Instagram", href: "https://instagram.com", enabled: true },
     { icon: "Youtube", href: "https://youtube.com", enabled: true },
     { icon: "WhatsApp", href: "https://wa.me/8801708356800", enabled: true },
@@ -42,5 +42,5 @@ export const DEFAULT_FOOTER_CONFIG: FooterConfig = {
       { label: "সাধারণ প্রশ্ন", href: "/faq" },
     ],
   },
-  copyright: "Copyright © {year} www.grihanova.com",
+  copyright: "Copyright © {year} www.farisshop.com",
 };

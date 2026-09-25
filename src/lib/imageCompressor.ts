@@ -112,7 +112,7 @@ export function generateWebPFileName(originalName?: string, contextName?: string
   const rand = Math.random().toString(36).substring(2, 7);
 
   if (contextName) {
-    // Create SEO-friendly slug from context name + "griha-nova"
+    // Create SEO-friendly slug from context name + "faris-seed"
     const slug = contextName
       .toLowerCase()
       .replace(/[^\w\s-]/g, "")
@@ -120,8 +120,8 @@ export function generateWebPFileName(originalName?: string, contextName?: string
       .replace(/-+/g, "-")
       .substring(0, 60)
       .replace(/^-+|-+$/g, "");
-    return `${slug}-griha-nova-${rand}.webp`;
+    return `${slug}-faris-seed-${rand}.webp`;
   }
 
-  return `griha-nova-${timestamp}-${rand}.webp`;
+  return `faris-seed-${timestamp}-${rand}.webp`;
 }

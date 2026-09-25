@@ -30,7 +30,7 @@ interface ScanResult {
 
 async function classifyImage(imageUrl: string): Promise<ScanResult> {
   const prompt =
-    `You are a strict content-moderation classifier for a Bangladeshi agriculture e-commerce site (Griha Nova). ` +
+    `You are a strict content-moderation classifier for a Bangladeshi agriculture e-commerce site (Faris Seed). ` +
     `Analyze the image and return a JSON object with these fields exactly: ` +
     `{"nsfw": boolean, "category": "safe"|"nudity"|"porn"|"gore"|"violence"|"hate"|"weapons"|"other", "confidence": "low"|"medium"|"high", "reason": "short english description"}. ` +
     `Mark nsfw=true for: nudity, sexual/pornographic content, genitalia, sexual acts, gore, graphic violence, hate symbols, weapons aimed/in use. ` +

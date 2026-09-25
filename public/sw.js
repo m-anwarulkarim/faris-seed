@@ -12,8 +12,8 @@ self.addEventListener("push", (event) => {
   const title = data.title || "Notification";
   const options = {
     body: data.body || "",
-    icon: data.icon || "/grihanova-logo-512.webp",
-    badge: data.badge || "/grihanova-logo-512.webp",
+    icon: data.icon || "/faris-seed-logo-512.webp",
+    badge: data.badge || "/faris-seed-logo-512.webp",
     data: { url: data.url || "/e" },
     tag: data.tag,
   };

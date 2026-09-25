@@ -17,13 +17,13 @@ export type FloatingBtn = {
 
 const DEFAULTS: FloatingBtn[] = [
   { id: "whatsapp", label: "WhatsApp", value: "8801708356800", enabled: true },
-  { id: "messenger", label: "Messenger", value: "grihanova.bd", enabled: true },
+  { id: "messenger", label: "Messenger", value: "farisshop", enabled: true },
   { id: "call", label: "Call", value: "01708356800", enabled: true },
 ];
 
 const HINT: Record<FloatingBtn["id"], string> = {
   whatsapp: "WhatsApp নম্বর (country code সহ, যেমন 8801708356800)",
-  messenger: "Facebook Page username (যেমন grihanova.bd)",
+  messenger: "Facebook Page username (যেমন farisshop)",
   call: "ফোন নম্বর (যেমন 01708356800)",
 };
 

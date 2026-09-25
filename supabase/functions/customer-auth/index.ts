@@ -137,7 +137,7 @@ async function sendOtpSms(supabase: ReturnType<typeof createClient>, phoneInput:
     return { success: false, error: "SMS API not configured" };
   }
 
-  const message = `Your Griha Nova OTP is: ${otp}`;
+  const message = `Your Faris Seed OTP is: ${otp}`;
 
   const res = await fetch("https://api.ecomah.com/sms-api", {
     method: "POST",

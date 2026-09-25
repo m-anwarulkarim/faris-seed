@@ -34,7 +34,7 @@ async function sendFacebookTextMessage(pageAccessToken: string, recipientId: str
   return fbData;
 }
 
-const SITE_URL = "https://grihanova.com";
+const SITE_URL = "https://farisshop.com";
 
 interface ParsedProduct {
   name: string;

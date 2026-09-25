@@ -110,7 +110,7 @@ Deno.serve(async (req) => {
     doc.setFontSize(10); doc.setFont("helvetica", "normal");
     doc.text("Confidential — for legal/law-enforcement use only", left, y); y += 5;
     doc.text(`Generated: ${new Date().toUTCString()}`, left, y); y += 5;
-    doc.text(`Issued by: GrihaNova (grihanova.com)`, left, y); y += 7;
+    doc.text(`Issued by: Faris Seed (farisshop.com)`, left, y); y += 7;
     hr();
 
     heading("1. SUBJECT IDENTIFICATION");
@@ -164,7 +164,7 @@ Deno.serve(async (req) => {
     }
 
     heading(`6. FORENSIC EVIDENCE — ${(logs || []).length} CAPTURED VISITS`);
-    para("The following technical evidence was collected automatically from the subject's browser during their visits to grihanova.com. This data persists across normal incognito/private-browsing sessions because it is derived from device-level signals (canvas rendering, GPU fingerprint, audio stack, hardware capabilities, fonts, network).");
+    para("The following technical evidence was collected automatically from the subject's browser during their visits to farisshop.com. This data persists across normal incognito/private-browsing sessions because it is derived from device-level signals (canvas rendering, GPU fingerprint, audio stack, hardware capabilities, fonts, network).");
     y += 2;
 
     // Aggregate fingerprints
@@ -218,7 +218,7 @@ Deno.serve(async (req) => {
     y += 4; hr();
     doc.setFontSize(8);
     doc.text("This report was generated automatically from server-side evidence stored at the time of the events.", left, y); y += 4;
-    doc.text("All timestamps are in UTC. For questions, contact the GrihaNova administrator.", left, y);
+    doc.text("All timestamps are in UTC. For questions, contact the Faris Seed administrator.", left, y);
 
     const buf = doc.output("arraybuffer");
     const u8 = new Uint8Array(buf);

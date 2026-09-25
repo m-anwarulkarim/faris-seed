@@ -123,7 +123,7 @@ Deno.serve(async (req) => {
         break;
 
       case "entry_done":
-        smsMessage = replaceVars(getMsg("sms_msg_entry_done", `যেকোনো প্রয়োজনে মেসেজ করুন- grihanova.com/help`));
+        smsMessage = replaceVars(getMsg("sms_msg_entry_done", `যেকোনো প্রয়োজনে মেসেজ করুন- farisshop.com/help`));
         smsReason = "courier_entry";
         sendSms = isOn("sms_on_entry_done");
         minaMessage = replaceVars(getMsg("mina_msg_entry_done", `আপনার অর্ডার ${orderId} কুরিয়ারে পাঠানো হয়েছে। সাধারণত, ঢাকা ও আশেপাশে ২ দিনের মধ্যে ডেলিভারি সম্পন্ন হয় এবং সারাদেশে ২ থেকে ৩ দিন সময় লাগে। যেকোনো জরুরি অবস্থার জন্য সর্বোচ্চ ৫ দিন পর্যন্ত লাগতে পারে।\nআপনার পণ্যটি খুব দ্রুত আপনার কাছে পৌঁছে যাবে।`));
@@ -335,7 +335,7 @@ Deno.serve(async (req) => {
           if (!hasPushSubscription) {
             const notifPrompt = {
               role: "assistant",
-              content: "🔔 টিপস: নোটিফিকেশন চালু করলে অর্ডারের সকল আপডেট সরাসরি আপনার ফোনে পাবেন! নোটিফিকেশন চালু করতে grihanova.com ভিজিট করুন এবং 'নোটিফিকেশন চালু করুন' বাটনে ক্লিক করুন।",
+              content: "🔔 টিপস: নোটিফিকেশন চালু করলে অর্ডারের সকল আপডেট সরাসরি আপনার ফোনে পাবেন! নোটিফিকেশন চালু করতে farisshop.com ভিজিট করুন এবং 'নোটিফিকেশন চালু করুন' বাটনে ক্লিক করুন।",
               timestamp: new Date(Date.now() + 1000).toISOString(),
             };
             messages.push(notifPrompt);

@@ -201,7 +201,7 @@ export default function ProductQAManagement() {
         question_id: questionId,
         answer: text,
         status: "approved",
-        guest_name: "Griha Nova (Official)",
+        guest_name: "Faris Seed (Official)",
         was_auto_approved: false,
       });
       if (aErr) throw aErr;

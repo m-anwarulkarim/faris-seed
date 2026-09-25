@@ -1,11 +1,11 @@
 /**
  * Generate SEO-friendly alt text for images.
- * Always includes "Griha Nova" branding for copyright & SEO.
+ * Always includes "Faris Seed" branding for copyright & SEO.
  */
 
-const BRAND = "Griha Nova";
+const BRAND = "Faris Seed";
 
-/** Product image alt: "পণ্যের নাম - Griha Nova" */
+/** Product image alt: "পণ্যের নাম - Faris Seed" */
 export function productAlt(name: string, index?: number): string {
   if (index !== undefined && index > 0) {
     return `${name} ছবি ${index + 1} - ${BRAND}`;
@@ -13,7 +13,7 @@ export function productAlt(name: string, index?: number): string {
   return `${name} - ${BRAND}`;
 }
 
-/** Category image alt: "ক্যাটাগরি নাম - Griha Nova" */
+/** Category image alt: "ক্যাটাগরি নাম - Faris Seed" */
 export function categoryAlt(name: string): string {
   return `${name} - ${BRAND}`;
 }

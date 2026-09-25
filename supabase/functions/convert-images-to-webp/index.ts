@@ -95,7 +95,7 @@ Deno.serve(async (req) => {
     for (const job of toProcess) {
       try {
         const webpBytes = await fetchAndEncodeWebP(job.url);
-        const fileName = `${slugify(job.productName)}-griha-nova-${Math.random()
+        const fileName = `${slugify(job.productName)}-faris-seed-${Math.random()
           .toString(36)
           .slice(2, 7)}.webp`;
 

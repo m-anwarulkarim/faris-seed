@@ -36,7 +36,7 @@ import { useSidebar } from "@/components/ui/sidebar";
 import { useState, useRef, useEffect, useCallback, createContext, useContext } from "react";
 import { getCurrentAdminAccess } from "@/lib/adminAccess";
 import { useIdleDetection } from "@/hooks/useIdleDetection";
-import grihaNovaLogo from "@/assets/grihanova-logo.webp";
+import brandLogo from "@/assets/faris-seed-logo.webp";
 
 const SUPER_ADMIN_EMAILS = ["dev.anwarul@gmail.com", "farisseed@gmail.com"];
 
@@ -502,10 +502,10 @@ export function AdminSidebar() {
           className="flex items-center gap-3 w-full text-left rounded-lg hover:bg-sidebar-accent transition-colors p-1 -m-1 cursor-pointer"
         >
           <div className="w-9 h-9 rounded-lg overflow-hidden bg-white flex items-center justify-center shrink-0">
-            <img src={grihaNovaLogo} alt="Griha Nova" className="w-full h-full object-contain" />
+            <img src={brandLogo} alt="Faris Seed" className="w-full h-full object-contain" />
           </div>
           <div className="group-data-[collapsible=icon]:hidden">
-            <h2 className="font-display text-sm font-bold text-sidebar-foreground">Griha Nova Company</h2>
+            <h2 className="font-display text-sm font-bold text-sidebar-foreground">Faris Seed</h2>
             <p className="text-xs text-muted-foreground">{t("প্রফেশনাল ড্যাশবোর্ড", "Professional Dashboard")}</p>
           </div>
         </button>

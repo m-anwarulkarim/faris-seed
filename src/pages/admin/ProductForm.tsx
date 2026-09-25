@@ -918,12 +918,12 @@ export default function ProductForm() {
                   try {
                     setVideoUploading(true);
                     const ext = (file.name.split(".").pop() || "mp4").toLowerCase();
-                    const safe = (form.getValues("sku") || "griha-nova-product")
+                    const safe = (form.getValues("sku") || "faris-seed-product")
                       .toLowerCase()
                       .replace(/[^a-z0-9-]+/g, "-")
                       .replace(/-+/g, "-")
-                      .slice(0, 40) || "griha-nova-product";
-                    const path = `${safe}/${Date.now()}-griha-nova-${safe}.${ext}`;
+                      .slice(0, 40) || "faris-seed-product";
+                    const path = `${safe}/${Date.now()}-faris-seed-${safe}.${ext}`;
                     const { error: upErr } = await supabase.storage
                       .from("product-videos")
                       .upload(path, file, { contentType: file.type, upsert: false });

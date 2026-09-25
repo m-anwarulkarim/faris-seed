@@ -58,7 +58,7 @@ async function createVapidToken(
   const payload = {
     aud: audience,
     exp: now + 12 * 3600,
-    sub: "mailto:push@grihanovas.com",
+    sub: "mailto:farisseed.bd@gmail.com",
   };
 
   const headerB64 = base64UrlEncode(new TextEncoder().encode(JSON.stringify(header)));

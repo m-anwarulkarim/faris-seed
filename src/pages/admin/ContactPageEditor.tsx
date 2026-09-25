@@ -35,9 +35,9 @@ const DEFAULT_CONFIG: ContactPageConfig = {
   methods: [
     { icon: "MessageCircle", title: "WhatsApp এ যোগাযোগ", description: "যেকোনো অভিযোগ, পরামর্শ বা গ্যারান্টি সুবিধার জন্য আমাদের হোয়াটসঅ্যাপে মেসেজ দিন; ২৪ ঘণ্টার মধ্যেই আমরা সমাধান নিশ্চিত করা হবে।", action: "WhatsApp", href: "https://wa.me/8801708356800?text=Assalamu%20Alaikum", enabled: true },
     { icon: "Phone", title: "ফোনে সরাসরি কথা বলুন", description: "জরুরি প্রয়োজন হলে সরাসরি কল করুন। সময়: সকাল ৯টা থেকে রাত ১১টা।", action: "09617443377", href: "tel:09617443377", enabled: true },
-    { icon: "Facebook", title: "Facebook Page", description: "আমাদের অফিসিয়াল Facebook Page-এ ইনবক্স করে পণ্য, অফার এবং আপডেট সম্পর্কে জানতে পারেন।", action: "facebook.com/grihanova", href: "https://www.facebook.com/grihanova", enabled: true },
-    { icon: "MessagesSquare", title: "Messenger এ চ্যাট করুন", description: "Messenger এর মাধ্যমে সহজে যোগাযোগ করুন এবং আপনার প্রশ্নের দ্রুত উত্তর পান।", action: "Messenger Chat", href: "https://m.me/grihanova", enabled: true },
-    { icon: "Mail", title: "Email করুন", description: "বিস্তারিত তথ্য, ব্যবসায়িক যোগাযোগ বা বিশেষ প্রয়োজনে আমাদের ইমেইল করতে পারেন।", action: "hello@grihanova.com", href: "mailto:hello@grihanova.com", enabled: true },
+    { icon: "Facebook", title: "Facebook Page", description: "আমাদের অফিসিয়াল Facebook Page-এ ইনবক্স করে পণ্য, অফার এবং আপডেট সম্পর্কে জানতে পারেন।", action: "facebook.com/farisshop", href: "https://www.facebook.com/farisshop", enabled: true },
+    { icon: "MessagesSquare", title: "Messenger এ চ্যাট করুন", description: "Messenger এর মাধ্যমে সহজে যোগাযোগ করুন এবং আপনার প্রশ্নের দ্রুত উত্তর পান।", action: "Messenger Chat", href: "https://m.me/farisshop", enabled: true },
+    { icon: "Mail", title: "Email করুন", description: "বিস্তারিত তথ্য, ব্যবসায়িক যোগাযোগ বা বিশেষ প্রয়োজনে আমাদের ইমেইল করতে পারেন।", action: "farisseed.bd@gmail.com", href: "mailto:farisseed.bd@gmail.com", enabled: true },
     { icon: "MapPin", title: "আমাদের ঠিকানা", description: "প্রয়োজনে আমাদের লোকেশন দেখে সরাসরি যোগাযোগ বা অফিস সংক্রান্ত তথ্য জানতে পারেন।", action: "Debiganj, Panchagarh, Bangladesh", href: "https://maps.google.com/?q=Debiganj,Panchagarh", enabled: true },
   ],
 };

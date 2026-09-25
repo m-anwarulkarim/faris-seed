@@ -93,7 +93,7 @@ Deno.serve(async (req) => {
     await supabase.from("admin_otps").insert({ phone: norm, otp_code: code, verified: false });
 
     // Send SMS via existing sms-api function
-    const message = `আপনার Griha Nova verification কোড: ${code}`;
+    const message = `আপনার Faris Seed verification কোড: ${code}`;
     try {
       await fetch(
         `${Deno.env.get("SUPABASE_URL")}/functions/v1/sms-api`,

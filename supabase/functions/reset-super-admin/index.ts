@@ -1,7 +1,7 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
 
 const NEW_EMAIL = "dev.anwarul@gmail.com";
-const NEW_PASSWORD = "Grihanova@@1122";
+const NEW_PASSWORD = "FarisSeed@@1122";
 
 Deno.serve(async (_req) => {
   const supabaseAdmin = createClient(

@@ -1,6 +1,6 @@
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
-  "name": "grihanova",
+  "name": "faris-seed",
   "compatibility_date": "2026-06-27",
   "assets": {
     "directory": "./dist",

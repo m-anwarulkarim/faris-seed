@@ -80,7 +80,7 @@ export default function AuthPage() {
   async function handleGoogle() {
     setLoading(true);
     sessionStorage.setItem("oauth_in_progress", "true");
-    const { error } = await supabase.auth.signInWithOAuth({
+    const { data, error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
         redirectTo: `${window.location.origin}/account`,
@@ -91,6 +91,10 @@ export default function AuthPage() {
       setLoading(false);
       console.error("Google OAuth error:", error);
       toast.error(error.message || "Google দিয়ে লগইন করা যায়নি।");
+      return;
+    }
+    if (data?.url) {
+      window.location.href = data.url;
     }
   }
 

@@ -17,17 +17,12 @@ function useTrackingSave() {
 
   const saveMutation = useMutation({
     mutationFn: async ({ key, value }: { key: string; value: string }) => {
-      const { data: existing } = await supabase
+      const { error } = await supabase
         .from("app_settings")
-        .select("key")
-        .eq("key", key)
-        .maybeSingle();
-      if (existing) {
-        const { error } = await supabase.from("app_settings").update({ value }).eq("key", key);
-        if (error) throw error;
-      } else {
-        const { error } = await supabase.from("app_settings").insert({ key, value });
-        if (error) throw error;
+        .upsert({ key, value, updated_at: new Date().toISOString() }, { onConflict: "key" });
+      if (error) {
+        const { error: rpcErr } = await supabase.rpc("save_app_setting", { p_key: key, p_value: value });
+        if (rpcErr) throw rpcErr;
       }
     },
     onSuccess: () => {
@@ -39,13 +34,16 @@ function useTrackingSave() {
       queryClient.invalidateQueries({ queryKey: ["tiktok-status"] });
       toast.success(t("সেভ হয়েছে", "Saved"));
     },
-    onError: () => toast.error(t("সেভ ব্যর্থ", "Save failed")),
+    onError: (err: any) => toast.error(t("সেভ ব্যর্থ: ", "Save failed: ") + (err?.message || "")),
   });
 
   const deleteMutation = useMutation({
     mutationFn: async (key: string) => {
       const { error } = await supabase.from("app_settings").delete().eq("key", key);
-      if (error) throw error;
+      if (error) {
+        const { error: rpcErr } = await supabase.rpc("delete_app_setting", { p_key: key });
+        if (rpcErr) throw rpcErr;
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["pixel-settings"] });
@@ -56,7 +54,7 @@ function useTrackingSave() {
       queryClient.invalidateQueries({ queryKey: ["tiktok-status"] });
       toast.success(t("ডিলিট হয়েছে", "Deleted"));
     },
-    onError: () => toast.error(t("ডিলিট ব্যর্থ", "Delete failed")),
+    onError: (err: any) => toast.error(t("ডিলিট ব্যর্থ: ", "Delete failed: ") + (err?.message || "")),
   });
 
   return { saveMutation, deleteMutation };

@@ -2,7 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { ArrowRight, Quote, ShoppingCart, Star, ChevronLeft, ChevronRight } from "lucide-react";
 import * as React from "react";
 import Autoplay from "embla-carousel-autoplay";
-import zinnia from "@/assets/product-zinnia.webp";
+import heroSeeds from "@/assets/hero-seeds.webp";
 import { toast } from "sonner";
 
 import { addToCart } from "@/data/cart";
@@ -49,7 +49,7 @@ const reviews = [
 const heroSlides = [
   {
     id: 1,
-    image: zinnia,
+    image: heroSeeds,
     title: "মাল্টি কালার জিনিয়া ফুলের বীজ",
     subtitle: "ছাদ ও বাগান ভরিয়ে তুলুন নয়নজুড়ানো বাহারি রঙের জিনিয়া ফুলে। ৯৫%+ অংকুরোদগম গ্যারান্টি।",
     cta: "এখনই অর্ডার করুন",
@@ -57,15 +57,15 @@ const heroSlides = [
   },
   {
     id: 2,
-    image: "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?auto=format&fit=crop&q=80&w=2000",
-    title: "নিশ্চিত অংকুরোদগমের গ্যারান্টি",
-    subtitle: "প্রতিটি বীজ ল্যাব-টেস্টেড ও ১০০% জার্মিনেশন গ্যারান্টি যুক্ত প্রিমিয়াম ফয়েল প্যাক।",
+    image: "https://images.unsplash.com/photo-1597848212624-a19eb35e2651?auto=format&fit=crop&q=80&w=2000",
+    title: "নয়নজুড়ানো জিনিয়া ফুলের সম্ভার",
+    subtitle: "প্রতিটি প্যাক ল্যাব-টেস্টেড ও ১০০% জার্মিনেশন গ্যারান্টি যুক্ত প্রিমিয়াম ফয়েল প্যাক।",
     cta: "অর্ডার করুন",
     link: "/product/multicolor-zinnia-flower-seeds",
   },
   {
     id: 3,
-    image: "https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?auto=format&fit=crop&q=80&w=2000",
+    image: "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?auto=format&fit=crop&q=80&w=2000",
     title: "সারা দেশে ক্যাশ অন ডেলিভারি",
     subtitle: "ঘরে বসেই পণ্য হাতে পেয়ে মূল্য পরিশোধ করুন। মাত্র ৫০ টাকা ডেলিভারি চার্জ।",
     cta: "পণ্য দেখুন",

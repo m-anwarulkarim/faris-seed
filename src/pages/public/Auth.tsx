@@ -88,7 +88,8 @@ export default function AuthPage() {
     });
     if (error) {
       setLoading(false);
-      toast.error("Google দিয়ে লগইন করা যায়নি।");
+      console.error("Google OAuth error:", error);
+      toast.error(error.message || "Google দিয়ে লগইন করা যায়নি।");
     }
   }
 

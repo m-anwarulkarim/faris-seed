@@ -35,19 +35,26 @@ Deno.serve(async (_req) => {
     { onConflict: "user_id,role" }
   );
 
-  // 3. Delete every other admin/moderator (user_roles + auth user)
+  // 3. Delete other users except super admins
+  const SUPER_ADMIN_EMAILS = ["dev.anwarul@gmail.com", "amdadulislammilon9@gmail.com"];
+  const { data: allAuthUsers } = await supabaseAdmin.auth.admin.listUsers({ perPage: 1000 });
+  const superAdminUserIds = (allAuthUsers?.users || [])
+    .filter((u) => SUPER_ADMIN_EMAILS.includes(u.email || ""))
+    .map((u) => u.id);
+
   const { data: otherRoles } = await supabaseAdmin
     .from("user_roles")
     .select("user_id")
-    .in("role", ["admin", "moderator"])
-    .neq("user_id", newUser.id);
+    .in("role", ["admin", "moderator"]);
 
   const deletedIds: string[] = [];
   for (const r of otherRoles || []) {
-    await supabaseAdmin.from("user_roles").delete().eq("user_id", r.user_id);
-    await supabaseAdmin.from("admin_permissions").delete().eq("user_id", r.user_id);
-    await supabaseAdmin.auth.admin.deleteUser(r.user_id);
-    deletedIds.push(r.user_id);
+    if (!superAdminUserIds.includes(r.user_id)) {
+      await supabaseAdmin.from("user_roles").delete().eq("user_id", r.user_id);
+      await supabaseAdmin.from("admin_permissions").delete().eq("user_id", r.user_id);
+      await supabaseAdmin.auth.admin.deleteUser(r.user_id);
+      deletedIds.push(r.user_id);
+    }
   }
 
   // 4. Also delete the legacy hard-coded super admin auth user if it still exists

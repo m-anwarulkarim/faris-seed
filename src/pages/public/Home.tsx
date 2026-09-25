@@ -57,7 +57,7 @@ const heroSlides = [
   },
   {
     id: 2,
-    image: "https://images.unsplash.com/photo-1466692476868-aef1dfb1e735?auto=format&fit=crop&q=80&w=2000",
+    image: "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?auto=format&fit=crop&q=80&w=2000",
     title: "নিশ্চিত অংকুরোদগমের গ্যারান্টি",
     subtitle: "প্রতিটি বীজ ল্যাব-টেস্টেড ও ১০০% জার্মিনেশন গ্যারান্টি যুক্ত প্রিমিয়াম ফয়েল প্যাক।",
     cta: "অর্ডার করুন",
@@ -65,7 +65,7 @@ const heroSlides = [
   },
   {
     id: 3,
-    image: "https://images.unsplash.com/photo-1592419044706-39796d40f98c?auto=format&fit=crop&q=80&w=2000",
+    image: "https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?auto=format&fit=crop&q=80&w=2000",
     title: "সারা দেশে ক্যাশ অন ডেলিভারি",
     subtitle: "ঘরে বসেই পণ্য হাতে পেয়ে মূল্য পরিশোধ করুন। মাত্র ৫০ টাকা ডেলিভারি চার্জ।",
     cta: "পণ্য দেখুন",

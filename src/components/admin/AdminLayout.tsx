@@ -415,33 +415,51 @@ export function AdminLayout() {
     setChecking(true);
     setAuthCheckError(null);
 
-    const access = await getCurrentAdminAccess();
+    try {
+      // 8-second timeout safety guard to prevent infinite spinning loader
+      const accessPromise = getCurrentAdminAccess();
+      const timeoutPromise = new Promise<import("@/lib/adminAccess").AdminAccessResult>((resolve) =>
+        setTimeout(() => resolve({ status: "error", message: "অ্যাডমিন ভেরিফিকেশন টাইমাউট হয়েছে (নেটওয়ার্ক বিলম্ব)।" }), 8000)
+      );
 
-    if (access.status === "no-session") {
-      setAuthorized(false);
-      navigate("/admin/login", { replace: true });
-      return;
-    }
+      const access = await Promise.race([accessPromise, timeoutPromise]);
 
-    if (access.status === "error") {
-      console.error("Admin access check failed:", access.message);
+      if (access.status === "no-session") {
+        setAuthorized(false);
+        setChecking(false);
+        navigate("/admin/login", { replace: true });
+        return;
+      }
+
+      if (access.status === "error") {
+        console.error("Admin access check failed:", access.message);
+        setAuthorized(false);
+        setChecking(false);
+        setAuthCheckError(access.message || "সেশন আছে, কিন্তু অ্যাডমিন ভেরিফিকেশন সাময়িকভাবে ব্যর্থ হয়েছে।");
+        return;
+      }
+
+      if (access.status === "unauthorized") {
+        await supabase.auth.signOut();
+        setAuthorized(false);
+        setChecking(false);
+        navigate("/admin/login", { replace: true });
+        return;
+      }
+
+      setIsSuperAdmin(access.isSuperAdmin);
+      setUserRole(access.role);
+      setUserPermissions(access.permissions);
+      setAuthorized(true);
+      setChecking(false);
+    } catch (err: any) {
+      console.error("Unexpected error during checkAdmin:", err);
       setAuthorized(false);
       setChecking(false);
-      setAuthCheckError("সেশন আছে, কিন্তু অ্যাডমিন ভেরিফিকেশন সাময়িকভাবে ব্যর্থ হয়েছে।");
-      return;
+      setAuthCheckError(err?.message || "অ্যাডমিন অ্যাক্সেস ভেরিফিকেশন ব্যর্থ হয়েছে।");
+    } finally {
+      setChecking(false);
     }
-
-    if (access.status === "unauthorized") {
-      await supabase.auth.signOut();
-      navigate("/admin/login", { replace: true });
-      return;
-    }
-
-    setIsSuperAdmin(access.isSuperAdmin);
-    setUserRole(access.role);
-    setUserPermissions(access.permissions);
-    setAuthorized(true);
-    setChecking(false);
   }, [navigate]);
 
   const queryClient = useQueryClient();

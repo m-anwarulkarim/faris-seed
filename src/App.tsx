@@ -123,24 +123,28 @@ function OAuthCallbackListener() {
 
   useEffect(() => {
     const isOAuthReturn =
+      sessionStorage.getItem("oauth_in_progress") === "true" ||
       window.location.hash.includes("access_token") ||
       window.location.hash.includes("refresh_token") ||
       window.location.hash.includes("error") ||
       window.location.search.includes("code=");
 
-    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (session && (isOAuthReturn || window.location.pathname === "/auth")) {
-        navigate("/account", { replace: true });
-      }
-    });
-
-    if (isOAuthReturn) {
-      supabase.auth.getSession().then(({ data }) => {
-        if (data.session) {
+    const checkAndRedirect = (session: unknown) => {
+      if (session) {
+        if (isOAuthReturn || window.location.pathname === "/auth") {
+          sessionStorage.removeItem("oauth_in_progress");
           navigate("/account", { replace: true });
         }
-      });
-    }
+      }
+    };
+
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
+      checkAndRedirect(session);
+    });
+
+    supabase.auth.getSession().then(({ data }) => {
+      checkAndRedirect(data.session);
+    });
 
     return () => sub.subscription.unsubscribe();
   }, [navigate]);

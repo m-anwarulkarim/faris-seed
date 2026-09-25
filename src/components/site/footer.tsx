@@ -100,10 +100,10 @@ export function Footer() {
 
             <span>Developed by</span>
             <a
-              href="https://wa.me/8801560007231?text=Hello%20HAQPLUS%20IT"
+              href="https://wa.me/8801560007230?text=Hello%20HAQPLUS%20IT"
               target="_blank"
               rel="noopener noreferrer"
-              className="group relative inline-flex items-center gap-1 rounded-lg bg-white/10 px-2.5 py-1 font-bold text-accent shadow-sm transition-all duration-300 hover:scale-105 hover:bg-emerald-500 hover:text-white"
+              className="group relative inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-emerald-400 to-teal-300 px-3 py-1 text-xs font-black text-emerald-950 shadow-md shadow-emerald-500/20 transition-all duration-300 hover:scale-105 hover:from-emerald-300 hover:to-teal-200 hover:shadow-lg hover:shadow-emerald-400/40"
             >
               <span className="relative z-10 flex items-center gap-1">
                 HAQPLUS IT

@@ -758,16 +758,14 @@ function ProductLandingPage() {
         <div className="mx-auto flex max-w-4xl flex-col items-center justify-between gap-2 px-4 sm:flex-row">
           <p>© {new Date().getFullYear()} FARIS SEED</p>
           <div className="flex items-center gap-1.5 font-medium">
-            <span>Crafted with</span>
-            <span className="inline-block animate-bounce text-red-500">❤️</span>
             <span>Developed by</span>
             <a
-              href="https://wa.me/8801560007231?text=Hello%20HAQPLUS%20IT"
+              href="https://wa.me/8801560007230?text=Hello%20HAQPLUS%20IT"
               target="_blank"
               rel="noopener noreferrer"
-              className="group inline-flex items-center gap-1 rounded-md bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-800 transition-all duration-300 hover:scale-105 hover:bg-emerald-600 hover:text-white"
+              className="group inline-flex items-center gap-1.5 rounded-full bg-emerald-600 px-3 py-1 text-xs font-black text-white shadow-md shadow-emerald-600/30 transition-all duration-300 hover:scale-105 hover:bg-emerald-500 hover:shadow-lg hover:shadow-emerald-500/40"
             >
-              HAQPLUS IT
+              <span>HAQPLUS IT</span>
               <span className="inline-block transition-transform duration-300 group-hover:translate-x-0.5">🚀</span>
             </a>
           </div>

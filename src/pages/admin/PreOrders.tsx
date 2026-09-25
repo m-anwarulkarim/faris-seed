@@ -182,7 +182,7 @@ export default function PreOrders() {
                             <TableCell className="min-w-[100px]">
                               <button
                                 className="font-bold text-primary hover:underline cursor-pointer text-left"
-                                onClick={() => navigate(`/e/orders/edit/${order.order_id}`)}
+                                onClick={() => navigate(`/admin/orders/edit/${order.order_id}`)}
                               >
                                 {order.customer_facing_id || order.order_id}
                               </button>
@@ -242,7 +242,7 @@ export default function PreOrders() {
                             </TableCell>
 
                             <TableCell className="text-center">
-                              <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => navigate(`/e/orders/edit/${order.order_id}`)}>
+                              <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => navigate(`/admin/orders/edit/${order.order_id}`)}>
                                 <Pencil className="w-4 h-4" />
                               </Button>
                             </TableCell>

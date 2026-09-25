@@ -296,7 +296,7 @@ export default function ProductList() {
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div className="flex flex-wrap gap-2">
-          <Button onClick={() => navigate("/e/products/create")}>
+          <Button onClick={() => navigate("/admin/products/create")}>
             <Plus className="w-4 h-4 mr-2" /> {t("নতুন পণ্য", "New Product")}
           </Button>
         </div>
@@ -448,15 +448,15 @@ export default function ProductList() {
                             <div className="flex gap-1 justify-end">
                               <Button variant="ghost" size="icon" onClick={(e) => {
                                 if (e.ctrlKey || e.metaKey || e.button === 1) {
-                                  window.open(`/e/products/edit/${product.id}?${searchParams.toString()}`, '_blank');
+                                  window.open(`/admin/products/edit/${product.id}?${searchParams.toString()}`, '_blank');
                                 } else {
-                                  navigate(`/e/products/edit/${product.id}?${searchParams.toString()}`);
+                                  navigate(`/admin/products/edit/${product.id}?${searchParams.toString()}`);
                                 }
                               }}
                               onAuxClick={(e) => {
                                 if (e.button === 1) {
                                   e.preventDefault();
-                                  window.open(`/e/products/edit/${product.id}?${searchParams.toString()}`, '_blank');
+                                  window.open(`/admin/products/edit/${product.id}?${searchParams.toString()}`, '_blank');
                                 }
                               }}
                               >

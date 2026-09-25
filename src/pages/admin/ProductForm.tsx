@@ -64,7 +64,7 @@ export default function ProductForm() {
   const queryClient = useQueryClient();
   const { t } = useLanguage();
   const isEdit = !!id;
-  const backUrl = `/e/products${searchParams.toString() ? `?${searchParams.toString()}` : ""}`;
+  const backUrl = `/admin/products${searchParams.toString() ? `?${searchParams.toString()}` : ""}`;
   const [loading, setLoading] = useState(false);
   const [imageLoading, setImageLoading] = useState(false);
   const [productImage, setProductImage] = useState<string | null>(null);
@@ -398,7 +398,7 @@ export default function ProductForm() {
     queryClient.invalidateQueries({ queryKey: ["products"] });
     queryClient.invalidateQueries({ queryKey: ["admin-products"] });
     toast.success("পণ্য ডুপ্লিকেট হয়েছে!");
-    navigate(`/e/products/edit/${newProduct.id}`);
+    navigate(`/admin/products/edit/${newProduct.id}`);
   };
 
   return (

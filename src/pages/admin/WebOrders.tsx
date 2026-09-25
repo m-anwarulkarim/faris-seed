@@ -502,7 +502,7 @@ export default function WebOrders() {
       queryClient.invalidateQueries({ queryKey: ["incomplete-orders"] });
       queryClient.invalidateQueries({ queryKey: ["web-orders"] });
       toast.success(t("অর্ডারে রূপান্তর হয়েছে", "Converted to order"));
-      navigate(`/e/orders/edit/${newOrder.order_id}`);
+      navigate(`/admin/orders/edit/${newOrder.order_id}`);
     },
     onError: (err: Error) => toast.error(err.message),
   });
@@ -909,7 +909,7 @@ export default function WebOrders() {
                         {/* Edit + Delete */}
                         <TableCell className="text-center">
                           <div className="flex items-center justify-center gap-0.5">
-                            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => navigate(`/e/orders/edit/${order.order_id}`)}>
+                            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => navigate(`/admin/orders/edit/${order.order_id}`)}>
                               <Pencil className="w-4 h-4" />
                             </Button>
                             <Button

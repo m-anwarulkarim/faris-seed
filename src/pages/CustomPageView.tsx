@@ -13,7 +13,7 @@ import { getDeliveryCharge } from "@/lib/delivery";
 import { DELIVERY_CONFIG_EVENT, getDeliveryTiers, loadDeliveryTiers, loadDhakaConfig, loadTiersEnabled, getDhakaConfig, getSavedDeliveryArea, setSavedDeliveryArea } from "@/lib/deliveryTiers";
 
 // Landing-page delivery charge resolver.
-// Source of truth: global admin delivery tiers at /e/settings/delivery-tiers.
+// Source of truth: global admin delivery tiers at /admin/settings/delivery-tiers.
 function resolveLandingDeliveryCharge(
   data: any,
   subtotal: number,

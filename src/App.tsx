@@ -138,7 +138,7 @@ function OAuthCallbackListener() {
 const App = () => {
   useEffect(() => {
     installGlobalErrorHandlers();
-    if (!window.location.pathname.startsWith("/e")) {
+    if (!window.location.pathname.startsWith("/admin")) {
       import("@/lib/visitorTracking")
         .then((m) => m.ensureVisitorTracked())
         .catch(() => {});
@@ -173,14 +173,14 @@ const App = () => {
                     <Route path="/login" element={<Navigate to="/auth" replace />} />
                     <Route path="/account" element={<PublicAccount />} />
 
-                    {/* Admin Login */}
-                    <Route path="/admin" element={<AdminLogin />} />
-                    <Route path="/ecomah" element={<Navigate to="/admin" replace />} />
-
+                    {/* Legacy /e and /ecomah redirects to /admin */}
+                    <Route path="/ecomah" element={<Navigate to="/admin/login" replace />} />
+                    <Route path="/admin/login" element={<AdminLogin />} />
+                    <Route path="/e/*" element={<Navigate to="/admin/my-activity" replace />} />
 
                     {/* Admin Panel */}
-                    <Route path="/e" element={<AdminLayout />}>
-                      <Route index element={<Navigate to="/e/my-activity" replace />} />
+                    <Route path="/admin" element={<AdminLayout />}>
+                      <Route index element={<Navigate to="/admin/my-activity" replace />} />
                       <Route path="my-activity" element={<MyActivity />} />
                       <Route path="overview" element={<Overview />} />
                       <Route path="sales-report" element={<SalesReport />} />
@@ -219,7 +219,7 @@ const App = () => {
                       <Route path="website/api" element={<ApiManagement />} />
                       <Route path="payments/bkash-logs" element={<BkashLogs />} />
                       <Route path="website/pages" element={<PagesManagement />} />
-                      <Route path="website/pages/new" element={<Navigate to="/e/page-builder/new" replace />} />
+                      <Route path="website/pages/new" element={<Navigate to="/admin/page-builder/new" replace />} />
                       <Route path="website/pages/edit/:id" element={<PageEditRedirect />} />
                       <Route path="website/media" element={<MediaManagement />} />
                       <Route path="website/import-export" element={<ImportExport />} />
@@ -253,8 +253,8 @@ const App = () => {
                     </Route>
 
                     {/* Page Builder - full screen */}
-                    <Route path="/e/page-builder/new" element={<PageEditor />} />
-                    <Route path="/e/page-builder/edit/:id" element={<PageEditor />} />
+                    <Route path="/admin/page-builder/new" element={<PageEditor />} />
+                    <Route path="/admin/page-builder/edit/:id" element={<PageEditor />} />
 
                     <Route path="*" element={<Navigate to="/" replace />} />
                   </Routes>

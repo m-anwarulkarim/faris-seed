@@ -22,89 +22,89 @@ const WEB_ORDER_SOURCE_FILTER = "traffic_source.is.null,traffic_source.neq.ecomd
 
 // URL → permission key mapping (must match AdminSidebar)
 const urlToPermission: Record<string, string> = {
-  "/e/overview": "overview",
-  "/e/sales-report": "sales-report",
-  "/e/top-products": "top-products",
+  "/admin/overview": "overview",
+  "/admin/sales-report": "sales-report",
+  "/admin/top-products": "top-products",
   
   
   
-  "/e/products": "product-list",
-  "/e/inventory": "inventory",
-  "/e/categories": "categories",
-  "/e/product-tags": "product-tags",
-  "/e/offers": "offers",
-  "/e/reviews": "reviews",
-  "/e/qa": "reviews",
-  "/e/review-qa-settings": "reviews",
-  "/e/orders/create": "orders-create",
-  "/e/orders/search": "orders-search",
-  "/e/orders/web": "orders-web",
-  "/e/orders/pre": "orders-pre",
-  "/e/orders/list": "orders-list",
-  "/e/orders/reports": "orders-reports",
-  "/e/orders/deleted": "orders-deleted",
-  "/e/users/admins": "users-admins",
-  "/e/users/customers": "users-customers",
-  "/e/website/api": "website-api",
-  "/e/website/pages": "website-pages",
-  "/e/website/media": "website-media",
-  "/e/website/import-export": "settings-import-export",
+  "/admin/products": "product-list",
+  "/admin/inventory": "inventory",
+  "/admin/categories": "categories",
+  "/admin/product-tags": "product-tags",
+  "/admin/offers": "offers",
+  "/admin/reviews": "reviews",
+  "/admin/qa": "reviews",
+  "/admin/review-qa-settings": "reviews",
+  "/admin/orders/create": "orders-create",
+  "/admin/orders/search": "orders-search",
+  "/admin/orders/web": "orders-web",
+  "/admin/orders/pre": "orders-pre",
+  "/admin/orders/list": "orders-list",
+  "/admin/orders/reports": "orders-reports",
+  "/admin/orders/deleted": "orders-deleted",
+  "/admin/users/admins": "users-admins",
+  "/admin/users/customers": "users-customers",
+  "/admin/website/api": "website-api",
+  "/admin/website/pages": "website-pages",
+  "/admin/website/media": "website-media",
+  "/admin/website/import-export": "settings-import-export",
   
   
   
   
   
-  "/e/courier": "courier-handle",
-  "/e/message-monitor": "support-inbox",
-  "/e/settings/theme": "settings-theme",
-  "/e/settings/language": "settings-language",
-  "/e/settings/cursor": "settings-cursor",
-  "/e/settings/menu": "settings-menu",
-  "/e/support/reports": "support-reports",
-  "/e/notifications/orders": "notifications-orders",
-  "/e/notifications/sms": "notifications-sms",
-  "/e/notifications/push": "notifications-push",
+  "/admin/courier": "courier-handle",
+  "/admin/message-monitor": "support-inbox",
+  "/admin/settings/theme": "settings-theme",
+  "/admin/settings/language": "settings-language",
+  "/admin/settings/cursor": "settings-cursor",
+  "/admin/settings/menu": "settings-menu",
+  "/admin/support/reports": "support-reports",
+  "/admin/notifications/orders": "notifications-orders",
+  "/admin/notifications/sms": "notifications-sms",
+  "/admin/notifications/push": "notifications-push",
 };
 
 // Route → page title/subtitle mapping
 const routeTitles: Record<string, { bn: string; en: string; subBn?: string; subEn?: string }> = {
-  "/e/overview": { bn: "ওভারভিউ", en: "Overview", subBn: "আপনার ব্যবসার সারসংক্ষেপ", subEn: "Your business summary" },
-  "/e/my-activity": { bn: "আমার অ্যাক্টিভিটি", en: "My Activity" },
-  "/e/sales-report": { bn: "বিক্রি রিপোর্ট", en: "Sales Report" },
-  "/e/top-products": { bn: "টপ প্রোডাক্ট", en: "Top Products" },
+  "/admin/overview": { bn: "ওভারভিউ", en: "Overview", subBn: "আপনার ব্যবসার সারসংক্ষেপ", subEn: "Your business summary" },
+  "/admin/my-activity": { bn: "আমার অ্যাক্টিভিটি", en: "My Activity" },
+  "/admin/sales-report": { bn: "বিক্রি রিপোর্ট", en: "Sales Report" },
+  "/admin/top-products": { bn: "টপ প্রোডাক্ট", en: "Top Products" },
   
   
   
-  "/e/products": { bn: "পণ্য তালিকা", en: "Product List", subBn: "সকল পণ্য পরিচালনা করুন", subEn: "Manage all products" },
-  "/e/products/new": { bn: "নতুন পণ্য", en: "New Product" },
-  "/e/inventory": { bn: "ইনভেন্টরি ম্যানেজমেন্ট", en: "Inventory Management" },
-  "/e/categories": { bn: "ক্যাটাগরি", en: "Categories" },
-  "/e/product-tags": { bn: "প্রোডাক্ট ট্যাগ", en: "Product Tags" },
-  "/e/orders/create": { bn: "নতুন অর্ডার", en: "Create Order" },
-  "/e/orders/search": { bn: "অর্ডার সার্চ", en: "Order Search" },
-  "/e/orders/web": { bn: "অর্ডারসমূহ", en: "All Orders" },
-  "/e/courier": { bn: "কুরিয়ার হ্যান্ডেল", en: "Courier Handle" },
-  "/e/orders/pre": { bn: "প্রি-অর্ডার", en: "Pre Orders", subBn: "প্রি-অর্ডার স্ট্যাটাসের সকল অর্ডার", subEn: "All orders with pre status" },
-  "/e/orders/list": { bn: "অর্ডার তালিকা", en: "Order List" },
-  "/e/orders/deleted": { bn: "মুছে ফেলা অর্ডার", en: "Deleted Orders" },
-  "/e/users/admins": { bn: "অ্যাডমিন তালিকা", en: "Admin List" },
-  "/e/users/customers": { bn: "কাস্টমার তালিকা", en: "Customer List" },
-  "/e/website/api": { bn: "API ম্যানেজমেন্ট", en: "API Management" },
-  "/e/website/pages": { bn: "পেজ ব্যবস্থাপনা", en: "Page Management" },
-  "/e/website/media": { bn: "মিডিয়া", en: "Media Management" },
-  "/e/website/import-export": { bn: "ইমপোর্ট / এক্সপোর্ট", en: "Import / Export" },
+  "/admin/products": { bn: "পণ্য তালিকা", en: "Product List", subBn: "সকল পণ্য পরিচালনা করুন", subEn: "Manage all products" },
+  "/admin/products/new": { bn: "নতুন পণ্য", en: "New Product" },
+  "/admin/inventory": { bn: "ইনভেন্টরি ম্যানেজমেন্ট", en: "Inventory Management" },
+  "/admin/categories": { bn: "ক্যাটাগরি", en: "Categories" },
+  "/admin/product-tags": { bn: "প্রোডাক্ট ট্যাগ", en: "Product Tags" },
+  "/admin/orders/create": { bn: "নতুন অর্ডার", en: "Create Order" },
+  "/admin/orders/search": { bn: "অর্ডার সার্চ", en: "Order Search" },
+  "/admin/orders/web": { bn: "অর্ডারসমূহ", en: "All Orders" },
+  "/admin/courier": { bn: "কুরিয়ার হ্যান্ডেল", en: "Courier Handle" },
+  "/admin/orders/pre": { bn: "প্রি-অর্ডার", en: "Pre Orders", subBn: "প্রি-অর্ডার স্ট্যাটাসের সকল অর্ডার", subEn: "All orders with pre status" },
+  "/admin/orders/list": { bn: "অর্ডার তালিকা", en: "Order List" },
+  "/admin/orders/deleted": { bn: "মুছে ফেলা অর্ডার", en: "Deleted Orders" },
+  "/admin/users/admins": { bn: "অ্যাডমিন তালিকা", en: "Admin List" },
+  "/admin/users/customers": { bn: "কাস্টমার তালিকা", en: "Customer List" },
+  "/admin/website/api": { bn: "API ম্যানেজমেন্ট", en: "API Management" },
+  "/admin/website/pages": { bn: "পেজ ব্যবস্থাপনা", en: "Page Management" },
+  "/admin/website/media": { bn: "মিডিয়া", en: "Media Management" },
+  "/admin/website/import-export": { bn: "ইমপোর্ট / এক্সপোর্ট", en: "Import / Export" },
   
   
   
-  "/e/settings/theme": { bn: "থিম সেটিংস", en: "Theme Settings" },
-  "/e/settings/language": { bn: "ভাষা সেটিংস", en: "Language Settings" },
-  "/e/settings/cursor": { bn: "কার্সর সেটিংস", en: "Cursor Settings" },
-  "/e/settings/menu": { bn: "মেনু কন্ট্রোল", en: "Menu Control" },
-  "/e/support/reports": { bn: "সাপোর্ট রিপোর্ট", en: "Support Reports" },
-  "/e/notifications/orders": { bn: "অর্ডার নোটিফিকেশন", en: "Order Notifications" },
-  "/e/notifications/sms": { bn: "SMS লগ", en: "SMS Logs" },
-  "/e/notifications/push": { bn: "পুশ ব্রডকাস্ট", en: "Push Broadcast", subBn: "ফিল্টার করে কাস্টমারদের পুশ নোটিফিকেশন পাঠান", subEn: "Send push notifications to filtered customers" },
-  "/e/coupons": { bn: "কুপন ম্যানেজমেন্ট", en: "Coupon Management" },
+  "/admin/settings/theme": { bn: "থিম সেটিংস", en: "Theme Settings" },
+  "/admin/settings/language": { bn: "ভাষা সেটিংস", en: "Language Settings" },
+  "/admin/settings/cursor": { bn: "কার্সর সেটিংস", en: "Cursor Settings" },
+  "/admin/settings/menu": { bn: "মেনু কন্ট্রোল", en: "Menu Control" },
+  "/admin/support/reports": { bn: "সাপোর্ট রিপোর্ট", en: "Support Reports" },
+  "/admin/notifications/orders": { bn: "অর্ডার নোটিফিকেশন", en: "Order Notifications" },
+  "/admin/notifications/sms": { bn: "SMS লগ", en: "SMS Logs" },
+  "/admin/notifications/push": { bn: "পুশ ব্রডকাস্ট", en: "Push Broadcast", subBn: "ফিল্টার করে কাস্টমারদের পুশ নোটিফিকেশন পাঠান", subEn: "Send push notifications to filtered customers" },
+  "/admin/coupons": { bn: "কুপন ম্যানেজমেন্ট", en: "Coupon Management" },
 };
 
 // My Activity is always accessible — no permission needed
@@ -164,7 +164,7 @@ function usePageCounts(pathname: string) {
   // Pre-order count for subtitle
   const { data: preOrderCount } = useQuery({
     queryKey: ["header-pre-order-count"],
-    enabled: pathname === "/e/orders/pre",
+    enabled: pathname === "/admin/orders/pre",
     queryFn: async () => {
       const { count } = await supabase
         .from("orders")
@@ -178,7 +178,7 @@ function usePageCounts(pathname: string) {
   // Web order pending count
   const { data: webOrderCount } = useQuery({
     queryKey: ["header-web-order-count"],
-    enabled: pathname === "/e/orders/web",
+    enabled: pathname === "/admin/orders/web",
     queryFn: async () => {
       const { count } = await supabase
         .from("orders")
@@ -190,8 +190,8 @@ function usePageCounts(pathname: string) {
     },
   });
 
-  if (pathname === "/e/orders/pre") return preOrderCount;
-  if (pathname === "/e/orders/web") return webOrderCount;
+  if (pathname === "/admin/orders/pre") return preOrderCount;
+  if (pathname === "/admin/orders/web") return webOrderCount;
   return undefined;
 }
 
@@ -200,73 +200,73 @@ type Shortcut = { icon: React.ElementType; label: string; labelBn: string; to: s
 
 const sectionShortcuts: Record<string, Shortcut[]> = {
   orders: [
-    { icon: Plus, label: "Create", labelBn: "নতুন", to: "/e/orders/create" },
-    { icon: Search, label: "Search", labelBn: "সার্চ", to: "/e/orders/search" },
-    { icon: Globe, label: "Web", labelBn: "ওয়েব", to: "/e/orders/web" },
-    { icon: CalendarClock, label: "Pre", labelBn: "প্রি", to: "/e/orders/pre" },
-    { icon: List, label: "List", labelBn: "লিস্ট", to: "/e/orders/list" },
+    { icon: Plus, label: "Create", labelBn: "নতুন", to: "/admin/orders/create" },
+    { icon: Search, label: "Search", labelBn: "সার্চ", to: "/admin/orders/search" },
+    { icon: Globe, label: "Web", labelBn: "ওয়েব", to: "/admin/orders/web" },
+    { icon: CalendarClock, label: "Pre", labelBn: "প্রি", to: "/admin/orders/pre" },
+    { icon: List, label: "List", labelBn: "লিস্ট", to: "/admin/orders/list" },
   ],
   products: [
-    { icon: Plus, label: "New", labelBn: "নতুন", to: "/e/products/new" },
-    { icon: Package, label: "Products", labelBn: "পণ্য", to: "/e/products" },
-    { icon: Layers, label: "Inventory", labelBn: "ইনভেন্টরি", to: "/e/inventory" },
-    { icon: List, label: "Categories", labelBn: "ক্যাটাগরি", to: "/e/categories" },
-    { icon: Tag, label: "Tags", labelBn: "ট্যাগ", to: "/e/product-tags" },
+    { icon: Plus, label: "New", labelBn: "নতুন", to: "/admin/products/new" },
+    { icon: Package, label: "Products", labelBn: "পণ্য", to: "/admin/products" },
+    { icon: Layers, label: "Inventory", labelBn: "ইনভেন্টরি", to: "/admin/inventory" },
+    { icon: List, label: "Categories", labelBn: "ক্যাটাগরি", to: "/admin/categories" },
+    { icon: Tag, label: "Tags", labelBn: "ট্যাগ", to: "/admin/product-tags" },
   ],
   reports: [
-    { icon: BarChart3, label: "Sales", labelBn: "বিক্রি", to: "/e/sales-report" },
-    { icon: Package, label: "Top Products", labelBn: "টপ পণ্য", to: "/e/top-products" },
+    { icon: BarChart3, label: "Sales", labelBn: "বিক্রি", to: "/admin/sales-report" },
+    { icon: Package, label: "Top Products", labelBn: "টপ পণ্য", to: "/admin/top-products" },
     
     
   ],
   users: [
-    { icon: ShieldCheck, label: "Admins", labelBn: "অ্যাডমিন", to: "/e/users/admins" },
-    { icon: Users, label: "Customers", labelBn: "কাস্টমার", to: "/e/users/customers" },
+    { icon: ShieldCheck, label: "Admins", labelBn: "অ্যাডমিন", to: "/admin/users/admins" },
+    { icon: Users, label: "Customers", labelBn: "কাস্টমার", to: "/admin/users/customers" },
   ],
   website: [
-    { icon: Settings, label: "API", labelBn: "API", to: "/e/website/api" },
-    { icon: FileText, label: "Pages", labelBn: "পেজ", to: "/e/website/pages" },
-    { icon: Image, label: "Media", labelBn: "মিডিয়া", to: "/e/website/media" },
-    { icon: ArrowDownUp, label: "Import/Export", labelBn: "ইমপোর্ট", to: "/e/website/import-export" },
+    { icon: Settings, label: "API", labelBn: "API", to: "/admin/website/api" },
+    { icon: FileText, label: "Pages", labelBn: "পেজ", to: "/admin/website/pages" },
+    { icon: Image, label: "Media", labelBn: "মিডিয়া", to: "/admin/website/media" },
+    { icon: ArrowDownUp, label: "Import/Export", labelBn: "ইমপোর্ট", to: "/admin/website/import-export" },
     
     
     
   ],
   settings: [
-    { icon: Palette, label: "Theme", labelBn: "থিম", to: "/e/settings/theme" },
-    { icon: Languages, label: "Language", labelBn: "ভাষা", to: "/e/settings/language" },
-    { icon: MousePointer2, label: "Cursor", labelBn: "কার্সর", to: "/e/settings/cursor" },
-    { icon: ChevronsLeftRight, label: "Menu Control", labelBn: "মেনু কন্ট্রোল", to: "/e/settings/menu" },
+    { icon: Palette, label: "Theme", labelBn: "থিম", to: "/admin/settings/theme" },
+    { icon: Languages, label: "Language", labelBn: "ভাষা", to: "/admin/settings/language" },
+    { icon: MousePointer2, label: "Cursor", labelBn: "কার্সর", to: "/admin/settings/cursor" },
+    { icon: ChevronsLeftRight, label: "Menu Control", labelBn: "মেনু কন্ট্রোল", to: "/admin/settings/menu" },
     
   ],
   support: [
-    { icon: MessageCircle, label: "Reports", labelBn: "রিপোর্ট", to: "/e/support/reports" },
+    { icon: MessageCircle, label: "Reports", labelBn: "রিপোর্ট", to: "/admin/support/reports" },
   ],
   notifications: [
-    { icon: Bell, label: "Orders", labelBn: "অর্ডার", to: "/e/notifications/orders" },
-    { icon: MessageSquare, label: "SMS", labelBn: "SMS", to: "/e/notifications/sms" },
-    { icon: Bell, label: "Push", labelBn: "পুশ", to: "/e/notifications/push" },
+    { icon: Bell, label: "Orders", labelBn: "অর্ডার", to: "/admin/notifications/orders" },
+    { icon: MessageSquare, label: "SMS", labelBn: "SMS", to: "/admin/notifications/sms" },
+    { icon: Bell, label: "Push", labelBn: "পুশ", to: "/admin/notifications/push" },
   ],
   myActivity: [
-    { icon: Search, label: "Search", labelBn: "সার্চ", to: "/e/orders/search" },
-    { icon: Plus, label: "Add Order", labelBn: "নতুন অর্ডার", to: "/e/orders/create" },
-    { icon: Globe, label: "All Orders", labelBn: "অর্ডারসমূহ", to: "/e/orders/web" },
+    { icon: Search, label: "Search", labelBn: "সার্চ", to: "/admin/orders/search" },
+    { icon: Plus, label: "Add Order", labelBn: "নতুন অর্ডার", to: "/admin/orders/create" },
+    { icon: Globe, label: "All Orders", labelBn: "অর্ডারসমূহ", to: "/admin/orders/web" },
   ],
 };
 
 // Map routes to their section
 function getShortcutsForPath(pathname: string): Shortcut[] {
-  if (pathname === "/e/courier") return sectionShortcuts.orders;
-  if (pathname.startsWith("/e/orders/")) return sectionShortcuts.orders;
-  if (pathname.startsWith("/e/products") || pathname === "/e/inventory" || pathname === "/e/categories" || pathname === "/e/product-tags") return sectionShortcuts.products;
-  if (["/e/sales-report", "/e/top-products"].includes(pathname)) return sectionShortcuts.reports;
-  if (pathname.startsWith("/e/users/")) return sectionShortcuts.users;
-  if (pathname.startsWith("/e/website/")) return sectionShortcuts.website;
-  if (pathname.startsWith("/e/settings/")) return sectionShortcuts.settings;
-  if (pathname.startsWith("/e/support/")) return sectionShortcuts.support;
-  if (pathname.startsWith("/e/notifications/")) return sectionShortcuts.notifications;
-  if (pathname === "/e/my-activity") return sectionShortcuts.myActivity;
-  if (pathname === "/e/overview") return sectionShortcuts.myActivity;
+  if (pathname === "/admin/courier") return sectionShortcuts.orders;
+  if (pathname.startsWith("/admin/orders/")) return sectionShortcuts.orders;
+  if (pathname.startsWith("/admin/products") || pathname === "/admin/inventory" || pathname === "/admin/categories" || pathname === "/admin/product-tags") return sectionShortcuts.products;
+  if (["/admin/sales-report", "/admin/top-products"].includes(pathname)) return sectionShortcuts.reports;
+  if (pathname.startsWith("/admin/users/")) return sectionShortcuts.users;
+  if (pathname.startsWith("/admin/website/")) return sectionShortcuts.website;
+  if (pathname.startsWith("/admin/settings/")) return sectionShortcuts.settings;
+  if (pathname.startsWith("/admin/support/")) return sectionShortcuts.support;
+  if (pathname.startsWith("/admin/notifications/")) return sectionShortcuts.notifications;
+  if (pathname === "/admin/my-activity") return sectionShortcuts.myActivity;
+  if (pathname === "/admin/overview") return sectionShortcuts.myActivity;
   return [];
 }
 
@@ -318,10 +318,10 @@ function AdminHeader() {
   // Find matching route title (exact match first, then check for dynamic routes)
   let titleInfo = routeTitles[pathname];
   if (!titleInfo) {
-    if (pathname.startsWith("/e/orders/edit/")) {
+    if (pathname.startsWith("/admin/orders/edit/")) {
       const orderId = pathname.split("/").pop();
       titleInfo = { bn: `অর্ডার এডিট`, en: `Edit Order`, subBn: `#${orderId}`, subEn: `#${orderId}` };
-    } else if (pathname.startsWith("/e/products/edit/")) {
+    } else if (pathname.startsWith("/admin/products/edit/")) {
       titleInfo = { bn: "পণ্য এডিট", en: "Edit Product" };
     }
   }
@@ -370,7 +370,7 @@ function AccessDeniedRedirect() {
   const navigate = useNavigate();
   
   useEffect(() => {
-    navigate("/e/my-activity", { replace: true });
+    navigate("/admin/my-activity", { replace: true });
   }, [navigate]);
 
   return (
@@ -419,7 +419,7 @@ export function AdminLayout() {
 
     if (access.status === "no-session") {
       setAuthorized(false);
-      navigate("/admin", { replace: true });
+      navigate("/admin/login", { replace: true });
       return;
     }
 
@@ -433,7 +433,7 @@ export function AdminLayout() {
 
     if (access.status === "unauthorized") {
       await supabase.auth.signOut();
-      navigate("/admin", { replace: true });
+      navigate("/admin/login", { replace: true });
       return;
     }
 
@@ -452,7 +452,7 @@ export function AdminLayout() {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
       if (event === "SIGNED_OUT") {
         setAuthorized(false);
-        navigate("/admin", { replace: true });
+        navigate("/admin/login", { replace: true });
         return;
       }
 
@@ -511,27 +511,27 @@ export function AdminLayout() {
       return userPermissions.includes(permKey);
     }
 
-    // Check if it's a sub-route of an allowed path (e.g. /e/orders/edit/123)
+    // Check if it's a sub-route of an allowed path (e.g. /admin/orders/edit/123)
     for (const [url, key] of Object.entries(urlToPermission)) {
       if (currentPath.startsWith(url + "/") && userPermissions.includes(key)) {
         return true;
       }
     }
 
-    // Product form routes like /e/products/new or /e/products/edit/:id
-    if (currentPath.startsWith("/e/products/")) {
+    // Product form routes like /admin/products/new or /admin/products/edit/:id
+    if (currentPath.startsWith("/admin/products/")) {
       return userPermissions.includes("product-list");
     }
 
     // Order edit routes
-    if (currentPath.startsWith("/e/orders/edit/")) {
+    if (currentPath.startsWith("/admin/orders/edit/")) {
       return userPermissions.includes("orders-list") || userPermissions.includes("orders-web");
     }
 
     // If route not in the map, DENY for moderators (security-first approach)
-    // Only /e/my-activity is implicitly allowed (no permKey needed)
+    // Only /admin/my-activity is implicitly allowed (no permKey needed)
     if (!permKey) {
-      if (currentPath === "/e/my-activity") return true;
+      if (currentPath === "/admin/my-activity") return true;
       return false;
     }
 

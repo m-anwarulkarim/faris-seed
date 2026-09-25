@@ -45,7 +45,7 @@ export default function AdminLogin() {
 
     setLoading(false);
     toast.success("সফলভাবে লগইন হয়েছে!");
-    navigate("/e/overview");
+    navigate("/admin/overview");
   };
 
   return (

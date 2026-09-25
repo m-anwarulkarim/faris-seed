@@ -14,7 +14,7 @@ import { AlertTriangle } from "lucide-react";
 
 const POLL_MS = 10 * 60 * 1000; // 10 minutes
 const SEEN_KEY = "ab_support_alert_seen_ids_v1";
-const REPORTS_PATH = "/e/support/reports";
+const REPORTS_PATH = "/admin/support/reports";
 
 type PendingReport = {
   id: string;

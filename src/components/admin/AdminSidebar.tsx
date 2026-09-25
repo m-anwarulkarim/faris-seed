@@ -42,45 +42,45 @@ const SUPER_ADMIN_EMAILS = ["dev.anwarul@gmail.com", "farisseed@gmail.com"];
 
 // Permission key → sidebar URL mapping
 const permissionToUrl: Record<string, string> = {
-  "overview": "/e/overview",
-  "sales-report": "/e/sales-report",
-  "top-products": "/e/top-products",
+  "overview": "/admin/overview",
+  "sales-report": "/admin/sales-report",
+  "top-products": "/admin/top-products",
   
   
   
-  "product-list": "/e/products",
-  "search-monitoring": "/e/search-monitoring",
-  "categories": "/e/categories",
-  "product-tags": "/e/product-tags",
-  "offers": "/e/offers",
-  "reviews": "/e/reviews",
-  "orders-create": "/e/orders/create",
-  "orders-search": "/e/orders/search",
-  "orders-web": "/e/orders/web",
-  "orders-pre": "/e/orders/pre",
-  "orders-list": "/e/orders/list",
-  "orders-reports": "/e/orders/reports",
-  "orders-deleted": "/e/orders/deleted",
-  "users-admins": "/e/users/admins",
-  "users-customers": "/e/users/customers",
+  "product-list": "/admin/products",
+  "search-monitoring": "/admin/search-monitoring",
+  "categories": "/admin/categories",
+  "product-tags": "/admin/product-tags",
+  "offers": "/admin/offers",
+  "reviews": "/admin/reviews",
+  "orders-create": "/admin/orders/create",
+  "orders-search": "/admin/orders/search",
+  "orders-web": "/admin/orders/web",
+  "orders-pre": "/admin/orders/pre",
+  "orders-list": "/admin/orders/list",
+  "orders-reports": "/admin/orders/reports",
+  "orders-deleted": "/admin/orders/deleted",
+  "users-admins": "/admin/users/admins",
+  "users-customers": "/admin/users/customers",
   
   
-  "website-api": "/e/website/api",
-  "website-pages": "/e/website/pages",
-  "website-media": "/e/website/media",
-  "website-ai": "/e/website/ai",
+  "website-api": "/admin/website/api",
+  "website-pages": "/admin/website/pages",
+  "website-media": "/admin/website/media",
+  "website-ai": "/admin/website/ai",
   
   
   
   
-  "website-facebook-catalog": "/e/website/facebook-catalog",
-  "website-floating-buttons": "/e/website/floating-buttons",
+  "website-facebook-catalog": "/admin/website/facebook-catalog",
+  "website-floating-buttons": "/admin/website/floating-buttons",
   
-  "settings-theme": "/e/settings/theme",
-  "settings-language": "/e/settings/language",
-  "settings-cursor": "/e/settings/cursor",
-  "settings-menu": "/e/settings/menu",
-  "support-reports": "/e/support/reports",
+  "settings-theme": "/admin/settings/theme",
+  "settings-language": "/admin/settings/language",
+  "settings-cursor": "/admin/settings/cursor",
+  "settings-menu": "/admin/settings/menu",
+  "support-reports": "/admin/support/reports",
 };
 
 // Reverse: URL → permission key
@@ -323,7 +323,7 @@ export function AdminSidebar() {
       menuKey: "my-activity",
       title: t("মাই একটিভিটি", "My Activity"),
       icon: Activity,
-      url: "/e/my-activity",
+      url: "/admin/my-activity",
       // No permissionKey — always visible for all roles
     },
     {
@@ -331,9 +331,9 @@ export function AdminSidebar() {
       title: t("ড্যাশবোর্ড", "Dashboard"),
       icon: LayoutDashboard,
       subItems: [
-        { title: t("ওভারভিউ", "Overview"), url: "/e/overview", icon: Eye, permissionKey: "overview" },
-        { title: t("বিক্রি রিপোর্ট", "Sales Report"), url: "/e/sales-report", icon: BarChart3, permissionKey: "sales-report" },
-        { title: t("শীর্ষ পণ্য", "Top Products"), url: "/e/top-products", icon: TrendingUp, permissionKey: "top-products" },
+        { title: t("ওভারভিউ", "Overview"), url: "/admin/overview", icon: Eye, permissionKey: "overview" },
+        { title: t("বিক্রি রিপোর্ট", "Sales Report"), url: "/admin/sales-report", icon: BarChart3, permissionKey: "sales-report" },
+        { title: t("শীর্ষ পণ্য", "Top Products"), url: "/admin/top-products", icon: TrendingUp, permissionKey: "top-products" },
         
         
         
@@ -344,7 +344,7 @@ export function AdminSidebar() {
       menuKey: "order-search",
       title: t("অর্ডার সার্চ", "Order Search"),
       icon: Search,
-      url: "/e/orders/search",
+      url: "/admin/orders/search",
       permissionKey: "orders-search",
     },
     {
@@ -352,14 +352,14 @@ export function AdminSidebar() {
       title: t("পণ্য", "Product"),
       icon: Package,
       subItems: [
-        { title: t("পণ্য তালিকা", "Product List"), url: "/e/products", icon: ListOrdered, permissionKey: "product-list" },
-        { title: t("সার্চ মনিটরিং", "Search Monitoring"), url: "/e/search-monitoring", icon: Search, permissionKey: "search-monitoring" },
-        { title: t("ইনভেন্টরি", "Inventory"), url: "/e/inventory", icon: Warehouse, permissionKey: "inventory" },
-        { title: t("ক্যাটাগরি", "Category"), url: "/e/categories", icon: BookOpen, permissionKey: "categories" },
-        { title: t("প্রোডাক্ট ট্যাগ", "Product Tag"), url: "/e/product-tags", icon: Tag, permissionKey: "product-tags" },
-        { title: t("অফার", "Offers"), url: "/e/offers", icon: Gift, permissionKey: "offers" },
-        { title: t("রিভিউ", "Review"), url: "/e/reviews", icon: MessageSquare, permissionKey: "reviews" },
-        { title: t("জিজ্ঞাসা", "Q&A"), url: "/e/qa", icon: MessageSquare, badge: pendingQaCount || 0, permissionKey: "reviews" },
+        { title: t("পণ্য তালিকা", "Product List"), url: "/admin/products", icon: ListOrdered, permissionKey: "product-list" },
+        { title: t("সার্চ মনিটরিং", "Search Monitoring"), url: "/admin/search-monitoring", icon: Search, permissionKey: "search-monitoring" },
+        { title: t("ইনভেন্টরি", "Inventory"), url: "/admin/inventory", icon: Warehouse, permissionKey: "inventory" },
+        { title: t("ক্যাটাগরি", "Category"), url: "/admin/categories", icon: BookOpen, permissionKey: "categories" },
+        { title: t("প্রোডাক্ট ট্যাগ", "Product Tag"), url: "/admin/product-tags", icon: Tag, permissionKey: "product-tags" },
+        { title: t("অফার", "Offers"), url: "/admin/offers", icon: Gift, permissionKey: "offers" },
+        { title: t("রিভিউ", "Review"), url: "/admin/reviews", icon: MessageSquare, permissionKey: "reviews" },
+        { title: t("জিজ্ঞাসা", "Q&A"), url: "/admin/qa", icon: MessageSquare, badge: pendingQaCount || 0, permissionKey: "reviews" },
       ],
     },
     {
@@ -367,18 +367,18 @@ export function AdminSidebar() {
       title: t("অর্ডারসমূহ", "All Orders"),
       icon: ShoppingCart,
       subItems: [
-        { title: t("নতুন তৈরি", "Create New"), url: "/e/orders/create", icon: Plus, permissionKey: "orders-create" },
-        { title: t("অর্ডারসমূহ", "All Orders"), url: "/e/orders/web", icon: ClipboardList, badge: pendingOrderCount || 0, permissionKey: "orders-web" },
-        { title: t("প্রি-অর্ডার", "Pre Orders"), url: "/e/orders/pre", icon: CalendarClock, badge: preOrderCount || 0, permissionKey: "orders-pre" },
-        { title: t("অর্ডার তালিকা", "Order List"), url: "/e/orders/list", icon: ClipboardList, badge: confirmedOrderCount || 0, permissionKey: "orders-list" },
-        { title: t("মুছে ফেলা", "Deleted"), url: "/e/orders/deleted", icon: Trash2, badge: deletedOrderCount || 0, hideFromParent: true, permissionKey: "orders-deleted" },
+        { title: t("নতুন তৈরি", "Create New"), url: "/admin/orders/create", icon: Plus, permissionKey: "orders-create" },
+        { title: t("অর্ডারসমূহ", "All Orders"), url: "/admin/orders/web", icon: ClipboardList, badge: pendingOrderCount || 0, permissionKey: "orders-web" },
+        { title: t("প্রি-অর্ডার", "Pre Orders"), url: "/admin/orders/pre", icon: CalendarClock, badge: preOrderCount || 0, permissionKey: "orders-pre" },
+        { title: t("অর্ডার তালিকা", "Order List"), url: "/admin/orders/list", icon: ClipboardList, badge: confirmedOrderCount || 0, permissionKey: "orders-list" },
+        { title: t("মুছে ফেলা", "Deleted"), url: "/admin/orders/deleted", icon: Trash2, badge: deletedOrderCount || 0, hideFromParent: true, permissionKey: "orders-deleted" },
       ],
     },
     {
       menuKey: "courier-handle",
       title: t("কুরিয়ার হ্যান্ডেল", "Courier Handle"),
       icon: Truck,
-      url: "/e/courier",
+      url: "/admin/courier",
       permissionKey: "courier-handle",
     },
     {
@@ -386,8 +386,8 @@ export function AdminSidebar() {
       title: t("ইউজার", "Users"),
       icon: Users,
       subItems: [
-        { title: t("অ্যাডমিন", "Admins"), url: "/e/users/admins", icon: UserCog, permissionKey: "users-admins" },
-        { title: t("কাস্টমার", "Customers"), url: "/e/users/customers", icon: UsersRound, permissionKey: "users-customers" },
+        { title: t("অ্যাডমিন", "Admins"), url: "/admin/users/admins", icon: UserCog, permissionKey: "users-admins" },
+        { title: t("কাস্টমার", "Customers"), url: "/admin/users/customers", icon: UsersRound, permissionKey: "users-customers" },
         
         
         
@@ -398,24 +398,24 @@ export function AdminSidebar() {
       title: t("ওয়েবসাইট", "Website"),
       icon: Globe,
       subItems: [
-        { title: "API", url: "/e/website/api", icon: Code, permissionKey: "website-api" },
-        { title: t("পেজ", "Page"), url: "/e/website/pages", icon: FileText, permissionKey: "website-pages" },
-        { title: t("ল্যান্ডিং পেজ", "Landing Pages"), url: "/e/website/landing-pages", icon: FileText, permissionKey: "website-pages" },
-        { title: t("থ্যাংক-ইউ অফার", "Thank-You Offers"), url: "/e/website/thankyou-offers", icon: ShoppingBag, permissionKey: "website-pages" },
-        { title: t("মিডিয়া", "Media"), url: "/e/website/media", icon: FileImage, permissionKey: "website-media" },
-        { title: t("ইমপোর্ট/এক্সপোর্ট", "Import/Export"), url: "/e/website/import-export", icon: ArrowUpDown, permissionKey: "settings-import-export" },
+        { title: "API", url: "/admin/website/api", icon: Code, permissionKey: "website-api" },
+        { title: t("পেজ", "Page"), url: "/admin/website/pages", icon: FileText, permissionKey: "website-pages" },
+        { title: t("ল্যান্ডিং পেজ", "Landing Pages"), url: "/admin/website/landing-pages", icon: FileText, permissionKey: "website-pages" },
+        { title: t("থ্যাংক-ইউ অফার", "Thank-You Offers"), url: "/admin/website/thankyou-offers", icon: ShoppingBag, permissionKey: "website-pages" },
+        { title: t("মিডিয়া", "Media"), url: "/admin/website/media", icon: FileImage, permissionKey: "website-media" },
+        { title: t("ইমপোর্ট/এক্সপোর্ট", "Import/Export"), url: "/admin/website/import-export", icon: ArrowUpDown, permissionKey: "settings-import-export" },
         
         
         
         
         
-        { title: "FB Catalog", url: "/e/website/facebook-catalog", icon: ShoppingBag, permissionKey: "website-facebook-catalog" },
-        { title: t("ভাসমান বাটন", "Floating Buttons"), url: "/e/website/floating-buttons", icon: MessageSquare, permissionKey: "website-floating-buttons" },
-        { title: t("Contact পেজ", "Contact Page"), url: "/e/website/contact-page", icon: MessageSquare, permissionKey: "website-pages" },
-        { title: t("Footer", "Footer"), url: "/e/website/footer", icon: MessageSquare, permissionKey: "website-pages" },
-        { title: t("কাউন্টডাউন টাইমার", "Countdown Timers"), url: "/e/website/countdown-timers", icon: CalendarClock, permissionKey: "website-pages" },
-        { title: t("হিরো ব্যানার", "Hero Banners"), url: "/e/website/hero-banners", icon: ImageIcon, permissionKey: "website-pages" },
-        { title: t("হোম সেকশন", "Home Sections"), url: "/e/website/home-sections", icon: LayoutGrid, permissionKey: "website-pages" },
+        { title: "FB Catalog", url: "/admin/website/facebook-catalog", icon: ShoppingBag, permissionKey: "website-facebook-catalog" },
+        { title: t("ভাসমান বাটন", "Floating Buttons"), url: "/admin/website/floating-buttons", icon: MessageSquare, permissionKey: "website-floating-buttons" },
+        { title: t("Contact পেজ", "Contact Page"), url: "/admin/website/contact-page", icon: MessageSquare, permissionKey: "website-pages" },
+        { title: t("Footer", "Footer"), url: "/admin/website/footer", icon: MessageSquare, permissionKey: "website-pages" },
+        { title: t("কাউন্টডাউন টাইমার", "Countdown Timers"), url: "/admin/website/countdown-timers", icon: CalendarClock, permissionKey: "website-pages" },
+        { title: t("হিরো ব্যানার", "Hero Banners"), url: "/admin/website/hero-banners", icon: ImageIcon, permissionKey: "website-pages" },
+        { title: t("হোম সেকশন", "Home Sections"), url: "/admin/website/home-sections", icon: LayoutGrid, permissionKey: "website-pages" },
         
         
       ],
@@ -425,13 +425,13 @@ export function AdminSidebar() {
       title: t("সেটিংস", "Settings"),
       icon: Settings,
       subItems: [
-        { title: t("থিম", "Theme"), url: "/e/settings/theme", icon: Palette, permissionKey: "settings-theme" },
-        { title: t("ভাষা", "Language"), url: "/e/settings/language", icon: Languages, permissionKey: "settings-language" },
-        { title: t("কার্সর ইফেক্ট", "Cursor Effect"), url: "/e/settings/cursor", icon: MousePointer2, permissionKey: "settings-cursor" },
-        { title: t("মেনু কন্ট্রোল", "Menu Control"), url: "/e/settings/menu", icon: ChevronsLeftRight, permissionKey: "settings-menu" },
+        { title: t("থিম", "Theme"), url: "/admin/settings/theme", icon: Palette, permissionKey: "settings-theme" },
+        { title: t("ভাষা", "Language"), url: "/admin/settings/language", icon: Languages, permissionKey: "settings-language" },
+        { title: t("কার্সর ইফেক্ট", "Cursor Effect"), url: "/admin/settings/cursor", icon: MousePointer2, permissionKey: "settings-cursor" },
+        { title: t("মেনু কন্ট্রোল", "Menu Control"), url: "/admin/settings/menu", icon: ChevronsLeftRight, permissionKey: "settings-menu" },
         
-        { title: t("ডেলিভারি চার্জ", "Delivery Charges"), url: "/e/settings/delivery-tiers", icon: Truck, permissionKey: "settings-theme" },
-        { title: t("অর্ডার কুলডাউন", "Order Cooldown"), url: "/e/settings/order-cooldown", icon: Clock, permissionKey: "settings-theme" },
+        { title: t("ডেলিভারি চার্জ", "Delivery Charges"), url: "/admin/settings/delivery-tiers", icon: Truck, permissionKey: "settings-theme" },
+        { title: t("অর্ডার কুলডাউন", "Order Cooldown"), url: "/admin/settings/order-cooldown", icon: Clock, permissionKey: "settings-theme" },
         
         
       ],
@@ -440,7 +440,7 @@ export function AdminSidebar() {
       menuKey: "notification",
       title: t("নোটিফিকেশন", "Notification"),
       icon: BellRing,
-      url: "/e/notifications/orders",
+      url: "/admin/notifications/orders",
       permissionKey: "notifications-orders",
     },
   ];

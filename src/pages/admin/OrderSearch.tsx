@@ -832,7 +832,7 @@ export default function OrderSearch() {
                               <Button variant="ghost" size="icon" className="h-8 w-8" title={t("ইনভয়েস দেখুন", "View Invoice")} onClick={() => { setInvoiceHtml(""); prevPreviewRef.current = null; setPreviewOrder(order); }}>
                                 <Eye className="w-3.5 h-3.5" />
                               </Button>
-                              <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => navigate(`/e/orders/edit/${order.order_id}`)}>
+                              <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => navigate(`/admin/orders/edit/${order.order_id}`)}>
                                 <Pencil className="w-3.5 h-3.5" />
                               </Button>
                             </div>
@@ -1316,7 +1316,7 @@ export default function OrderSearch() {
                                   <Button variant="ghost" size="icon" className="h-8 w-8" title={t("ইনভয়েস দেখুন", "View Invoice")} onClick={() => { setInvoiceHtml(""); prevPreviewRef.current = null; setPreviewOrder(order); }}>
                                     <Eye className="w-3.5 h-3.5" />
                                   </Button>
-                                  <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => navigate(`/e/orders/edit/${order.order_id}`)}>
+                                  <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => navigate(`/admin/orders/edit/${order.order_id}`)}>
                                     <Pencil className="w-3.5 h-3.5" />
                                   </Button>
                                 </div>

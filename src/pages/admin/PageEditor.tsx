@@ -380,7 +380,7 @@ export default function PageEditor() {
   useEffect(() => {
     getCurrentAdminAccess().then((result) => {
       if (result.status !== "authorized") {
-        navigate("/ecomah");
+        navigate("/admin/login");
       } else {
         setAuthChecked(true);
       }
@@ -392,7 +392,7 @@ export default function PageEditor() {
     if (!authChecked) return;
     if (isNew) { setLoading(false); return; }
     supabase.from("custom_pages").select("*").eq("id", id).maybeSingle().then(({ data }) => {
-      if (!data) { navigate("/e/website/pages"); return; }
+      if (!data) { navigate("/admin/website/pages"); return; }
       setTitle(data.title);
       setSlug(data.slug);
       setIsPublished(data.is_published);
@@ -458,7 +458,7 @@ export default function PageEditor() {
     if (isNew) {
       const { error } = await supabase.from("custom_pages").insert({ title, slug: finalSlug, content, is_published: isPublished });
       if (error) toast.error(error.message);
-      else { toast.success("পেজ তৈরি হয়েছে!"); navigate("/e/website/pages"); }
+      else { toast.success("পেজ তৈরি হয়েছে!"); navigate("/admin/website/pages"); }
     } else {
       const { error } = await supabase.from("custom_pages").update({ title, slug: finalSlug, content, is_published: isPublished, updated_at: new Date().toISOString() }).eq("id", id);
       if (error) toast.error(error.message);
@@ -550,7 +550,7 @@ export default function PageEditor() {
     <div className="h-screen flex flex-col bg-background overflow-hidden">
       {/* ===== Top Toolbar ===== */}
       <div className="flex items-center gap-2 px-3 py-2 border-b border-border bg-card shrink-0">
-        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => navigate("/e/website/pages")}>
+        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => navigate("/admin/website/pages")}>
           <ArrowLeft className="w-4 h-4" />
         </Button>
 

@@ -703,7 +703,7 @@ export default function Overview() {
         <Card>
           <CardHeader className="pb-2 flex flex-row items-center justify-between">
             <CardTitle className="text-base">{t("সাম্প্রতিক অর্ডার", "Recent Orders")}</CardTitle>
-            <button onClick={() => navigate("/e/orders/web")} className="text-xs text-primary hover:underline">
+            <button onClick={() => navigate("/admin/orders/web")} className="text-xs text-primary hover:underline">
               {t("সব দেখুন", "View all")}
             </button>
           </CardHeader>
@@ -713,7 +713,7 @@ export default function Overview() {
                 <div
                   key={order.id}
                   className="flex items-center justify-between px-4 py-2.5 hover:bg-muted/40 cursor-pointer transition-colors"
-                  onClick={() => navigate(`/e/orders/edit/${order.order_id}`)}
+                  onClick={() => navigate(`/admin/orders/edit/${order.order_id}`)}
                 >
                   <div className="flex items-center gap-2 min-w-0">
                     {statusIcon(order.status)}
@@ -742,7 +742,7 @@ export default function Overview() {
               <AlertTriangle className="w-4 h-4 text-yellow-500" />
               {t("স্টক কম", "Low Stock")}
             </CardTitle>
-            <button onClick={() => navigate("/e/inventory")} className="text-xs text-primary hover:underline">
+            <button onClick={() => navigate("/admin/inventory")} className="text-xs text-primary hover:underline">
               {t("সব দেখুন", "View all")}
             </button>
           </CardHeader>
@@ -752,7 +752,7 @@ export default function Overview() {
                 <div
                   key={product.id}
                   className="flex items-center justify-between px-4 py-2.5 hover:bg-muted/40 cursor-pointer transition-colors"
-                  onClick={() => navigate(`/e/products/edit/${product.id}`)}
+                  onClick={() => navigate(`/admin/products/edit/${product.id}`)}
                 >
                   <div className="flex items-center gap-2.5 min-w-0">
                     {product.product_image ? (

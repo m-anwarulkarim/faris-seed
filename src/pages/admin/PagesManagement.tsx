@@ -122,7 +122,7 @@ export default function PagesManagement() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <Button onClick={() => navigate("/e/website/pages/new")} className="gap-2">
+        <Button onClick={() => navigate("/admin/website/pages/new")} className="gap-2">
           <Plus className="w-4 h-4" /> {t("নতুন পেজ", "New Page")}
         </Button>
       </div>
@@ -141,7 +141,7 @@ export default function PagesManagement() {
             <CardContent className="py-12 text-center">
               <FileText className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
               <p className="text-sm text-muted-foreground">{t("কোনো কাস্টম পেজ নেই", "No custom pages yet")}</p>
-              <Button variant="outline" className="mt-3 gap-2" onClick={() => navigate("/e/website/pages/new")}>
+              <Button variant="outline" className="mt-3 gap-2" onClick={() => navigate("/admin/website/pages/new")}>
                 <Plus className="w-4 h-4" /> {t("প্রথম পেজ তৈরি করুন", "Create your first page")}
               </Button>
             </CardContent>
@@ -166,7 +166,7 @@ export default function PagesManagement() {
                         <ExternalLink className="w-3 h-3" /> {t("ভিজিট", "Visit")}
                       </Button>
                     </a>
-                    <Button size="sm" variant="outline" className="gap-1 text-xs h-7" onClick={() => navigate(`/e/website/pages/edit/${page.id}`)}>
+                    <Button size="sm" variant="outline" className="gap-1 text-xs h-7" onClick={() => navigate(`/admin/website/pages/edit/${page.id}`)}>
                       <Pencil className="w-3 h-3" /> {t("এডিট", "Edit")}
                     </Button>
                     <Button size="sm" variant="outline" className="gap-1 text-xs h-7 text-destructive hover:bg-destructive/10" onClick={() => setDeleteId(page.id)}>

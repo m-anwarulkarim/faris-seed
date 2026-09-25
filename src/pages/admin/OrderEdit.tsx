@@ -916,7 +916,7 @@ export default function OrderEdit() {
           navigate(-1);
           return;
         }
-        navigate(`/e/orders/edit/${newOrder.order_id}`, { replace: true });
+        navigate(`/admin/orders/edit/${newOrder.order_id}`, { replace: true });
       } else {
         // Update order
         const { data: { session } } = await supabase.auth.getSession();
@@ -1255,7 +1255,7 @@ export default function OrderEdit() {
                     if (error) { toast.error(error.message); return; }
                     toast.success(t("ইনভয়েস আপডেট হয়েছে", "Invoice updated"));
                     queryClient.invalidateQueries({ queryKey: ["order-edit", id] });
-                    navigate(`/e/orders/edit/${editingInvoiceValue.trim()}`, { replace: true });
+                    navigate(`/admin/orders/edit/${editingInvoiceValue.trim()}`, { replace: true });
                     setEditingInvoice(false);
                   }
                   if (e.key === "Escape") setEditingInvoice(false);
@@ -2095,7 +2095,7 @@ export default function OrderEdit() {
                     <div
                       key={o.id}
                       className={`flex items-center justify-between rounded-lg px-2.5 py-1.5 border cursor-pointer transition-colors ${o.order_id === id ? "border-primary bg-primary/5 ring-1 ring-primary/20" : "hover:bg-muted/50"}`}
-                      onClick={() => navigate(`/e/orders/edit/${o.order_id}`)}
+                      onClick={() => navigate(`/admin/orders/edit/${o.order_id}`)}
                     >
                       <div className="flex items-center gap-2 text-[11px]">
                         <span className="font-mono font-bold">{o.order_id}</span>
@@ -2156,7 +2156,7 @@ export default function OrderEdit() {
                       <div
                         key={o.id}
                         className="flex items-center justify-between bg-white/80 rounded-lg px-2.5 py-1.5 mb-1 border border-amber-200 cursor-pointer hover:bg-amber-100/50 transition-colors"
-                        onClick={() => navigate(`/e/orders/${o.id}`)}
+                        onClick={() => navigate(`/admin/orders/${o.id}`)}
                       >
                         <div className="text-[10px]">
                           <span className="font-mono font-bold text-amber-900">{o.order_id}</span>
@@ -2456,7 +2456,7 @@ export default function OrderEdit() {
                             className={`flex items-center gap-2 p-2 rounded-lg text-[11px] transition-colors ${isCurrent ? 'bg-primary/5 border border-primary/20' : 'bg-muted/30'} ${isLocked ? 'opacity-70 cursor-not-allowed' : 'cursor-pointer hover:bg-muted/50'}`}
                             onClick={() => {
                               if (isCurrent || isLocked) return;
-                              navigate(`/e/orders/edit/${o.order_id}`);
+                              navigate(`/admin/orders/edit/${o.order_id}`);
                             }}
                             title={isLocked ? t('এই অর্ডার এডিট করা যাবে না', 'This order cannot be edited') : ''}
                           >

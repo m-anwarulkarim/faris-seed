@@ -217,7 +217,7 @@ export function BrokenImagesDialog({ open, onOpenChange }: BrokenImagesDialogPro
                     </div>
 
                     <Link
-                      to={`/e/products/${r.product.id}/edit`}
+                      to={`/admin/products/${r.product.id}/edit`}
                       target="_blank"
                       className="text-primary hover:underline flex items-center gap-1 flex-shrink-0"
                       onClick={() => onOpenChange(false)}

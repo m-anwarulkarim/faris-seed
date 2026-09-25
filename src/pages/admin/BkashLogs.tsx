@@ -143,7 +143,7 @@ export default function BkashLogs() {
                 <TableCell><Badge variant="outline">{r.action}</Badge></TableCell>
                 <TableCell>
                   {r.order_id ? (
-                    <Link to={`/e/orders/${r.order_id}`} className="text-primary underline text-xs">
+                    <Link to={`/admin/orders/${r.order_id}`} className="text-primary underline text-xs">
                       {r.order_id.slice(0, 8)}
                     </Link>
                   ) : "-"}

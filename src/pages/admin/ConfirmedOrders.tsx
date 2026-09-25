@@ -86,7 +86,7 @@ export default function ConfirmedOrders() {
     queryFn: async () => {
       let query = supabase
         .from("orders")
-        .select("*, order_items(*, products(product_image)), visitors(traffic_source)", { count: "exact" })
+        .select("*, order_items(*), visitors(traffic_source)", { count: "exact" })
         .in("status", VISIBLE_STATUSES)
         .eq("is_deleted", false)
         .order("created_at", { ascending: false })

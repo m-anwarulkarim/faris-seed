@@ -201,7 +201,7 @@ export default function WebOrders() {
     queryFn: async () => {
       let query = supabase
         .from("orders")
-        .select("*, order_items(*, products(product_image)), visitors(traffic_source, admin_notes)", { count: "exact" })
+        .select("*, order_items(*), visitors(traffic_source, admin_notes)", { count: "exact" })
         .eq("is_deleted", false)
         .or(WEB_ORDER_SOURCE_FILTER)
         .order("created_at", { ascending: false })
@@ -668,7 +668,7 @@ export default function WebOrders() {
                     const items = rawItems.map((i: any) => {
                       const snap = i.product_image as string | null;
                       const isBroken = !snap || /bij-bd\.com/i.test(snap);
-                      return { ...i, product_image: (isBroken ? i.products?.product_image : snap) || i.products?.product_image || null };
+                      return { ...i, product_image: (isBroken ? i.products?.product_image : snap) || snap || null };
                     });
                     const timeAgo = formatDistanceToNow(new Date(order.created_at), { addSuffix: true });
 

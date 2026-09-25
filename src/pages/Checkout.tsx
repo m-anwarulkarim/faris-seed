@@ -20,6 +20,7 @@ import { getUserType, getUserTypeLabel } from "@/hooks/useUserType";
 import { trackInitiateCheckout } from "@/components/TrackingScripts";
 import { trackEvent } from "@/hooks/useAnalyticsTracker";
 import { productAlt } from "@/lib/seoAlt";
+import { formatBDPhone } from "@/lib/format";
 import { useCheckoutDialog } from "@/contexts/CheckoutDialogContext";
 import CheckoutRelatedProducts from "@/components/CheckoutRelatedProducts";
 import { Zap } from "lucide-react";
@@ -60,10 +61,10 @@ export default function Checkout() {
   const customerSession = getCustomerSession();
   const saved = loadDeliveryInfo();
   const [name, setName] = useState(saved.name || "");
-  const [phone, setPhone] = useState(saved.phone || "");
+  const [phone, setPhone] = useState(formatBDPhone(saved.phone || ""));
   const [address, setAddress] = useState(saved.address || "");
   const [showAltPhone, setShowAltPhone] = useState(!!saved.altPhone);
-  const [altPhone, setAltPhone] = useState(saved.altPhone || "");
+  const [altPhone, setAltPhone] = useState(formatBDPhone(saved.altPhone || ""));
   const [showNote, setShowNote] = useState(false);
   const [note, setNote] = useState("");
   const [paymentMethod, setPaymentMethod] = useState<"cod" | "bkash">("cod");
@@ -731,7 +732,7 @@ export default function Checkout() {
               <Label htmlFor="phone">ফোন নম্বর * (১১ ডিজিট)</Label>
               <div className="relative">
                 <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                <Input id="phone" placeholder="01XXXXXXXXX" value={phone} onChange={(e) => setPhone(e.target.value.replace(/\D/g, "").slice(0, 11))} maxLength={11} required className="pl-9" />
+                <Input id="phone" placeholder="01XXXXXXXXX" value={phone} onChange={(e) => setPhone(formatBDPhone(e.target.value))} maxLength={11} required className="pl-9" />
               </div>
             </div>
 

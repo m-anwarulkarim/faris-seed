@@ -15,7 +15,7 @@ import { Section, SectionHeading } from "@/components/pub/section";
 import { Textarea } from "@/components/ui/textarea";
 import { cartDeliveryCharge, cartSubtotal, clearCart, useCart } from "@/data/cart";
 import { placeOrder } from "@/lib/placeOrder";
-import { bn } from "@/lib/format";
+import { bn, formatBDPhone } from "@/lib/format";
 
 
 function CheckoutPage() {
@@ -34,7 +34,8 @@ function CheckoutPage() {
   const delivery = cartDeliveryCharge(items);
 
   function update(key: keyof typeof form, value: string) {
-    setForm((f) => ({ ...f, [key]: value }));
+    const sanitizedValue = (key === "phone" || key === "altPhone") ? formatBDPhone(value) : value;
+    setForm((f) => ({ ...f, [key]: sanitizedValue }));
   }
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {

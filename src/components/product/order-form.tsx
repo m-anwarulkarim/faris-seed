@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { placeOrder } from "@/lib/placeOrder";
 import type { Product } from "@/data/products";
-import { bn } from "@/lib/format";
+import { bn, formatBDPhone } from "@/lib/format";
 import { getPackOffer, getPackOffers } from "@/lib/pack-offers";
 
 
@@ -29,7 +29,8 @@ export function OrderForm({ product }: { product: Product }) {
 
 
   function update(key: keyof typeof form, value: string) {
-    setForm((f) => ({ ...f, [key]: value }));
+    const sanitizedValue = (key === "phone" || key === "altPhone") ? formatBDPhone(value) : value;
+    setForm((f) => ({ ...f, [key]: sanitizedValue }));
   }
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {

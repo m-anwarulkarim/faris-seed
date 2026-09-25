@@ -4063,6 +4063,14 @@ export type Database = {
       }
     }
     Functions: {
+      delete_app_setting: {
+        Args: { p_key: string }
+        Returns: undefined
+      }
+      save_app_setting: {
+        Args: { p_key: string; p_value: string }
+        Returns: undefined
+      }
       add_linked_phone_with_otp: {
         Args: { p_otp_code: string; p_phone: string; p_session_token: string }
         Returns: Json

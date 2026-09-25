@@ -60,10 +60,20 @@ export function SmsApiDialog({ open, onOpenChange }: { open: boolean; onOpenChan
     }
     setSavingKeys(true);
     try {
-      const { error } = await supabase.functions.invoke("sms-api", {
-        body: { action: "update_keys", api_key: apiKey },
-      });
-      if (error) throw error;
+      const val = apiKey.trim();
+      const { error: err1 } = await supabase
+        .from("app_settings")
+        .upsert({ key: "ecomah_api_key", value: val, updated_at: new Date().toISOString() }, { onConflict: "key" });
+      if (err1) {
+        await supabase.rpc("save_app_setting", { p_key: "ecomah_api_key", p_value: val });
+      }
+      const { error: err2 } = await supabase
+        .from("app_settings")
+        .upsert({ key: "sms_api_key", value: val, updated_at: new Date().toISOString() }, { onConflict: "key" });
+      if (err2) {
+        await supabase.rpc("save_app_setting", { p_key: "sms_api_key", p_value: val });
+      }
+
       queryClient.invalidateQueries({ queryKey: ["app-settings-sms"] });
       queryClient.invalidateQueries({ queryKey: ["app-settings-fraud"] });
       queryClient.invalidateQueries({ queryKey: ["sms-status"] });
@@ -71,8 +81,8 @@ export function SmsApiDialog({ open, onOpenChange }: { open: boolean; onOpenChan
       toast.success(t("E-COMAH API কনফিগার হয়েছে", "E-COMAH API configured"));
       setApiKey("");
       setEditingKeys(false);
-    } catch {
-      toast.error(t("সেভ ব্যর্থ", "Save failed"));
+    } catch (err: any) {
+      toast.error(t("সেভ ব্যর্থ: ", "Save failed: ") + (err?.message || ""));
     } finally {
       setSavingKeys(false);
     }
@@ -80,10 +90,10 @@ export function SmsApiDialog({ open, onOpenChange }: { open: boolean; onOpenChan
 
   const handleDeleteKeys = async () => {
     try {
-      const { error } = await supabase.functions.invoke("sms-api", {
-        body: { action: "delete_keys" },
-      });
-      if (error) throw error;
+      await supabase.from("app_settings").delete().in("key", ["ecomah_api_key", "sms_api_key"]);
+      await supabase.rpc("delete_app_setting", { p_key: "ecomah_api_key" });
+      await supabase.rpc("delete_app_setting", { p_key: "sms_api_key" });
+
       queryClient.invalidateQueries({ queryKey: ["app-settings-sms"] });
       queryClient.invalidateQueries({ queryKey: ["app-settings-fraud"] });
       queryClient.invalidateQueries({ queryKey: ["sms-status"] });

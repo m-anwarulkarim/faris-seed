@@ -56,24 +56,39 @@ export function FraudCheckerDialog({ open, onOpenChange }: { open: boolean; onOp
     if (!apiKey.trim()) { toast.error(t("API Key প্রয়োজন", "API Key is required")); return; }
     setSavingKey(true);
     try {
-      const { error } = await supabase.functions.invoke("fraud-checker", {
-        body: { action: "update_key", api_key: apiKey },
-      });
-      if (error) throw error;
+      const val = apiKey.trim();
+      const { error: err1 } = await supabase
+        .from("app_settings")
+        .upsert({ key: "ecomah_api_key", value: val, updated_at: new Date().toISOString() }, { onConflict: "key" });
+      if (err1) {
+        await supabase.rpc("save_app_setting", { p_key: "ecomah_api_key", p_value: val });
+      }
+      const { error: err2 } = await supabase
+        .from("app_settings")
+        .upsert({ key: "fraud_checker_api_key", value: val, updated_at: new Date().toISOString() }, { onConflict: "key" });
+      if (err2) {
+        await supabase.rpc("save_app_setting", { p_key: "fraud_checker_api_key", p_value: val });
+      }
+
       queryClient.invalidateQueries({ queryKey: ["app-settings-fraud"] });
       queryClient.invalidateQueries({ queryKey: ["app-settings-sms"] });
       queryClient.invalidateQueries({ queryKey: ["fraud-status"] });
       queryClient.invalidateQueries({ queryKey: ["sms-status"] });
       toast.success(t("E-COMAH API কনফিগার হয়েছে", "E-COMAH API configured"));
       setApiKey(""); setEditingKey(false);
-    } catch { toast.error(t("সেভ ব্যর্থ", "Save failed")); }
-    finally { setSavingKey(false); }
+    } catch (err: any) {
+      toast.error(t("সেভ ব্যর্থ: ", "Save failed: ") + (err?.message || ""));
+    } finally {
+      setSavingKey(false);
+    }
   };
 
   const handleDeleteKey = async () => {
     try {
-      const { error } = await supabase.functions.invoke("fraud-checker", { body: { action: "delete_key" } });
-      if (error) throw error;
+      await supabase.from("app_settings").delete().in("key", ["ecomah_api_key", "fraud_checker_api_key"]);
+      await supabase.rpc("delete_app_setting", { p_key: "ecomah_api_key" });
+      await supabase.rpc("delete_app_setting", { p_key: "fraud_checker_api_key" });
+
       queryClient.invalidateQueries({ queryKey: ["app-settings-fraud"] });
       queryClient.invalidateQueries({ queryKey: ["app-settings-sms"] });
       queryClient.invalidateQueries({ queryKey: ["fraud-status"] });

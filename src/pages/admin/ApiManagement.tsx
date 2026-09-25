@@ -119,10 +119,12 @@ function CourierApiDialog({ open, onOpenChange }: { open: boolean; onOpenChange:
     setGeneratingToken(true);
     try {
       const token = generateToken();
-      const { error } = await supabase.functions.invoke("steadfast-courier", {
-        body: { action: "update_webhook_token", token },
-      });
-      if (error) throw error;
+      const { error } = await supabase
+        .from("app_settings")
+        .upsert({ key: "steadfast_webhook_token", value: token, updated_at: new Date().toISOString() }, { onConflict: "key" });
+      if (error) {
+        await supabase.rpc("save_app_setting", { p_key: "steadfast_webhook_token", p_value: token });
+      }
       queryClient.invalidateQueries({ queryKey: ["app-settings-courier"] });
       toast.success(t("টোকেন তৈরি ও সেভ হয়েছে", "Token generated and saved"));
     } catch {
@@ -139,10 +141,21 @@ function CourierApiDialog({ open, onOpenChange }: { open: boolean; onOpenChange:
     }
     setSavingKeys(true);
     try {
-      const { error } = await supabase.functions.invoke("steadfast-courier", {
-        body: { action: "update_keys", api_key: apiKey, secret_key: secretKey },
-      });
-      if (error) throw error;
+      const ak = apiKey.trim();
+      const sk = secretKey.trim();
+      const { error: err1 } = await supabase
+        .from("app_settings")
+        .upsert({ key: "steadfast_api_key", value: ak, updated_at: new Date().toISOString() }, { onConflict: "key" });
+      if (err1) {
+        await supabase.rpc("save_app_setting", { p_key: "steadfast_api_key", p_value: ak });
+      }
+      const { error: err2 } = await supabase
+        .from("app_settings")
+        .upsert({ key: "steadfast_secret_key", value: sk, updated_at: new Date().toISOString() }, { onConflict: "key" });
+      if (err2) {
+        await supabase.rpc("save_app_setting", { p_key: "steadfast_secret_key", p_value: sk });
+      }
+
       queryClient.invalidateQueries({ queryKey: ["app-settings-courier"] });
       queryClient.invalidateQueries({ queryKey: ["courier-status"] });
       toast.success(t("API কী আপডেট হয়েছে", "API keys updated"));

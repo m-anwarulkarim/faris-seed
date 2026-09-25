@@ -1,7 +1,8 @@
 import { useEffect, Suspense } from "react";
 import { lazyWithRetry as lazy } from "@/lib/lazyWithRetry";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Route, Routes, Navigate, useParams } from "react-router-dom";
+import { BrowserRouter, Route, Routes, Navigate, useParams, useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -117,6 +118,29 @@ function SessionGuardWrapper() {
   return null;
 }
 
+function OAuthCallbackListener() {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const hasOAuthParams =
+      window.location.hash.includes("access_token") ||
+      window.location.hash.includes("error") ||
+      window.location.search.includes("code=");
+
+    const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
+      if ((event === "SIGNED_IN" || event === "TOKEN_REFRESHED") && session) {
+        if (hasOAuthParams || window.location.pathname === "/auth") {
+          navigate("/account", { replace: true });
+        }
+      }
+    });
+
+    return () => sub.subscription.unsubscribe();
+  }, [navigate]);
+
+  return null;
+}
+
 const App = () => {
   useEffect(() => {
     installGlobalErrorHandlers();
@@ -140,6 +164,7 @@ const App = () => {
                 <TikTokPixel />
                 <ActivityHeartbeatWrapper />
                 <SessionGuardWrapper />
+                <OAuthCallbackListener />
                 <Suspense fallback={<PageLoader />}>
                   <Routes>
                     {/* Public site */}

@@ -69,7 +69,7 @@ export function forceCustomerLogout(reason: "user_type_changed" | "session_revok
 
     setTimeout(() => {
       // Hard reload so all React state is fresh and chunks reload too.
-      window.location.replace("/profile");
+      window.location.replace("/auth");
     }, 1500);
   } catch {
     inProgress = false;

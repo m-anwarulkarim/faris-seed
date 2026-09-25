@@ -4,7 +4,6 @@ import { toast } from "sonner";
 import { Loader2, Mail, KeyRound, UserRound } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
-import { lovable } from "@/integrations/lovable/index";
 import { Navbar } from "@/components/site/navbar";
 import { Footer } from "@/components/site/footer";
 import { Section } from "@/components/pub/section";

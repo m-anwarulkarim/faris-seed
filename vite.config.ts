@@ -20,6 +20,9 @@ export default defineConfig(() => ({
   build: {
     target: "es2020",
     cssMinify: true,
+    cssCodeSplit: true,
+    chunkSizeWarningLimit: 1000,
+    reportCompressedSize: false,
     rollupOptions: {
       output: {
         manualChunks: {

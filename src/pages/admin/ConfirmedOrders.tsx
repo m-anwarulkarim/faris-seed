@@ -469,6 +469,8 @@ export default function ConfirmedOrders() {
                 </TableHeader>
                 <TableBody>
                   {orders.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE).map((order) => {
+                    const si = getStatusInfo(order.status);
+                    const StatusIcon = si.icon;
                     const rawItems = (order as any).order_items && (order as any).order_items.length > 0 ? (order as any).order_items : (itemsByOrder[order.id] || []);
                     const items = rawItems.map((i: any) => {
                       const snap = i.product_image as string | null;

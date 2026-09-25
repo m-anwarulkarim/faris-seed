@@ -1,10 +1,4 @@
-import tomato from "@/assets/product-tomato.webp";
-import chili from "@/assets/product-chili.webp";
-import carrot from "@/assets/product-carrot.webp";
-import brinjal from "@/assets/product-brinjal.webp";
-import cucumber from "@/assets/product-cucumber.webp";
-import pumpkin from "@/assets/product-pumpkin.webp";
-import marigold from "@/assets/product-marigold.webp";
+import zinnia from "@/assets/product-zinnia.webp";
 
 export type ProductTag = "bestseller" | "new" | "limited" | null;
 
@@ -24,91 +18,21 @@ export interface Product {
 
 export const products: Product[] = [
   {
-    slug: "hybrid-tomato-seeds",
-    name: "Portulaca / Time Flower seed",
-    nameEn: "Hybrid Tomato Seeds",
-    tagline: "উচ্চ ফলনশীল, ৫০ পিস প্যাক",
-    price: 250,
-    oldPrice: 350,
-    image: tomato,
-    images: [tomato, chili, carrot], // Demos
-    inStock: true,
-    tag: "bestseller",
-  },
-
-  {
-    slug: "green-chili-seeds",
-    name: "Zinnia Flower seed",
-    nameEn: "Green Chili Seeds",
-    tagline: "ঝাঁঝালো স্বাদ, সারা বছর ফলন",
-    price: 200,
-    oldPrice: 280,
-    image: chili,
-    images: [chili, tomato, brinjal], // Added multiple images for the slider
-    inStock: true,
-    tag: "bestseller",
-  },
-
-  {
-    slug: "carrot-seeds",
-    name: "বারি-১২/ কেজি বেগুন",
-    nameEn: "Premium Carrot Seeds",
-    tagline: "মিষ্টি ও রসালো শীতকালীন গাজর",
+    slug: "multicolor-zinnia-flower-seeds",
+    name: "মাল্টি কালার জিনিয়া ফুলের বীজ",
+    nameEn: "Multicolor Zinnia Flower Seeds",
+    tagline: "অফুরন্ত প্রিমিয়াম রঙ, ৯৫%+ অংকুরোদগম গ্যারান্টি, ছাদ বাগান ও টবের জন্য সেরা",
     price: 180,
-    image: carrot,
-    images: [carrot, cucumber, pumpkin],
+    oldPrice: 280,
+    image: zinnia,
+    images: [zinnia],
     inStock: true,
-    tag: null,
-  },
-  {
-    slug: "brinjal-seeds",
-    name: "কেরালা শিম ",
-    nameEn: "Long Brinjal Seeds",
-    tagline: "লম্বা জাত, রোগ প্রতিরোধী",
-    price: 220,
-    image: brinjal,
-    images: [brinjal, chili, tomato],
-    inStock: true,
-    tag: "new",
-  },
-  {
-    slug: "cucumber-seeds",
-    name: "শশা বীজ",
-    nameEn: "Cucumber Seeds",
-    tagline: "দ্রুত ফলন, টবেও চাষ উপযোগী",
-    price: 190,
-    image: cucumber,
-    images: [cucumber, carrot, pumpkin],
-    inStock: true,
-    tag: null,
-  },
-  {
-    slug: "pumpkin-seeds",
-    name: "মিষ্টি কুমড়া বীজ",
-    nameEn: "Sweet Pumpkin Seeds",
-    tagline: "বড় আকারের ফল, দীর্ঘ সংরক্ষণ",
-    price: 210,
-    image: pumpkin,
-    images: [pumpkin, cucumber, marigold],
-    inStock: false,
-    tag: "limited",
-  },
-  {
-    slug: "marigold-flower-seeds",
-    name: "গাঁদা ফুলের বীজ",
-    nameEn: "Marigold Flower Seeds",
-    tagline: "ছাদ বাগানের জন্য পারফেক্ট",
-    price: 150,
-    image: marigold,
-    images: [marigold, pumpkin, chili],
-    inStock: true,
-    tag: null,
+    tag: "bestseller",
   },
 ];
 
-
 export function getProduct(slug: string): Product | undefined {
-  return products.find((p) => p.slug === slug);
+  return products.find((p) => p.slug === slug) ?? products[0];
 }
 
 /* ---------------- Landing page content (reusable template data) ---------------- */
@@ -149,56 +73,70 @@ export interface LandingContent {
 /** Shared fallbacks so a new product only needs name, price, image & tagline. */
 const defaultBenefits: Benefit[] = [
   { icon: "sprout", title: "৯৫%+ Germination", text: "ল্যাব-টেস্টেড বীজ, প্রতিটি ব্যাচ যাচাই করা" },
-  { icon: "leaf", title: "১০০% অর্গানিক", text: "কোনো ক্ষতিকর কেমিক্যাল ট্রিটমেন্ট নেই" },
-  { icon: "package", title: "প্রিমিয়াম প্যাকেজিং", text: "এয়ার-টাইট ফয়েল প্যাক, দীর্ঘ সংরক্ষণ" },
-  { icon: "truck", title: "ক্যাশ অন ডেলিভারি", text: "সারা দেশে ২৪–৭২ ঘণ্টায় হোম ডেলিভারি" },
+  { icon: "leaf", title: "১০০% প্রিমিয়াম বীজ", text: "ছাদ ও মাঠের যেকোনো মাটিতে সহজ চাষযোগ্য" },
+  { icon: "package", title: "এয়ার-টাইট ফয়েল প্যাক", text: "বীজের আর্দ্রতা ধরে রাখে, দীর্ঘদিন সংরক্ষণযোগ্য" },
+  { icon: "truck", title: "ক্যাশ অন ডেলিভারি", text: "সারা বাংলাদেশে ২৪–৭২ ঘণ্টায় দ্রুত হোম ডেলিভারি" },
 ];
 
 const defaultReviews: Review[] = [
   {
-    name: "রফিকুল ইসলাম",
-    location: "বগুড়া",
-    rating: 5,
-    text: "বীজের গজানোর হার দুর্দান্ত। প্যাকেজিংও খুব ভালো ছিল, ডেলিভারি দ্রুত পেয়েছি।",
-  },
-  {
-    name: "সাবরিনা আক্তার",
+    name: "শারমিন আক্তার",
     location: "ঢাকা",
     rating: 5,
-    text: "ছাদ বাগানের জন্য নিয়েছিলাম, প্রায় সব বীজই গজিয়েছে। আবার অর্ডার করব।",
+    text: "জিনিয়া বীজের প্যাকটা অনেক ভালো ছিল। প্রায় সব বীজ থেকে সুন্দর সুন্দর রঙ-বেরঙের ফুটফুটে চারা গজিয়েছে!",
   },
   {
-    name: "মোঃ জাহিদ",
+    name: "আব্দুল করিম",
+    location: "বগুড়া",
+    rating: 5,
+    text: "এক প্যাকেটে এতো সুন্দর বাহারি রঙের ফুল একসাথে পাবো ভাবিনি। বীজ গজানোর হারও খুব চমৎকার।",
+  },
+  {
+    name: "মো জাহিদুল হাসান",
     location: "যশোর",
-    rating: 4,
-    text: "দাম অনুযায়ী কোয়ালিটি ভালো। ক্যাশ অন ডেলিভারিতে নিতে পেরে নিশ্চিন্ত লেগেছে।",
+    rating: 5,
+    text: "ক্যাশ অন ডেলিভারিতে ২ দিনেই হাতে পেলাম। প্যাকেজিং খুব সুরক্ষিত ছিল। ধন্যবাদ ফারিস সিড।",
+  },
+  {
+    name: "মেহেরুন্নেসা চৌধুরী",
+    location: "সিলেট",
+    rating: 5,
+    text: "ছাদ বাগানে টবে লাগিয়েছিলাম। ৪০ দিনের মাথায় মাশাল্লাহ প্রচুর ফুল ফুটেছে, বাগানটাই দেখতে অসাধারণ লাগছে।",
   },
 ];
 
 const defaultFaqs: Faq[] = [
-  { q: "ডেলিভারি কত দিনে পাব?", a: "ঢাকার ভেতরে ২৪–৪৮ ঘণ্টা এবং ঢাকার বাইরে ৪৮–৭২ ঘণ্টার মধ্যে হোম ডেলিভারি করা হয়।" },
-  { q: "পেমেন্ট কীভাবে করব?", a: "ক্যাশ অন ডেলিভারি — পণ্য হাতে পেয়ে ডেলিভারি ম্যানকে টাকা পরিশোধ করবেন।" },
-  { q: "বীজ না গজালে কী হবে?", a: "সঠিক নিয়মে বপনের পরও গজানোর হার ৮০%-এর নিচে হলে আমরা বীজ রিপ্লেস করে দিই।" },
-  { q: "ডেলিভারি চার্জ কত?", a: "সারা বাংলাদেশে ডেলিভারি চার্জ মাত্র ৫০ টাকা। তবে একের অধিক (২টি বা তার বেশি) প্যাক অর্ডারে ডেলিভারি চার্জ একদম ফ্রি!" },
+  { q: "একটি প্যাকেটে কতটি বীজ থাকে?", a: "প্রতিটি প্যাকেটে ৫০টিরও বেশি উচ্চ ফলনশীল প্রিমিয়াম মাল্টি কালার জিনিয়া ফুলের বীজ থাকে।" },
+  { q: "বীজ না গজালে কী হবে?", a: "সঠিক নিয়মে বপনের পরও অঙ্কুরোদগমের হার ৮০%-এর নিচে হলে আমরা বীজ সম্পূর্ণ ফ্রি-তে রিপ্লেস করে দিই।" },
+  { q: "ডেলিভারি চার্জ কত?", a: "সারা বাংলাদেশে ডেলিভারি চার্জ মাত্র ৫০ টাকা। ২টি বা তার বেশি প্যাক অর্ডার করলে ডেলিভারি চার্জ একদম ফ্রি!" },
+  { q: "কত দিনে গাছে ফুল ফোটে?", a: "বীজ থেকে চারা বের হওয়ার ৪০ থেকে ৫০ দিনের মধ্যেই গাছে প্রচুর উজ্জ্বল ও নয়নজুড়ানো ফুল ফুটতে শুরু করে।" },
 ];
 
 const landingOverrides: Partial<Record<string, Partial<LandingContent>>> = {
-  "hybrid-tomato-seeds": {
-    headline: "সারা বছর ধরে থোকায় থোকায় টমেটো",
-    highlights: ["গাছপ্রতি ৮–১০ কেজি ফলন", "রোগ প্রতিরোধী হাইব্রিড জাত", "৫০ পিস বীজের প্যাক"],
-  },
-  "green-chili-seeds": {
-    headline: "ঝাঁঝালো স্বাদের কাঁচা মরিচ, ঘরেই",
-    highlights: ["সারা বছর ফলন", "টব ও জমিতে সমান উপযোগী", "উচ্চ ঝাল মাত্রা"],
-  },
-  "marigold-flower-seeds": {
-    headline: "ছাদ বাগান ভরে উঠবে গাঁদা ফুলে",
-    highlights: ["দীর্ঘ সময় ফুল থাকে", "পোকা প্রতিরোধে সহায়ক", "সহজ পরিচর্যা"],
+  "multicolor-zinnia-flower-seeds": {
+    headline: "ছাদ ও বাগান ভরিয়ে তুলুন নয়নজুড়ানো বাহারি রঙের জিনিয়া ফুলে",
+    subheadline: "আমাদের হাই-জার্মিনেশন প্রিমিয়াম প্যাকেটের মাল্টি কালার জিনিয়া ফুল চাষ করে আপনার বাগানকে অনন্য সুন্দর রূপ দিন। ল্যাব-টেস্টেড ফ্রেশ বীজ।",
+    highlights: [
+      "অফুরন্ত উজ্জ্বল রঙের মিশ্রণ (লাল, হলুদ, গোলাপী, সাদা, বেগুনী, কমলা)",
+      "সহজ চারা তৈরি ও দ্রুত ফুল আসার নিশ্চয়তা (৪০–৫০ দিনে ফুল)",
+      "টব, ছাদ বাগান এবং সীমানা বাগানের জন্য অত্যন্ত উপযোগী",
+      "৯৫%+ অংকুরোদগমের সেরা ল্যাব-টেস্টেড পারফেক্ট ব্যাচ",
+    ],
+    description: [
+      "জ জিনিয়া (Zinnia) অত্যন্ত চমৎকার রঙিন ও দীর্ঘস্থায়ী ফুল গাছ। মাল্টি কালার জিনিয়া বীজের এই প্যাকেটে আপনি পাবেন লাল, গোলাপী, হলুদ, সাদা, বেগুনী ও কমলার মতো উজ্জ্বল ও নয়নজুড়ানো রূপের বৈচিত্র্য।",
+      "এই বীজ অত্যন্ত সহজে অঙ্কুরিত হয় এবং চারা রোপণের মাত্র ৪০ থেকে ৫০ দিনের মধ্যেই প্রচুর ফুল ফুটতে শুরু করে। রোদ উজ্জ্বল স্থানে ও টবে খুব ভালো জন্মায়। প্রতিটি ফয়েল প্যাক এয়ার-টাইট ও সম্পূর্ণ আর্দ্রতারোধী।",
+    ],
+    usage: [
+      "বীজ বপনের আগে ৪–৬ ঘণ্টা পরিষ্কার পানিতে ভিজিয়ে রাখুন।",
+      "টব বা চারা তৈরির পাত্রে ঝুরঝুরে জৈব সারযুক্ত মাটিতে ০.৫ সেমি গভীরে ছিটিয়ে হালকা মাটি দিয়ে ঢেকে দিন।",
+      "হালকা স্প্রে করে পানি দিন এবং সরাসরি কড়া রোদ এড়িয়ে ছায়াযুক্ত স্থানে রাখুন (৩–৫ দিনে চারা গজাবে)।",
+      "চারা ৩–৪ ইঞ্চি লম্বা হলে পর্যাপ্ত আলো বাতাসযুক্ত স্থানে বা বড় টবে স্থানান্তর করুন।",
+    ],
   },
 };
 
 export function getLandingContent(product: Product): LandingContent {
-  const o = landingOverrides[product.slug] ?? {};
+  const o = landingOverrides[product.slug] ?? landingOverrides["multicolor-zinnia-flower-seeds"] ?? {};
   return {
     headline: o.headline ?? `${product.name} — ${product.tagline}`,
     subheadline:
@@ -208,19 +146,19 @@ export function getLandingContent(product: Product): LandingContent {
     benefits: o.benefits ?? defaultBenefits,
     description:
       o.description ?? [
-        `${product.name} (${product.nameEn}) আমাদের সবচেয়ে যাচাইকৃত জাতগুলোর একটি। প্রতিটি ব্যাচ বপনের আগে germination test করা হয়, ফলে আপনি পাচ্ছেন নিশ্চিত অঙ্কুরোদগম ও সুস্থ সবল চারা।`,
+        `${product.name} (${product.nameEn}) আমাদের সবচেয়ে পছন্দনীয় ফুল বীজের একটি। প্রতিটি ব্যাচ বপনের আগে germination test করা হয়, ফলে আপনি পাচ্ছেন নিশ্চিত অঙ্কুরোদগম ও সুস্থ সবল চারা।`,
         "বীজ সংগ্রহ থেকে প্যাকেজিং পর্যন্ত পুরো প্রক্রিয়া নিয়ন্ত্রিত পরিবেশে করা হয়। এয়ার-টাইট ফয়েল প্যাকেজিং বীজের আর্দ্রতা ধরে রাখে, তাই দীর্ঘদিন সংরক্ষণ করেও গুণ নষ্ট হয় না।",
       ],
     usage:
       o.usage ?? [
-        "বপনের আগে বীজ ৬–৮ ঘণ্টা পানিতে ভিজিয়ে রাখুন।",
-        "ঝুরঝুরে মাটিতে ০.৫–১ সেমি গভীরে বীজ বপন করুন।",
-        "প্রতিদিন হালকা পানি দিন, মাটি যেন কখনো শুকিয়ে না যায়।",
-        "চারা ৪–৫ পাতা হলে মূল জমি বা বড় টবে স্থানান্তর করুন।",
+        "বপনের আগে বীজ ৪–৬ ঘণ্টা পানিতে ভিজিয়ে রাখুন।",
+        "ঝুরঝুরে মাটিতে ০.৫ সেমি গভীরে বীজ বপন করুন।",
+        "প্রতিদিন হালকা স্প্রে করে পানি দিন, মাটি যেন কখনো শুকিয়ে না যায়।",
+        "চারা ৩–৪ ইঞ্চি লম্বা হলে মূল জমি বা বড় টবে স্থানান্তর করুন।",
       ],
     reviews: o.reviews ?? defaultReviews,
     faqs: o.faqs ?? defaultFaqs,
-    packSize: o.packSize ?? "১ প্যাক (৫০ পিস বীজ)",
+    packSize: o.packSize ?? "১ প্যাক (৫০+ বীজ)",
     germination: o.germination ?? "৯৫%+",
   };
 }

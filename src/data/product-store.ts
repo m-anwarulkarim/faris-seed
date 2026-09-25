@@ -44,7 +44,7 @@ function fromSeed(p: Product): ProductRecord {
 /** Server/first-render catalog — the built-in seed products. */
 export const seedCatalog: ProductRecord[] = seedProducts.map(fromSeed);
 
-const STORAGE_KEY = "sobuj-bij-products";
+const STORAGE_KEY = "faris-seed-zinnia-v1";
 
 function isBrowser() {
   return typeof window !== "undefined";

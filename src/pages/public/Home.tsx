@@ -2,7 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { ArrowRight, Quote, ShoppingCart, Star, ChevronLeft, ChevronRight } from "lucide-react";
 import * as React from "react";
 import Autoplay from "embla-carousel-autoplay";
-import heroSeeds from "@/assets/hero-seeds.webp";
+import zinnia from "@/assets/product-zinnia.webp";
 import { toast } from "sonner";
 
 import { addToCart } from "@/data/cart";
@@ -25,51 +25,51 @@ import {
 
 const reviews = [
   {
-    name: "রফিকুল ইসলাম",
-    location: "বগুড়া",
-    text: "টমেটোর বীজ থেকে প্রায় সব গাছই গজিয়েছে। এবার ফলনও দ্বিগুণ হয়েছে। প্যাকেজিং খুব ভালো ছিল।",
-  },
-  {
-    name: "সাদিয়া আফরিন",
+    name: "শারমিন আক্তার",
     location: "ঢাকা",
-    text: "ছাদ বাগানের জন্য গাঁদা আর শশার বীজ নিয়েছিলাম। ১০ দিনেই চারা বের হয়েছে, দামও রিজনেবল।",
+    text: "জিনিয়া বীজের প্যাকটা অনেক ভালো ছিল। প্রায় সব বীজ থেকে সুন্দর সুন্দর রঙ-বেরঙের চারা গজিয়েছে!",
   },
   {
-    name: "মোঃ জাহাঙ্গীর",
+    name: "আব্দুল করিম",
+    location: "বগুড়া",
+    text: "এক প্যাকেটে এতো সুন্দর বাহারি রঙের ফুল একসাথে পাবো ভাবিনি। বীজ গজানোর হারও খুব চমৎকার।",
+  },
+  {
+    name: "মো জাহিদুল হাসান",
     location: "যশোর",
-    text: "ক্যাশ অন ডেলিভারিতে অর্ডার করেছি, পরদিনই কুরিয়ারে পেয়ে গেছি। বিশ্বস্ত সেলার।",
+    text: "ক্যাশ অন ডেলিভারিতে ২ দিনেই হাতে পেলাম। প্যাকেজিং খুব সুরক্ষিত ছিল। ধন্যবাদ ফারিস সিড।",
   },
   {
-    name: "নাজমুল হাসান",
+    name: "মেহেরুন্নেসা চৌধুরী",
     location: "সিলেট",
-    text: "আগে বাজার থেকে বীজ কিনে ঠকেছি। এখান থেকে নেওয়ার পর germination নিয়ে আর চিন্তা নেই।",
+    text: "ছাদ বাগানে টবে লাগিয়েছিলাম। ৪০ দিনের মাথায় মাশাল্লাহ প্রচুর ফুল ফুটেছে, বাগানটাই দেখতে অসাধারণ লাগছে।",
   },
 ];
 
 const heroSlides = [
   {
     id: 1,
-    image: heroSeeds,
-    title: "সেরা মানের বীজ, সেরা ফলন",
-    subtitle: "আমাদের প্রিমিয়াম বীজে বাগান হবে আরও সবুজ ও সতেজ।",
-    cta: "বীজ দেখুন",
-    link: "#products",
+    image: zinnia,
+    title: "মাল্টি কালার জিনিয়া ফুলের বীজ",
+    subtitle: "ছাদ ও বাগান ভরিয়ে তুলুন নয়নজুড়ানো বাহারি রঙের জিনিয়া ফুলে। ৯৫%+ অংকুরোদগম গ্যারান্টি।",
+    cta: "এখনই অর্ডার করুন",
+    link: "/product/multicolor-zinnia-flower-seeds",
   },
   {
     id: 2,
     image: "https://images.unsplash.com/photo-1466692476868-aef1dfb1e735?auto=format&fit=crop&q=80&w=2000",
     title: "নিশ্চিত অংকুরোদগমের গ্যারান্টি",
-    subtitle: "প্রতিটি বীজ যাচাইকৃত এবং ১০০% জার্মিনেশন গ্যারান্টি যুক্ত।",
+    subtitle: "প্রতিটি বীজ ল্যাব-টেস্টেড ও ১০০% জার্মিনেশন গ্যারান্টি যুক্ত প্রিমিয়াম ফয়েল প্যাক।",
     cta: "অর্ডার করুন",
-    link: "#products",
+    link: "/product/multicolor-zinnia-flower-seeds",
   },
   {
     id: 3,
     image: "https://images.unsplash.com/photo-1592419044706-39796d40f98c?auto=format&fit=crop&q=80&w=2000",
     title: "সারা দেশে ক্যাশ অন ডেলিভারি",
-    subtitle: "ঘরে বসেই অর্ডার করুন আপনার পছন্দের সবজি ও ফুলের বীজ।",
-    cta: "কালেকশন দেখুন",
-    link: "#products",
+    subtitle: "ঘরে বসেই পণ্য হাতে পেয়ে মূল্য পরিশোধ করুন। মাত্র ৫০ টাকা ডেলিভারি চার্জ।",
+    cta: "পণ্য দেখুন",
+    link: "/product/multicolor-zinnia-flower-seeds",
   },
 ];
 

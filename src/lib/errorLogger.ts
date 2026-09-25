@@ -70,7 +70,7 @@ function isStaleChunkError(message: string, stack?: string): boolean {
   );
 }
 
-const STALE_RELOAD_KEY = "__lovable_stale_reload_at";
+const STALE_RELOAD_KEY = "__faris_stale_reload_at";
 function maybeReloadOnStaleChunk(message: string, stack?: string) {
   if (typeof window === "undefined") return;
   if (!isStaleChunkError(message, stack)) return;

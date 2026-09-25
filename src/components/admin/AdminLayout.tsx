@@ -549,17 +549,29 @@ export function AdminLayout() {
   if (authCheckError) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-muted/30 p-6">
-        <div className="max-w-md rounded-2xl border bg-background p-6 text-center shadow-sm">
-          <ShieldAlert className="mx-auto mb-3 h-8 w-8 text-destructive" />
-          <h2 className="text-lg font-semibold text-foreground">অটো লগআউট bug fix করা হয়েছে</h2>
-          <p className="mt-2 text-sm text-muted-foreground">{authCheckError}</p>
-          <button
-            type="button"
-            onClick={() => void checkAdmin()}
-            className="mt-4 inline-flex items-center justify-center rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90"
-          >
-            আবার চেষ্টা করুন
-          </button>
+        <div className="max-w-md rounded-2xl border bg-background p-6 text-center shadow-sm space-y-3">
+          <ShieldAlert className="mx-auto h-8 w-8 text-destructive" />
+          <h2 className="text-lg font-semibold text-foreground">অ্যাডমিন অ্যাক্সেস ভেরিফিকেশন</h2>
+          <p className="text-sm text-muted-foreground">{authCheckError}</p>
+          <div className="flex items-center justify-center gap-2 pt-2">
+            <button
+              type="button"
+              onClick={() => void checkAdmin()}
+              className="inline-flex items-center justify-center rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90"
+            >
+              আবার চেষ্টা করুন
+            </button>
+            <button
+              type="button"
+              onClick={async () => {
+                await supabase.auth.signOut();
+                navigate("/admin", { replace: true });
+              }}
+              className="inline-flex items-center justify-center rounded-lg border border-border bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted"
+            >
+              পুনরায় অ্যাডমিন লগইন
+            </button>
+          </div>
         </div>
       </div>
     );

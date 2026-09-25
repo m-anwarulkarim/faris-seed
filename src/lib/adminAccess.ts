@@ -36,7 +36,18 @@ export async function getCurrentAdminAccess(): Promise<AdminAccessResult> {
 }
 
 async function getAdminAccessForUser(userId: string, email: string): Promise<AdminAccessResult> {
-  const isSuperAdmin = SUPER_ADMIN_EMAILS.includes(email as string);
+  const normalizedEmail = email.trim().toLowerCase();
+  const isSuperAdmin = SUPER_ADMIN_EMAILS.some((e) => e.toLowerCase() === normalizedEmail);
+
+  if (isSuperAdmin) {
+    return {
+      status: "authorized",
+      role: "admin",
+      permissions: [],
+      email,
+      isSuperAdmin: true,
+    };
+  }
 
   const { data: roleRows, error: roleError } = await supabase
     .from("user_roles")
@@ -56,7 +67,7 @@ async function getAdminAccessForUser(userId: string, email: string): Promise<Adm
       : null;
 
   if (!resolvedRole) {
-    return { status: "unauthorized", email, isSuperAdmin };
+    return { status: "unauthorized", email, isSuperAdmin: false };
   }
 
   if (resolvedRole === "admin") {

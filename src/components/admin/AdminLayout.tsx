@@ -12,7 +12,7 @@ import { CustomCursor } from "./CustomCursor";
 import { PushNotificationPrompt } from "./PushNotificationPrompt";
 import { NewSupportReportAlert } from "./NewSupportReportAlert";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { getCurrentAdminAccess } from "@/lib/adminAccess";
+import { getCurrentAdminAccess, type AdminAccessResult } from "@/lib/adminAccess";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import { useOrdersRealtime } from "@/hooks/useOrdersRealtime";
 import { savePageState, restoreScroll } from "@/lib/adminPageState";
@@ -418,7 +418,7 @@ export function AdminLayout() {
     try {
       // 8-second timeout safety guard to prevent infinite spinning loader
       const accessPromise = getCurrentAdminAccess();
-      const timeoutPromise = new Promise<import("@/lib/adminAccess").AdminAccessResult>((resolve) =>
+      const timeoutPromise = new Promise<AdminAccessResult>((resolve) =>
         setTimeout(() => resolve({ status: "error", message: "অ্যাডমিন ভেরিফিকেশন টাইমাউট হয়েছে (নেটওয়ার্ক বিলম্ব)।" }), 8000)
       );
 

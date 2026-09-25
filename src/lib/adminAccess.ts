@@ -2,9 +2,9 @@ import { supabase } from "@/integrations/supabase/client";
 
 const ADMIN_ROLES = ["admin", "moderator"] as const;
 
-type AdminRole = (typeof ADMIN_ROLES)[number];
+export type AdminRole = (typeof ADMIN_ROLES)[number];
 
-type AdminAccessResult =
+export type AdminAccessResult =
   | { status: "no-session" }
   | { status: "unauthorized"; email: string; isSuperAdmin: boolean }
   | { status: "error"; message: string }

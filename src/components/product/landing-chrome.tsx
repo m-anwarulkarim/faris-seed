@@ -43,7 +43,15 @@ export function StickyOrderBar({ price, oldPrice, hidden }: { price: number; old
           ) : null}
         </div>
         <Button asChild variant="cta" className="flex-1 max-w-56">
-          <a href="#order">এখনই অর্ডার করুন</a>
+          <a
+            href="#order"
+            onClick={(e) => {
+              e.preventDefault();
+              document.getElementById("order")?.scrollIntoView({ behavior: "smooth", block: "start" });
+            }}
+          >
+            এখনই অর্ডার করুন
+          </a>
         </Button>
       </div>
     </div>

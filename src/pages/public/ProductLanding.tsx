@@ -1,4 +1,4 @@
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useLocation } from "react-router-dom";
 import { useEffect, useRef, useState, type ComponentType } from "react";
 
 import {
@@ -341,14 +341,31 @@ function ProductLandingPage() {
   const [openFaq, setOpenFaq] = useState<number | null>(0);
   const { h, m, s } = useMidnightCountdown();
 
+  const location = useLocation();
+
   useEffect(() => {
     if (!product?.slug) return;
     trackViewContent(product.slug, product.name, product.price);
   }, [product?.slug, product?.name, product?.price]);
 
+  useEffect(() => {
+    if (location.hash === "#order") {
+      const timer = setTimeout(() => {
+        const el = document.getElementById("order");
+        if (el) {
+          el.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      }, 150);
+      return () => clearTimeout(timer);
+    }
+  }, [location.hash, product?.slug]);
+
   const scrollToOrder = (e?: React.MouseEvent) => {
-    e?.preventDefault();
-    document.getElementById("order")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    if (e) e.preventDefault();
+    const el = document.getElementById("order");
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
   };
 
   if (!product || !c) {
@@ -567,7 +584,7 @@ function ProductLandingPage() {
 
     /* 4. ORDER FORM */
     order: (
-      <section key="order" className="bg-white py-10">
+      <section key="order" id="order" className="bg-white py-10 scroll-mt-14">
         <div className="mx-auto max-w-3xl px-4">
           <Reveal>
             <h2 className="mb-5 inline-flex w-full items-center justify-center gap-2 text-center text-2xl font-extrabold md:text-3xl" style={{ color: PRIMARY }}>

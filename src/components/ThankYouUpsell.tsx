@@ -29,13 +29,18 @@ export function ThankYouUpsell({ orderId, onAdded }: Props) {
     loadThankYouOffers().then((list) => setOffers(list.filter((o) => o.active)));
   }, []);
 
-  if (!orderId || offers.length === 0) return null;
+  if (offers.length === 0) return null;
 
   async function confirm() {
-    if (!selected || !orderId) return;
+    if (!selected) return;
+    if (!orderId) {
+      toast.info("অর্ডার করার পর স্পেশাল অফারটি সরাসরি অর্ডারে যুক্ত করতে পারবেন।");
+      setSelected(null);
+      return;
+    }
     setBusy(true);
     try {
-      const res = await addOfferToOrder(orderId, selected.id, 1);
+      const res = await addOfferToOrder(orderId, selected, 1);
       if (!res.ok) {
         const msg =
           res.error === "too_late" || res.error === "order_locked"

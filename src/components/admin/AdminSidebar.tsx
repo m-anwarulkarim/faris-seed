@@ -38,7 +38,7 @@ import { getCurrentAdminAccess } from "@/lib/adminAccess";
 import { useIdleDetection } from "@/hooks/useIdleDetection";
 import grihaNovaLogo from "@/assets/grihanova-logo.webp";
 
-const SUPER_ADMIN_EMAILS = ["grihanova26@gmail.com", "dev.anwarul@gmail.com"];
+const SUPER_ADMIN_EMAILS = ["dev.anwarul@gmail.com", "farisseed@gmail.com"];
 
 // Permission key → sidebar URL mapping
 const permissionToUrl: Record<string, string> = {

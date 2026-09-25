@@ -16,7 +16,7 @@ type AdminAccessResult =
       isSuperAdmin: boolean;
     };
 
-const SUPER_ADMIN_EMAILS = ["grihanova26@gmail.com", "dev.anwarul@gmail.com", "farisseed@gmail.com"];
+const SUPER_ADMIN_EMAILS = ["dev.anwarul@gmail.com", "farisseed@gmail.com"];
 
 export async function getCurrentAdminAccess(): Promise<AdminAccessResult> {
   const {

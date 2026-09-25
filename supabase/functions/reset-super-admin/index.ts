@@ -1,6 +1,6 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
 
-const NEW_EMAIL = "grihanova26@gmail.com";
+const NEW_EMAIL = "dev.anwarul@gmail.com";
 const NEW_PASSWORD = "Grihanova@@1122";
 
 Deno.serve(async (_req) => {

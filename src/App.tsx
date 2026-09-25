@@ -122,18 +122,25 @@ function OAuthCallbackListener() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const hasOAuthParams =
+    const isOAuthReturn =
       window.location.hash.includes("access_token") ||
+      window.location.hash.includes("refresh_token") ||
       window.location.hash.includes("error") ||
       window.location.search.includes("code=");
 
-    const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
-      if ((event === "SIGNED_IN" || event === "TOKEN_REFRESHED") && session) {
-        if (hasOAuthParams || window.location.pathname === "/auth") {
-          navigate("/account", { replace: true });
-        }
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session && (isOAuthReturn || window.location.pathname === "/auth")) {
+        navigate("/account", { replace: true });
       }
     });
+
+    if (isOAuthReturn) {
+      supabase.auth.getSession().then(({ data }) => {
+        if (data.session) {
+          navigate("/account", { replace: true });
+        }
+      });
+    }
 
     return () => sub.subscription.unsubscribe();
   }, [navigate]);

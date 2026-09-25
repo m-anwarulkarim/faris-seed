@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/pub/button";
 import { bn } from "@/lib/format";
-import { addOfferToOrder, loadThankYouOffers, type ThankYouOffer } from "@/lib/thankYouOffers";
+import { addOfferToOrder, loadThankYouOffers, resolveOfferImage, type ThankYouOffer } from "@/lib/thankYouOffers";
 
 interface Props {
   orderId?: string | null;
@@ -71,34 +71,37 @@ export function ThankYouUpsell({ orderId, onAdded }: Props) {
         </p>
       </div>
 
-      <div className="mt-3 grid grid-cols-4 gap-2 sm:grid-cols-5 lg:grid-cols-6">
+      <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
         {offers.map((o) => {
           const isAdded = added.includes(o.id);
+          const imgSrc = resolveOfferImage(o.image, o.name);
           return (
             <button
               key={o.id}
               type="button"
               disabled={isAdded}
               onClick={() => setSelected(o)}
-              className="group relative flex flex-col overflow-hidden rounded-xl border border-border bg-card text-center transition hover:-translate-y-0.5 hover:shadow-md disabled:opacity-70"
+              className="group relative flex flex-col overflow-hidden rounded-2xl border border-border/80 bg-card text-center transition-all hover:-translate-y-1 hover:shadow-lg disabled:opacity-75"
             >
-              <div className="aspect-square w-full overflow-hidden bg-secondary">
+              <div className="aspect-square w-full overflow-hidden bg-muted">
                 <img
-                  src={o.image || "/placeholder.svg"}
-                  alt={o.name}
+                  src={imgSrc}
+                  alt=""
                   loading="lazy"
-                  className="h-full w-full object-cover"
+                  className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
                 />
               </div>
-              <div className="flex flex-1 flex-col gap-0.5 p-1.5">
-                <span className="line-clamp-2 text-[10px] font-semibold leading-tight">{o.name}</span>
-                <span className="text-[11px] font-extrabold text-primary">৳{bn(o.price)}</span>
-                {o.oldPrice ? (
-                  <span className="text-[9px] text-muted-foreground line-through">৳{bn(o.oldPrice)}</span>
-                ) : null}
+              <div className="flex flex-1 flex-col justify-between gap-1 p-2.5">
+                <span className="line-clamp-2 text-xs font-bold leading-tight text-foreground">{o.name}</span>
+                <div className="mt-auto flex items-baseline justify-center gap-1.5">
+                  <span className="text-sm font-extrabold text-primary">৳{bn(o.price)}</span>
+                  {o.oldPrice ? (
+                    <span className="text-xs text-muted-foreground line-through">৳{bn(o.oldPrice)}</span>
+                  ) : null}
+                </div>
               </div>
-              <span className="absolute right-1 top-1 flex size-5 items-center justify-center rounded-full bg-primary text-primary-foreground shadow">
-                {isAdded ? <Check className="size-3" /> : <Plus className="size-3" />}
+              <span className="absolute right-2 top-2 flex size-6 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-md transition-transform group-hover:scale-110">
+                {isAdded ? <Check className="size-3.5 stroke-[3]" /> : <Plus className="size-3.5 stroke-[3]" />}
               </span>
             </button>
           );
@@ -116,8 +119,8 @@ export function ThankYouUpsell({ orderId, onAdded }: Props) {
           {selected ? (
             <div className="flex items-center gap-3 rounded-xl border border-border p-3">
               <img
-                src={selected.image || "/placeholder.svg"}
-                alt={selected.name}
+                src={resolveOfferImage(selected.image, selected.name)}
+                alt=""
                 className="size-16 rounded-lg object-cover"
               />
               <div>

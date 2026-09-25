@@ -1,4 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
+import zinnia from "@/assets/product-zinnia.webp";
+import portulaca from "@/assets/product-portulaca.webp";
 
 export const THANKYOU_OFFERS_KEY = "thankyou_offers";
 
@@ -11,6 +13,19 @@ export interface ThankYouOffer {
   active: boolean;
 }
 
+export function resolveOfferImage(img?: string, name?: string): string {
+  const src = String(img || "").trim();
+  const n = String(name || "").trim();
+  if (src.includes("zinnia") || n.includes("জিনিয়া") || n.includes("জিনিয়া")) {
+    return zinnia;
+  }
+  if (src.includes("portulaca") || n.includes("পর্তুলিকা") || n.includes("টাইম")) {
+    return portulaca;
+  }
+  if (src && !src.startsWith("/assets/")) return src;
+  return zinnia;
+}
+
 function normalize(list: unknown): ThankYouOffer[] {
   if (!Array.isArray(list)) return [];
   return list
@@ -21,10 +36,11 @@ function normalize(list: unknown): ThankYouOffer[] {
       const price = Number(o.price ?? 0);
       if (!id || !name || !Number.isFinite(price) || price < 0) return null;
       const oldPrice = Number(o.oldPrice ?? 0);
+      const image = resolveOfferImage(String(o.image ?? ""), name);
       return {
         id,
         name,
-        image: String(o.image ?? ""),
+        image,
         price,
         oldPrice: Number.isFinite(oldPrice) && oldPrice > price ? oldPrice : null,
         active: o.active !== false,
@@ -55,7 +71,7 @@ export async function loadThankYouOffers(): Promise<ThankYouOffer[]> {
     {
       id: "offer-zinnia",
       name: "মাল্টি কালার জিনিয়া ফুলের বীজ",
-      image: "/assets/product-zinnia.webp",
+      image: zinnia,
       price: 140,
       oldPrice: 180,
       active: true,
@@ -63,7 +79,7 @@ export async function loadThankYouOffers(): Promise<ThankYouOffer[]> {
     {
       id: "offer-portulaca",
       name: "মিক্স কালার পর্তুলিকা বা টাইম ফুলের বীজ",
-      image: "/assets/product-portulaca.webp",
+      image: portulaca,
       price: 120,
       oldPrice: 160,
       active: true,

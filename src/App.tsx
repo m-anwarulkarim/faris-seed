@@ -31,6 +31,7 @@ const PublicThankYou = lazy(() => import("./pages/public/ThankYou.tsx"));
 const PublicAuth = lazy(() => import("./pages/public/Auth.tsx"));
 const PublicAccount = lazy(() => import("./pages/public/Account.tsx"));
 const PublicAuthError = lazy(() => import("./pages/public/AuthError.tsx"));
+const PublicProduct = lazy(() => import("./pages/public/ProductLanding.tsx"));
 
 // Admin pages
 
@@ -124,35 +125,16 @@ function OAuthCallbackListener() {
   useEffect(() => {
     const hash = window.location.hash;
     const search = window.location.search;
-    const isErrorReturn = hash.includes("error=") || search.includes("error=");
 
-    if (isErrorReturn) {
-      sessionStorage.removeItem("oauth_in_progress");
+    if (hash.includes("error=") || search.includes("error=")) {
       navigate(`/auth-error${search}${hash}`, { replace: true });
       return;
     }
 
-    const isOAuthReturn =
-      sessionStorage.getItem("oauth_in_progress") === "true" ||
-      hash.includes("access_token") ||
-      hash.includes("refresh_token") ||
-      search.includes("code=");
-
-    const checkAndRedirect = (session: unknown) => {
-      if (session) {
-        if (isOAuthReturn || window.location.pathname === "/auth") {
-          sessionStorage.removeItem("oauth_in_progress");
-          navigate("/account", { replace: true });
-        }
-      }
-    };
-
     const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
-      checkAndRedirect(session);
-    });
-
-    supabase.auth.getSession().then(({ data }) => {
-      checkAndRedirect(data.session);
+      if (session && window.location.pathname === "/auth") {
+        navigate("/account", { replace: true });
+      }
     });
 
     return () => sub.subscription.unsubscribe();

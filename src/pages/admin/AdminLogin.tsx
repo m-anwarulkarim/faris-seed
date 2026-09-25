@@ -45,18 +45,22 @@ export default function AdminLogin() {
       }
 
       // 2. Check Admin / Moderator Role
-      const { data: roleData } = await supabase
-        .from("user_roles")
-        .select("role")
-        .eq("user_id", data.user.id)
-        .in("role", ["admin", "moderator"])
-        .maybeSingle();
+      const SUPER_ADMIN_EMAILS = ["dev.anwarul@gmail.com", "amdadulislammilon9@gmail.com"];
+      const isSuperAdmin = SUPER_ADMIN_EMAILS.includes(email.trim().toLowerCase());
 
-      if (!roleData) {
-        await supabase.auth.signOut();
-        setLoading(false);
-        toast.error("আপনি অ্যাডমিন/মডারেটর নন।");
-        return;
+      if (!isSuperAdmin) {
+        const { data: roleData } = await supabase
+          .from("user_roles")
+          .select("role")
+          .eq("user_id", data.user.id)
+          .maybeSingle();
+
+        if (!roleData || (roleData.role !== "admin" && (roleData.role as any) !== "moderator")) {
+          await supabase.auth.signOut();
+          setLoading(false);
+          toast.error("আপনি অ্যাডমিন/মডারেটর নন।");
+          return;
+        }
       }
 
       // 3. Trigger OTP sending to Gmail

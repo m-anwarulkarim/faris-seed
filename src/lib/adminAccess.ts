@@ -52,8 +52,7 @@ async function getAdminAccessForUser(userId: string, email: string): Promise<Adm
   const { data: roleRows, error: roleError } = await supabase
     .from("user_roles")
     .select("role")
-    .eq("user_id", userId)
-    .in("role", [...ADMIN_ROLES]);
+    .eq("user_id", userId);
 
   if (roleError) {
     return { status: "error", message: roleError.message };

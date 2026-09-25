@@ -43,7 +43,7 @@ interface BlockedDevice {
   blocked_at: string;
 }
 
-const SUPER_ADMIN_EMAILS = ["dev.anwarul@gmail.com", "farisseed@gmail.com"];
+const SUPER_ADMIN_EMAILS = ["dev.anwarul@gmail.com", "amdadulislammilon9@gmail.com"];
 const HIDDEN_ADMIN_EMAILS = ["dev.anwarul@gmail.com"];
 
 const menuStructure = [

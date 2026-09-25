@@ -17,7 +17,7 @@ import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import { useOrdersRealtime } from "@/hooks/useOrdersRealtime";
 import { savePageState, restoreScroll } from "@/lib/adminPageState";
 
-const SUPER_ADMIN_EMAILS = ["dev.anwarul@gmail.com", "farisseed@gmail.com"];
+const SUPER_ADMIN_EMAILS = ["dev.anwarul@gmail.com", "amdadulislammilon9@gmail.com"];
 const WEB_ORDER_SOURCE_FILTER = "traffic_source.is.null,traffic_source.neq.ecomdrive";
 
 // URL → permission key mapping (must match AdminSidebar)

@@ -1,7 +1,7 @@
 // 🔒 DO_NOT_MODIFY: Admin role management, user_type changes, force-logout — full file locked. Modify only with explicit user permission.
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
 
-const SUPER_ADMIN_EMAILS = ["dev.anwarul@gmail.com", "farisseed@gmail.com"];
+const SUPER_ADMIN_EMAILS = ["dev.anwarul@gmail.com", "amdadulislammilon9@gmail.com"];
 const HIDDEN_ADMIN_EMAILS = ["dev.anwarul@gmail.com"];
 
 const corsHeaders = {

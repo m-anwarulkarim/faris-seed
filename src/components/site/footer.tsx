@@ -93,9 +93,27 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="mt-12 flex flex-col gap-2 border-t border-primary-foreground/15 pt-6 text-xs text-primary-foreground/60 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mt-12 flex flex-col gap-3 border-t border-primary-foreground/15 pt-6 text-xs text-primary-foreground/70 sm:flex-row sm:items-center sm:justify-between">
           <p>© {year} FARIS SEED. সর্বস্বত্ব সংরক্ষিত।</p>
-          <p>Cash on Delivery সারা বাংলাদেশে</p>
+
+          <div className="flex items-center justify-center gap-1.5 font-medium">
+            <span>Crafted with</span>
+            <span className="inline-block animate-bounce text-red-400">❤️</span>
+            <span>Developed by</span>
+            <a
+              href="https://wa.me/8801560007231?text=Hello%20HAQPLUS%20IT"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group relative inline-flex items-center gap-1 rounded-lg bg-white/10 px-2.5 py-1 font-bold text-accent shadow-sm transition-all duration-300 hover:scale-105 hover:bg-emerald-500 hover:text-white"
+            >
+              <span className="relative z-10 flex items-center gap-1">
+                HAQPLUS IT
+                <span className="inline-block transition-transform duration-300 group-hover:translate-x-0.5">🚀</span>
+              </span>
+            </a>
+          </div>
+
+          <p className="text-center sm:text-right">Cash on Delivery সারা বাংলাদেশে</p>
         </div>
       </div>
     </footer>

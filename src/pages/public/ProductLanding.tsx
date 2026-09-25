@@ -754,8 +754,24 @@ function ProductLandingPage() {
         })()}
       </main>
 
-      <footer className="border-t bg-white py-4 text-center text-xs text-neutral-500">
-        © {new Date().getFullYear()} FARIS SEED
+      <footer className="border-t bg-white py-5 text-center text-xs text-neutral-600">
+        <div className="mx-auto flex max-w-4xl flex-col items-center justify-between gap-2 px-4 sm:flex-row">
+          <p>© {new Date().getFullYear()} FARIS SEED</p>
+          <div className="flex items-center gap-1.5 font-medium">
+            <span>Crafted with</span>
+            <span className="inline-block animate-bounce text-red-500">❤️</span>
+            <span>Developed by</span>
+            <a
+              href="https://wa.me/8801560007231?text=Hello%20HAQPLUS%20IT"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group inline-flex items-center gap-1 rounded-md bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-800 transition-all duration-300 hover:scale-105 hover:bg-emerald-600 hover:text-white"
+            >
+              HAQPLUS IT
+              <span className="inline-block transition-transform duration-300 group-hover:translate-x-0.5">🚀</span>
+            </a>
+          </div>
+        </div>
       </footer>
 
       {/* Sticky mobile order bar */}

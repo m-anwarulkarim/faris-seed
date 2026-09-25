@@ -30,7 +30,6 @@ const PublicCheckout = lazy(() => import("./pages/public/Checkout.tsx"));
 const PublicThankYou = lazy(() => import("./pages/public/ThankYou.tsx"));
 const PublicAuth = lazy(() => import("./pages/public/Auth.tsx"));
 const PublicAccount = lazy(() => import("./pages/public/Account.tsx"));
-const PublicAuthError = lazy(() => import("./pages/public/AuthError.tsx"));
 const PublicProduct = lazy(() => import("./pages/public/ProductLanding.tsx"));
 
 // Admin pages
@@ -123,14 +122,6 @@ function OAuthCallbackListener() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const hash = window.location.hash;
-    const search = window.location.search;
-
-    if (hash.includes("error=") || search.includes("error=")) {
-      navigate(`/auth-error${search}${hash}`, { replace: true });
-      return;
-    }
-
     const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
       if (session && window.location.pathname === "/auth") {
         navigate("/account", { replace: true });
@@ -178,7 +169,6 @@ const App = () => {
                     <Route path="/thank-you" element={<PublicThankYou />} />
                     <Route path="/product/:slug" element={<PublicProduct />} />
                     <Route path="/auth" element={<PublicAuth />} />
-                    <Route path="/auth-error" element={<PublicAuthError />} />
                     <Route path="/login" element={<Navigate to="/auth" replace />} />
                     <Route path="/account" element={<PublicAccount />} />
 

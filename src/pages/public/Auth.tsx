@@ -136,26 +136,6 @@ export default function AuthPage() {
                 ইমেইল অথবা Google দিয়ে লগইন করুন
               </p>
 
-              {authError && (
-                <div className="mt-4 rounded-lg border border-destructive/40 bg-destructive/10 p-3.5 text-xs text-destructive space-y-2">
-                  <div className="flex items-start gap-2 font-medium">
-                    <span className="font-semibold text-sm">❌ লগইন ত্রুটি:</span>
-                    <span className="flex-1 leading-relaxed">{authError}</span>
-                  </div>
-                  <div className="pt-1 flex justify-end">
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      className="h-7 text-[11px] text-destructive hover:bg-destructive/20 underline"
-                      onClick={() => navigate(`/auth-error${window.location.search}${window.location.hash}`)}
-                    >
-                      ডায়াগনস্টিক রিপোর্ট ও এরর বিস্তারিত দেখুন →
-                    </Button>
-                  </div>
-                </div>
-              )}
-
               <Button
                 type="button"
                 variant="outline"

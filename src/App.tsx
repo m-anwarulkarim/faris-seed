@@ -28,9 +28,9 @@ const PublicContact = lazy(() => import("./pages/public/Contact.tsx"));
 const PublicCart = lazy(() => import("./pages/public/Cart.tsx"));
 const PublicCheckout = lazy(() => import("./pages/public/Checkout.tsx"));
 const PublicThankYou = lazy(() => import("./pages/public/ThankYou.tsx"));
-const PublicProduct = lazy(() => import("./pages/public/ProductLanding.tsx"));
 const PublicAuth = lazy(() => import("./pages/public/Auth.tsx"));
 const PublicAccount = lazy(() => import("./pages/public/Account.tsx"));
+const PublicAuthError = lazy(() => import("./pages/public/AuthError.tsx"));
 
 // Admin pages
 
@@ -122,12 +122,21 @@ function OAuthCallbackListener() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    const hash = window.location.hash;
+    const search = window.location.search;
+    const isErrorReturn = hash.includes("error=") || search.includes("error=");
+
+    if (isErrorReturn) {
+      sessionStorage.removeItem("oauth_in_progress");
+      navigate(`/auth-error${search}${hash}`, { replace: true });
+      return;
+    }
+
     const isOAuthReturn =
       sessionStorage.getItem("oauth_in_progress") === "true" ||
-      window.location.hash.includes("access_token") ||
-      window.location.hash.includes("refresh_token") ||
-      window.location.hash.includes("error") ||
-      window.location.search.includes("code=");
+      hash.includes("access_token") ||
+      hash.includes("refresh_token") ||
+      search.includes("code=");
 
     const checkAndRedirect = (session: unknown) => {
       if (session) {
@@ -187,6 +196,7 @@ const App = () => {
                     <Route path="/thank-you" element={<PublicThankYou />} />
                     <Route path="/product/:slug" element={<PublicProduct />} />
                     <Route path="/auth" element={<PublicAuth />} />
+                    <Route path="/auth-error" element={<PublicAuthError />} />
                     <Route path="/login" element={<Navigate to="/auth" replace />} />
                     <Route path="/account" element={<PublicAccount />} />
 

@@ -43,22 +43,26 @@ export function useOrderEditLock(orderId: string | undefined): UseOrderEditLockR
   // Check existing lock
   const checkLock = useCallback(async () => {
     if (!orderId) return null;
-    const { data } = await supabase
-      .from("order_edit_locks")
-      .select("*")
-      .eq("order_id", orderId)
-      .maybeSingle();
+    try {
+      const { data, error } = await supabase
+        .from("order_edit_locks")
+        .select("*")
+        .eq("order_id", orderId)
+        .maybeSingle();
 
-    if (!data) return null;
+      if (error || !data) return null;
 
-    // Check if lock expired
-    const heartbeatAge = Date.now() - new Date(data.heartbeat_at).getTime();
-    if (heartbeatAge > LOCK_EXPIRY) {
-      await supabase.from("order_edit_locks").delete().eq("order_id", orderId);
+      // Check if lock expired
+      const heartbeatAge = Date.now() - new Date(data.heartbeat_at).getTime();
+      if (heartbeatAge > LOCK_EXPIRY) {
+        await supabase.from("order_edit_locks").delete().eq("order_id", orderId);
+        return null;
+      }
+
+      return data as unknown as LockInfo & { order_id: string };
+    } catch {
       return null;
     }
-
-    return data as unknown as LockInfo & { order_id: string };
   }, [orderId]);
 
   // Acquire lock
@@ -95,18 +99,20 @@ export function useOrderEditLock(orderId: string | undefined): UseOrderEditLockR
     }
 
     // Upsert lock
-    await supabase.from("order_edit_locks").upsert(
-      {
-        order_id: orderId,
-        user_id: myUserId,
-        user_email: email,
-        user_name: name,
-        user_photo: photo,
-        locked_at: new Date().toISOString(),
-        heartbeat_at: new Date().toISOString(),
-      } as any,
-      { onConflict: "order_id" }
-    );
+    try {
+      await supabase.from("order_edit_locks").upsert(
+        {
+          order_id: orderId,
+          user_id: myUserId,
+          user_email: email,
+          user_name: name,
+          user_photo: photo,
+          locked_at: new Date().toISOString(),
+          heartbeat_at: new Date().toISOString(),
+        } as any,
+        { onConflict: "order_id" }
+      );
+    } catch {}
 
     hasLockRef.current = true;
     setLockHolder(null);
@@ -128,11 +134,13 @@ export function useOrderEditLock(orderId: string | undefined): UseOrderEditLockR
     if (heartbeatRef.current) clearInterval(heartbeatRef.current);
     heartbeatRef.current = setInterval(async () => {
       if (!orderId || !myUserId) return;
-      await supabase
-        .from("order_edit_locks")
-        .update({ heartbeat_at: new Date().toISOString() })
-        .eq("order_id", orderId)
-        .eq("user_id", myUserId);
+      try {
+        await supabase
+          .from("order_edit_locks")
+          .update({ heartbeat_at: new Date().toISOString() })
+          .eq("order_id", orderId)
+          .eq("user_id", myUserId);
+      } catch {}
     }, HEARTBEAT_INTERVAL);
   }, [orderId, myUserId]);
 

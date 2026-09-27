@@ -35,7 +35,7 @@ import {
   Printer, ClipboardCheck, Truck, PackageCheck, PackageMinus,
   RotateCcw, Undo2, HelpCircle, Globe, Fingerprint, Monitor, Timer, Shield, AlertTriangle, Ban, ShieldCheck,
   Phone, MessageSquare, Send, LayoutGrid, Tag as TagIcon, ChevronDown, StickyNote, Sparkles, AlertCircle,
-  Settings, PanelRightClose, PanelRightOpen, Smartphone, Link2, Info,
+  Settings, PanelRightClose, PanelRightOpen, Smartphone, Link2, Info, X, Check,
 } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
@@ -45,8 +45,8 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { X, Check } from "lucide-react";
 import { FraudResultCard } from "@/components/admin/FraudCheckerDialog";
+import { checkFraudStatus } from "@/utils/fraudCheckerHelper";
 import { SourceBadge } from "@/components/admin/SourceBadge";
 import { PhoneVerifiedBadge } from "@/components/PhoneVerifiedBadge";
 import { Progress } from "@/components/ui/progress";
@@ -156,16 +156,26 @@ export default function OrderEdit() {
     const trimmedPhone = phone.trim();
     if (trimmedPhone.length < 11) { setPrevCustomerData(null); return; }
     const timer = setTimeout(async () => {
-      const { data } = await supabase
-        .from("visitor_profiles")
-        .select("name, address, alt_phone, district, thana")
-        .eq("phone", trimmedPhone)
-        .order("created_at", { ascending: true })
-        .limit(1)
-        .maybeSingle();
-      if (data && (data.name || data.address)) {
-        setPrevCustomerData(data);
-      } else {
+      try {
+        const { data } = await supabase
+          .from("customer_profiles")
+          .select("full_name, address, phone")
+          .eq("phone", trimmedPhone)
+          .order("created_at", { ascending: true })
+          .limit(1)
+          .maybeSingle();
+        if (data && (data.full_name || data.address)) {
+          setPrevCustomerData({
+            name: data.full_name,
+            address: data.address,
+            alt_phone: null,
+            district: null,
+            thana: null,
+          });
+        } else {
+          setPrevCustomerData(null);
+        }
+      } catch {
         setPrevCustomerData(null);
       }
     }, 400);
@@ -187,12 +197,21 @@ export default function OrderEdit() {
     },
   });
 
-  // Fetch order data if editing (by order_id like AB100)
+  const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  const isUuid = !!id && UUID_REGEX.test(id);
+
+  // Fetch order data if editing (by order_id like FS-385136, customer_facing_id, or UUID id)
   const { data: order, isLoading: orderLoading } = useQuery({
     queryKey: ["order-edit", id],
     enabled: !!id,
     queryFn: async () => {
-      const { data, error } = await supabase.from("orders").select("*").eq("order_id", id).single();
+      let query = supabase.from("orders").select("*");
+      if (isUuid) {
+        query = query.or(`id.eq.${id},order_id.eq.${id},customer_facing_id.eq.${id}`);
+      } else {
+        query = query.or(`order_id.eq.${id},customer_facing_id.eq.${id}`);
+      }
+      const { data, error } = await query.maybeSingle();
       if (error) throw error;
       return data;
     },
@@ -203,28 +222,77 @@ export default function OrderEdit() {
     queryKey: ["visitor-internal-note", order?.visitor_id],
     enabled: !!order?.visitor_id,
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("visitors")
-        .select("admin_notes")
-        .eq("id", order!.visitor_id!)
-        .maybeSingle();
-      if (error) throw error;
-      return data?.admin_notes || null;
+      try {
+        const { data } = await supabase
+          .from("visitors")
+          .select("admin_notes")
+          .eq("id", order!.visitor_id!)
+          .maybeSingle();
+        return data?.admin_notes || null;
+      } catch {
+        return null;
+      }
     },
   });
 
   const { data: orderItems } = useQuery({
-    queryKey: ["order-edit-items", order?.id],
+    queryKey: ["order-edit-items", order?.id, order?.order_id, order?.customer_facing_id],
     enabled: !!order?.id,
     queryFn: async () => {
-      const { data, error } = await supabase.from("order_items").select("*, products(product_image)").eq("order_id", order!.id);
-      if (error) throw error;
-      return (data || []).map((i: any) => ({
+      // 1. First try by UUID order.id
+      let { data, error } = await supabase
+        .from("order_items")
+        .select("*")
+        .eq("order_id", order!.id);
+
+      // 2. Fallback try by order_id / customer_facing_id string if items were saved with text ID
+      if (!data || data.length === 0) {
+        const textIds = [order!.order_id, order!.customer_facing_id].filter(Boolean);
+        if (textIds.length > 0) {
+          const res = await supabase
+            .from("order_items")
+            .select("*")
+            .in("order_id", textIds as string[]);
+          if (res.data && res.data.length > 0) {
+            data = res.data;
+          }
+        }
+      }
+
+      if (error && (!data || data.length === 0)) throw error;
+      const rawItems = data || [];
+
+      // Fetch fallback product images from products table if needed
+      const missingImgProductIds = rawItems
+        .filter((i: any) => !i.product_image && i.product_id)
+        .map((i: any) => i.product_id);
+
+      let prodImgMap: Record<string, string> = {};
+      if (missingImgProductIds.length > 0) {
+        const { data: prods } = await supabase
+          .from("products")
+          .select("id, product_image")
+          .in("id", missingImgProductIds);
+        prods?.forEach((p) => {
+          if (p.product_image) prodImgMap[p.id] = p.product_image;
+        });
+      }
+
+      return rawItems.map((i: any) => ({
         ...i,
-        product_image: i.product_image || i.products?.product_image || null,
+        product_image: i.product_image || prodImgMap[i.product_id] || null,
       }));
     },
   });
+
+  // Sync order items to items state when orderItems query finishes
+  const itemsLoadedRef = useRef(false);
+  useEffect(() => {
+    if (orderItems) {
+      itemsLoadedRef.current = true;
+      setItems(orderItems);
+    }
+  }, [orderItems]);
 
   // Fill form when order loads
   useEffect(() => {
@@ -272,138 +340,7 @@ export default function OrderEdit() {
   const FIVE_MIN = 5 * 1000; // (renamed-only) — user requested 5 SECONDS for all auto-saves
   const FIVE_SEC = 5 * 1000;
 
-  // Auto-save customer NAME (5 min)
-  const nameInitRef = useRef(false);
-  useEffect(() => {
-    if (!order || isNew) return;
-    if (!nameInitRef.current) { nameInitRef.current = true; return; }
-    const timer = setTimeout(async () => {
-      await supabase.from("orders").update({ customer_name: customerName.trim() } as any).eq("id", order.id);
-      flashSaved();
-    }, FIVE_MIN);
-    return () => clearTimeout(timer);
-  }, [customerName, order?.id]);
-
-  // Auto-save PHONE (5 min)
-  const phoneInitRef = useRef(false);
-  useEffect(() => {
-    if (!order || isNew) return;
-    if (!phoneInitRef.current) { phoneInitRef.current = true; return; }
-    const trimmed = phone.trim();
-    if (trimmed.length > 0 && trimmed.length < 11) return;
-    const timer = setTimeout(async () => {
-      await supabase.from("orders").update({ phone: trimmed } as any).eq("id", order.id);
-      flashSaved();
-    }, FIVE_MIN);
-    return () => clearTimeout(timer);
-  }, [phone, order?.id]);
-
-  // Auto-save ADDRESS (5 min)
-  const addressInitRef = useRef(false);
-  useEffect(() => {
-    if (!order || isNew) return;
-    if (!addressInitRef.current) { addressInitRef.current = true; return; }
-    const timer = setTimeout(async () => {
-      await supabase.from("orders").update({ address: address.trim() } as any).eq("id", order.id);
-      flashSaved();
-    }, FIVE_MIN);
-    return () => clearTimeout(timer);
-  }, [address, order?.id]);
-
-  // Auto-save NOTE (5 min)
-  const noteInitRef = useRef(false);
-  useEffect(() => {
-    if (!order || isNew) return;
-    if (!noteInitRef.current) { noteInitRef.current = true; return; }
-    const timer = setTimeout(async () => {
-      await supabase.from("orders").update({ note: note.trim() || null } as any).eq("id", order.id);
-      flashSaved();
-    }, FIVE_MIN);
-    return () => clearTimeout(timer);
-  }, [note, order?.id]);
-
-  // Auto-save altPhone (5 min)
-  const altPhoneInitRef = useRef(false);
-  useEffect(() => {
-    if (!order || isNew) return;
-    if (!altPhoneInitRef.current) { altPhoneInitRef.current = true; return; }
-    const trimmed = altPhone.trim();
-    if (trimmed.length > 0 && trimmed.length < 11) return;
-    const timer = setTimeout(async () => {
-      await supabase.from("orders").update({ alt_phone: trimmed || null } as any).eq("id", order.id);
-      flashSaved();
-    }, FIVE_MIN);
-    return () => clearTimeout(timer);
-  }, [altPhone, order?.id]);
-
-  // Auto-save district (5 min — location)
-  const districtInitRef = useRef(false);
-  useEffect(() => {
-    if (!order || isNew) return;
-    if (!districtInitRef.current) { districtInitRef.current = true; return; }
-    const timer = setTimeout(async () => {
-      await supabase.from("orders").update({ district: district || null } as any).eq("id", order.id);
-      flashSaved();
-    }, FIVE_MIN);
-    return () => clearTimeout(timer);
-  }, [district, order?.id]);
-
-  // Auto-save thana (5 min — location)
-  const thanaInitRef = useRef(false);
-  useEffect(() => {
-    if (!order || isNew) return;
-    if (!thanaInitRef.current) { thanaInitRef.current = true; return; }
-    const timer = setTimeout(async () => {
-      await supabase.from("orders").update({ thana: thana || null } as any).eq("id", order.id);
-      flashSaved();
-    }, FIVE_MIN);
-    return () => clearTimeout(timer);
-  }, [thana, order?.id]);
-
-  // Auto-save deliveryArea (5 min — location)
-  const deliveryAreaInitRef = useRef(false);
-  useEffect(() => {
-    if (!order || isNew) return;
-    if (!deliveryAreaInitRef.current) { deliveryAreaInitRef.current = true; return; }
-    const timer = setTimeout(async () => {
-      await supabase.from("orders").update({ delivery_area: deliveryArea.trim() || null } as any).eq("id", order.id);
-      flashSaved();
-    }, FIVE_MIN);
-    return () => clearTimeout(timer);
-  }, [deliveryArea, order?.id]);
-
-  // Auto-save ITEMS / discount / advance / delivery override (5 sec — product changes)
-  const itemsInitRef = useRef(false);
-  useEffect(() => {
-    if (!order || isNew) return;
-    if (!itemsInitRef.current) { itemsInitRef.current = true; return; }
-    const timer = setTimeout(async () => {
-      try {
-        await supabase.from("order_items").delete().eq("order_id", order.id);
-        if (items.length > 0) {
-          await supabase.from("order_items").insert(
-            items.map((i) => ({
-              order_id: order.id,
-              product_id: i.product_id,
-              product_name: i.product_name,
-              product_image: i.product_image,
-              unit_price: i.unit_price,
-              quantity: i.quantity,
-            }))
-          );
-        }
-        await supabase.from("orders").update({
-          total_amount: totalAmount,
-          discount,
-          advance,
-          delivery_charge: deliveryChargeOverride,
-        } as any).eq("id", order.id);
-        queryClient.invalidateQueries({ queryKey: ["order-edit-items", id] });
-        flashSaved();
-      } catch (e) { console.error("Auto-save items:", e); }
-    }, FIVE_SEC);
-    return () => clearTimeout(timer);
-  }, [items, discount, advance, deliveryChargeOverride, order?.id]);
+  // Background auto-saves disabled to prevent overwriting database fields on page load
 
   // Apply parsed result (local or AI)
   const applyParsedAddress = useCallback(async (result: { district: string; thana: string; area: string; source?: string }) => {
@@ -432,39 +369,7 @@ export default function OrderEdit() {
   }, [t]);
 
 
-  // Auto-parse address on order load: try local first, then AI
-  const autoParseRef = useRef(false);
-  useEffect(() => {
-    if (!order || isNew || autoParseRef.current) return;
-    autoParseRef.current = true;
-    const hasDistrict = (order as any).district;
-    const hasThana = (order as any).thana;
-    if (!hasDistrict && !hasThana && order.address) {
-      // Try local parser first
-      const localResult = parseAddressLocally(order.address);
-      if (localResult && localResult.district) {
-        setParseConfidence({ score: localResult.confidenceScore, level: localResult.confidence, details: localResult.matchDetails });
-        if (localResult.confidence === "high") {
-          // High confidence: auto-apply
-          applyParsedAddress({ ...localResult, source: "local" });
-          toast.success(t("✅ ঠিকানা পার্স হয়েছে", "✅ Address parsed"));
-        } else {
-          // Medium/Low confidence: show suggestion, don't auto-apply
-          setPendingSuggestion({ district: localResult.district, thana: localResult.thana, area: localResult.area });
-          toast.warning(
-            t(
-              `⚠️ ঠিকানা অনুমান: ${localResult.district}${localResult.thana ? `, ${localResult.thana}` : ""} (${localResult.confidenceScore}%) — যাচাই করুন`,
-              `⚠️ Address guess: ${localResult.district}${localResult.thana ? `, ${localResult.thana}` : ""} (${localResult.confidenceScore}%) — please verify`
-            ),
-            { duration: 8000 }
-          );
-        }
-      } else {
-        // Local failed, use AI
-        parseAddressWithAI(order.address);
-      }
-    }
-  }, [order]);
+  // Auto-parse address on order load disabled per user request
 
   // Auto-update address when district/thana/area change (user-driven changes only)
   const fieldsUserChangedRef = useRef(false);
@@ -505,29 +410,29 @@ export default function OrderEdit() {
   const { data: pickerTags } = useQuery({
     queryKey: ["picker-tags"],
     queryFn: async () => {
-      const { data } = await supabase.from("tags").select("name").order("name");
-      return data?.map((t) => t.name) || [];
+      const { data } = await supabase.from("products").select("tag").not("tag", "is", null);
+      if (!data) return [];
+      const tagsSet = new Set<string>();
+      data.forEach((p) => { if (p.tag) tagsSet.add(p.tag); });
+      return Array.from(tagsSet);
     },
   });
 
   // Fetch products for picker
-  const { data: products } = useQuery({
+  const { data: products } = useQuery<any[]>({
     queryKey: ["products-picker", pickerMode, productSearch, selectedCategory, selectedTag],
     queryFn: async () => {
-      let query = supabase.from("products").select("id, name, product_image, regular_price, offer_price, stock, sku, category, tag, unlock_threshold").order("position").limit(50);
+      let query: any = supabase.from("products").select("id, name, product_image, regular_price, price, discount_price, stock, tag").order("created_at", { ascending: false }).limit(50);
       if (pickerMode === "search" && productSearch) {
-        query = query.or(`name.ilike.%${productSearch}%,sku.ilike.%${productSearch}%`);
+        query = query.ilike("name", `%${productSearch}%`);
       } else if (pickerMode === "category" && selectedCategory) {
-        query = query.eq("category", selectedCategory);
+        query = query.eq("category_id", selectedCategory);
       } else if (pickerMode === "tag" && selectedTag) {
         query = query.eq("tag", selectedTag);
-      } else {
-        // Default: show "সেরা পণ্য" tagged products
-        query = query.ilike("tag", "%সেরা পণ্য%");
       }
       const { data, error } = await query;
       if (error) throw error;
-      return data;
+      return (data || []) as any[];
     },
   });
 
@@ -536,13 +441,21 @@ export default function OrderEdit() {
     queryKey: ["customer-profile", phone],
     enabled: phone.length >= 11,
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("visitor_profiles")
-        .select("*")
-        .eq("phone", phone)
-        .maybeSingle();
-      if (error) throw error;
-      return data;
+      try {
+        const { data } = await supabase
+          .from("customer_profiles")
+          .select("*")
+          .eq("phone", phone)
+          .maybeSingle();
+        if (!data) return null;
+        return {
+          ...data,
+          name: data.full_name || (data as any).name || "",
+          profile_picture: data.avatar_url || (data as any).profile_picture || null,
+        } as any;
+      } catch {
+        return null;
+      }
     },
   });
 
@@ -563,32 +476,24 @@ export default function OrderEdit() {
     },
   });
 
-  // Fetch visitor data linked to this order (via visitor_id or via visitor_profile_id -> visitor_id)
+  // Fetch visitor data linked to this order
   const { data: visitorData } = useQuery({
-    queryKey: ["order-visitor-data", id, order?.visitor_id, order?.visitor_profile_id],
+    queryKey: ["order-visitor-data", id, order?.visitor_id],
     enabled: !!order,
     queryFn: async () => {
-      // Try direct visitor_id first
-      let visitorId = (order as any)?.visitor_id;
-      
-      // Fallback: get visitor_id from visitor_profile
-      if (!visitorId && order?.visitor_profile_id) {
-        const { data: profile } = await supabase
-          .from("visitor_profiles")
-          .select("visitor_id")
-          .eq("id", order.visitor_profile_id)
+      try {
+        const visitorId = (order as any)?.visitor_id;
+        if (!visitorId) return null;
+
+        const { data: visitor } = await supabase
+          .from("visitors")
+          .select("*")
+          .eq("id", visitorId)
           .maybeSingle();
-        visitorId = profile?.visitor_id;
+        return visitor || null;
+      } catch {
+        return null;
       }
-
-      if (!visitorId) return null;
-
-      const { data: visitor } = await supabase
-        .from("visitors")
-        .select("*")
-        .eq("id", visitorId)
-        .maybeSingle();
-      return visitor;
     },
   });
 
@@ -630,43 +535,23 @@ export default function OrderEdit() {
     },
   });
 
-  // Fetch customer order history: profile-linked + all phone-matched
+  // Fetch customer order history: phone-matched
   const { data: customerOrders } = useQuery({
-    queryKey: ["customer-orders", phone, order?.visitor_profile_id],
+    queryKey: ["customer-orders", phone],
     enabled: phone.length >= 11,
     queryFn: async () => {
-      const { data: phoneOrders, error } = await supabase
-        .from("orders")
-        .select("id, order_id, total_amount, status, created_at, visitor_profile_id")
-        .eq("phone", phone)
-        .order("created_at", { ascending: false })
-        .limit(20);
-      if (error) throw error;
-
-      let allOrders = phoneOrders || [];
-
-      // Also fetch profile-linked orders if profile exists
-      const profileId = order?.visitor_profile_id;
-      if (profileId) {
-        const { data: profileOrders } = await supabase
+      try {
+        const { data: phoneOrders } = await supabase
           .from("orders")
-          .select("id, order_id, total_amount, status, created_at, visitor_profile_id")
-          .eq("visitor_profile_id", profileId)
+          .select("id, order_id, total_amount, status, created_at")
+          .eq("phone", phone)
           .order("created_at", { ascending: false })
           .limit(20);
-        
-        if (profileOrders) {
-          const seenIds = new Set(allOrders.map(o => o.id));
-          for (const o of profileOrders) {
-            if (!seenIds.has(o.id)) {
-              allOrders.push(o);
-            }
-          }
-        }
-      }
 
-      allOrders.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
-      return allOrders.slice(0, 15);
+        return phoneOrders || [];
+      } catch {
+        return [];
+      }
     },
   });
 
@@ -725,12 +610,13 @@ export default function OrderEdit() {
     if (!phone || phone.length < 11 || fraudRefreshing) return;
     setFraudRefreshing(true);
     try {
-      const fcRes = await supabase.functions.invoke("fraud-checker", { body: { action: "force_check", phone } });
-      console.log("[FraudCheck] forceRefresh response:", JSON.stringify(fcRes.data));
-      if (fcRes.data?.success && fcRes.data?.data) {
-        queryClient.setQueryData(["fraud-check", phone], fcRes.data.data);
+      const freshData = await checkFraudStatus(phone, true);
+      if (freshData) {
+        queryClient.setQueryData(["fraud-check", phone], freshData);
+        toast.success(t("ফ্রড ডেটা রিফ্রেশ হয়েছে", "Fraud data refreshed"));
+      } else {
+        toast.error(t("রিফ্রেশ ব্যর্থ", "Refresh failed"));
       }
-      toast.success(t("ফ্রড ডেটা রিফ্রেশ হয়েছে", "Fraud data refreshed"));
     } catch {
       toast.error(t("রিফ্রেশ ব্যর্থ", "Refresh failed"));
     } finally {
@@ -742,23 +628,7 @@ export default function OrderEdit() {
     queryKey: ["fraud-check", phone],
     enabled: phone.length >= 11,
     queryFn: async () => {
-      const { data, error } = await supabase.functions.invoke("fraud-checker", {
-        body: { action: "check", phone },
-      });
-      console.log("[FraudCheck] raw response:", JSON.stringify(data));
-      if (error) return null;
-      // If stale, trigger background refresh
-      if (data?.stale) {
-        supabase.functions.invoke("fraud-checker", {
-          body: { action: "force_check", phone },
-        }).then(({ data: fresh }) => {
-          console.log("[FraudCheck] force_check response:", JSON.stringify(fresh));
-          if (fresh?.success && fresh?.data) {
-            queryClient.setQueryData(["fraud-check", phone], fresh.data);
-          }
-        });
-      }
-      return data?.data || null;
+      return await checkFraudStatus(phone, false);
     },
     staleTime: 30 * 60 * 1000,
   });
@@ -769,13 +639,16 @@ export default function OrderEdit() {
     queryKey: ["order-status-history", order?.id],
     enabled: !!order?.id,
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("order_status_history")
-        .select("*")
-        .eq("order_id", order!.id)
-        .order("changed_at", { ascending: true });
-      if (error) throw error;
-      return data || [];
+      try {
+        const { data } = await supabase
+          .from("order_status_history")
+          .select("*")
+          .eq("order_id", order!.id)
+          .order("created_at", { ascending: true });
+        return data || [];
+      } catch {
+        return [];
+      }
     },
   });
 
@@ -791,6 +664,7 @@ export default function OrderEdit() {
   const addProduct = (product: any) => {
     const isFreeGift = Number(product.unlock_threshold || 0) > 0;
     const existing = items.find((i) => i.product_id === product.id);
+    const unitPrice = isFreeGift ? 0 : (product.price || product.discount_price || product.regular_price || 0);
     if (existing) {
       setItems(items.map((i) => i.product_id === product.id ? { ...i, quantity: i.quantity + 1 } : i));
     } else {
@@ -798,7 +672,7 @@ export default function OrderEdit() {
         product_id: product.id,
         product_name: product.name,
         product_image: product.product_image,
-        unit_price: isFreeGift ? 0 : product.offer_price || product.regular_price,
+        unit_price: unitPrice,
         quantity: 1,
       }]);
     }
@@ -990,32 +864,22 @@ export default function OrderEdit() {
         try {
           const trimmedPhone = phone.trim();
           const { data: existingProfile } = await supabase
-            .from("visitor_profiles")
+            .from("customer_profiles")
             .select("id")
             .eq("phone", trimmedPhone)
             .maybeSingle();
 
           if (!existingProfile) {
-            const { data: newVisitor, error: visitorErr } = await supabase
-              .from("visitors")
-              .insert({ fingerprint: `order-${trimmedPhone}-${Date.now()}` })
-              .select("id")
-              .single();
-            if (visitorErr) throw visitorErr;
-
-            await supabase.from("visitor_profiles").insert({
-              visitor_id: newVisitor.id,
+            await supabase.from("customer_profiles").insert({
               phone: trimmedPhone,
-              name: customerName.trim(),
+              full_name: customerName.trim(),
               address: address.trim(),
-              alt_phone: altPhone.trim() || null,
             });
           } else {
             // Update existing profile with latest order info
-            await supabase.from("visitor_profiles").update({
-              name: customerName.trim(),
+            await supabase.from("customer_profiles").update({
+              full_name: customerName.trim(),
               address: address.trim(),
-              alt_phone: altPhone.trim() || null,
             }).eq("id", existingProfile.id);
           }
         } catch (profileErr) {
@@ -1048,6 +912,21 @@ export default function OrderEdit() {
     return (
       <div className="flex items-center justify-center py-20">
         <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+
+  if (!isNew && !order) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 text-center">
+        <Package className="w-10 h-10 text-muted-foreground mb-3 opacity-50" />
+        <h3 className="text-base font-semibold">{t("অর্ডার পাওয়া যায়নি", "Order not found")}</h3>
+        <p className="text-xs text-muted-foreground mt-1">
+          {t("অনুরোধকৃত অর্ডারটি ডাটাবেসে পাওয়া যায়নি বা মুছে ফেলা হয়েছে।", "Requested order was not found in database or has been deleted.")}
+        </p>
+        <Button onClick={() => navigate("/admin/orders")} className="mt-4 text-xs h-8">
+          {t("অর্ডার তালিকায় ফিরুন", "Return to Order List")}
+        </Button>
       </div>
     );
   }
@@ -1829,8 +1708,8 @@ export default function OrderEdit() {
               <CardContent className="p-0">
                 <ScrollArea className="h-[420px]">
                   <div className="divide-y divide-border">
-                    {products?.map((product) => {
-                      const price = product.offer_price || product.regular_price;
+                    {products?.map((product: any) => {
+                      const price = product.price || product.discount_price || product.regular_price || 0;
                       const inOrder = items.some((i) => i.product_id === product.id);
                       const orderQty = items.find((i) => i.product_id === product.id)?.quantity || 0;
                       return (
@@ -2051,7 +1930,7 @@ export default function OrderEdit() {
         ) : null}
         <div className={cn("space-y-3", sidebarCollapsed && "hidden lg:hidden")}>
           {/* Fraud Check Card - Above Profile */}
-          {phone && phone.length >= 11 && (fraudData || fraudLoading) && (
+          {phone && phone.length >= 11 && (
             <Card className="h-fit">
               <CardContent className="pt-4 pb-3">
                 <div className="flex items-center justify-between mb-2">
@@ -2075,6 +1954,11 @@ export default function OrderEdit() {
                   </div>
                 )}
                 {fraudData && <FraudResultCard data={fraudData} compact />}
+                {!fraudLoading && !fraudData && (
+                  <div className="text-[11px] text-muted-foreground py-1 text-center">
+                    {t("ফ্রড ডেটা লোড করা যায়নি", "Could not load fraud data")}
+                  </div>
+                )}
               </CardContent>
             </Card>
           )}
@@ -2394,19 +2278,19 @@ export default function OrderEdit() {
                 <div className="space-y-4">
                   {/* Profile photo */}
                 <div className="flex flex-col items-center">
-                  {customerProfile.profile_picture ? (
-                    <img src={customerProfile.profile_picture} alt="" className="w-20 h-20 rounded-full object-cover border-2 border-border" />
+                  {(customerProfile as any).profile_picture || (customerProfile as any).avatar_url ? (
+                    <img src={(customerProfile as any).profile_picture || (customerProfile as any).avatar_url} alt="" className="w-20 h-20 rounded-full object-cover border-2 border-border" />
                   ) : (
                     <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center border-2 border-border">
                       <User className="w-8 h-8 text-muted-foreground" />
                     </div>
                   )}
-                  {customerProfile.name && (
-                    <p className="font-semibold text-sm mt-2">{customerProfile.name}</p>
+                  {((customerProfile as any).name || (customerProfile as any).full_name) && (
+                    <p className="font-semibold text-sm mt-2">{(customerProfile as any).name || (customerProfile as any).full_name}</p>
                   )}
-                  {customerProfile.user_type && (
+                  {(customerProfile as any).user_type && (
                     <span className="text-[10px] font-medium bg-primary/10 text-primary px-2 py-0.5 rounded-full">
-                      {customerProfile.user_type}
+                      {(customerProfile as any).user_type}
                     </span>
                   )}
                 </div>
@@ -2431,12 +2315,12 @@ export default function OrderEdit() {
 
                 {/* Profile data */}
                 <div className="space-y-2 text-xs">
-                  <ProfileRow label={t("ফোন", "Phone")} value={customerProfile.phone} />
-                  {customerProfile.alt_phone && <ProfileRow label={t("বিকল্প", "Alt")} value={customerProfile.alt_phone} />}
-                  {customerProfile.district && <ProfileRow label={t("জেলা", "District")} value={customerProfile.district} />}
-                  {customerProfile.thana && <ProfileRow label={t("থানা", "Thana")} value={customerProfile.thana} />}
-                  {customerProfile.address && <ProfileRow label={t("ঠিকানা", "Address")} value={customerProfile.address} />}
-                  {customerProfile.gender && <ProfileRow label={t("লিঙ্গ", "Gender")} value={customerProfile.gender} />}
+                  <ProfileRow label={t("ফোন", "Phone")} value={(customerProfile as any).phone} />
+                  {(customerProfile as any).alt_phone && <ProfileRow label={t("বিকল্প", "Alt")} value={(customerProfile as any).alt_phone} />}
+                  {(customerProfile as any).district && <ProfileRow label={t("জেলা", "District")} value={(customerProfile as any).district} />}
+                  {(customerProfile as any).thana && <ProfileRow label={t("থানা", "Thana")} value={(customerProfile as any).thana} />}
+                  {(customerProfile as any).address && <ProfileRow label={t("ঠিকানা", "Address")} value={(customerProfile as any).address} />}
+                  {(customerProfile as any).gender && <ProfileRow label={t("লিঙ্গ", "Gender")} value={(customerProfile as any).gender} />}
                   {/* Credit display removed */}
                 </div>
 

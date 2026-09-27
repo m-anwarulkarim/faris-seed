@@ -32,6 +32,7 @@ import { PhoneVerifiedBadge } from "@/components/PhoneVerifiedBadge";
 import { usePhoneVerificationMap } from "@/hooks/usePhoneVerification";
 
 import { FraudResultCard } from "@/components/admin/FraudCheckerDialog";
+import { checkFraudStatus } from "@/utils/fraudCheckerHelper";
 import { OrderIpBlockPanel } from "@/components/admin/OrderIpBlockPanel";
 import { PaymentBadge } from "@/components/admin/PaymentBadge";
 
@@ -58,6 +59,35 @@ const WEB_STATUS_WITH_CONFIRM = WEB_STATUS_OPTIONS;
 
 const WEB_STATUS_VALUES = WEB_STATUS_OPTIONS.map((s) => s.value);
 const WEB_ORDER_SOURCE_FILTER = "traffic_source.is.null,traffic_source.neq.ecomdrive";
+
+function ProductImgWithFallback({
+  src,
+  alt,
+  className = "w-8 h-8 rounded border border-border object-cover",
+  iconSize = "w-3 h-3",
+}: {
+  src: string | null;
+  alt: string;
+  className?: string;
+  iconSize?: string;
+}) {
+  const [imgErr, setImgErr] = useState(false);
+  if (!src || imgErr) {
+    return (
+      <div className={`${className} bg-muted flex items-center justify-center shrink-0`}>
+        <Package className={`${iconSize} text-muted-foreground`} />
+      </div>
+    );
+  }
+  return (
+    <img
+      src={src}
+      alt={alt}
+      className={className}
+      onError={() => setImgErr(true)}
+    />
+  );
+}
 
 export default function WebOrders() {
   const { t } = useLanguage();
@@ -140,11 +170,8 @@ export default function WebOrders() {
     setFraudLoading(true);
     setFraudData(null);
     try {
-      const { data, error } = await supabase.functions.invoke("fraud-checker", {
-        body: { action: "check", phone },
-      });
-      if (error) throw error;
-      setFraudData(data?.data || data);
+      const data = await checkFraudStatus(phone);
+      setFraudData(data);
     } catch (e: any) {
       toast.error(e?.message || t("চেক ব্যর্থ", "Check failed"));
     } finally {
@@ -156,11 +183,8 @@ export default function WebOrders() {
     if (!phone) return;
     setRowFraudLoading((s) => new Set(s).add(orderId));
     try {
-      const { data, error } = await supabase.functions.invoke("fraud-checker", {
-        body: { action: "check", phone },
-      });
-      if (error) throw error;
-      setRowFraudResults((r) => ({ ...r, [orderId]: data?.data || data }));
+      const data = await checkFraudStatus(phone);
+      setRowFraudResults((r) => ({ ...r, [orderId]: data }));
     } catch (e: any) {
       toast.error(e?.message || t("চেক ব্যর্থ", "Check failed"));
     } finally {
@@ -288,13 +312,13 @@ export default function WebOrders() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("order_items")
-        .select("*, products(product_image)")
+        .select("*")
         .in("order_id", orderIds);
       if (error) throw error;
       return (data || []).map((i: any) => {
         const snap = i.product_image as string | null;
         const isBroken = !snap || /bij-bd\.com/i.test(snap);
-        return { ...i, product_image: (isBroken ? i.products?.product_image : snap) || i.products?.product_image || null };
+        return { ...i, product_image: (isBroken ? null : snap) || snap || null };
       });
     },
   });
@@ -335,13 +359,13 @@ export default function WebOrders() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("order_items")
-        .select("*, products(product_image)")
+        .select("*")
         .eq("order_id", selectedOrder.id);
       if (error) throw error;
       return (data || []).map((i: any) => {
         const snap = i.product_image as string | null;
         const isBroken = !snap || /bij-bd\.com/i.test(snap);
-        return { ...i, product_image: (isBroken ? i.products?.product_image : snap) || i.products?.product_image || null };
+        return { ...i, product_image: (isBroken ? null : snap) || snap || null };
       });
     },
   });
@@ -466,6 +490,9 @@ export default function WebOrders() {
   const convertMutation = useMutation({
     mutationFn: async (inc: any) => {
       const cart = Array.isArray(inc.cart_snapshot) ? inc.cart_snapshot : [];
+      if (!cart || cart.length === 0) {
+        throw new Error(t("এই অসম্পূর্ণ অর্ডারে কোনো পণ্য নেই। অর্ডারে রূপান্তর করা সম্ভব নয়।", "No products in this incomplete order. Cannot convert."));
+      }
       const totalAmount = cart.reduce((sum: number, item: any) => sum + (item.price || 0) * (item.quantity || 1), 0);
 
       // Create order via RPC
@@ -666,11 +693,12 @@ export default function WebOrders() {
                   {orders.map((order) => {
                     const si = getStatusInfo(order.status);
                     const StatusIcon = si.icon;
-                    const rawItems = (order as any).order_items && (order as any).order_items.length > 0 ? (order as any).order_items : (itemsByOrder[order.id] || []);
+                    const rawItems = (itemsByOrder[order.id] && itemsByOrder[order.id].length > 0) ? itemsByOrder[order.id] : ((order as any).order_items || []);
                     const items = rawItems.map((i: any) => {
                       const snap = i.product_image as string | null;
                       const isBroken = !snap || /bij-bd\.com/i.test(snap);
-                      return { ...i, product_image: (isBroken ? i.products?.product_image : snap) || snap || null };
+                      const fallback = i.products?.product_image || null;
+                      return { ...i, product_image: (isBroken ? fallback : snap) || fallback || null };
                     });
                     const timeAgo = formatDistanceToNow(new Date(order.created_at), { addSuffix: true });
 
@@ -737,17 +765,12 @@ export default function WebOrders() {
                                           onClick={() => setSelectedOrder(order)}
                                           className="w-8 h-8 flex-shrink-0 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                                         >
-                                          {item.product_image ? (
-                                            <img
-                                              src={item.product_image}
-                                              alt={item.product_name}
-                                              className="w-8 h-8 rounded border border-border object-cover"
-                                            />
-                                          ) : (
-                                            <div className="w-8 h-8 rounded border border-border bg-muted flex items-center justify-center">
-                                              <Package className="w-3 h-3 text-muted-foreground" />
-                                            </div>
-                                          )}
+                                          <ProductImgWithFallback
+                                            src={item.product_image}
+                                            alt={item.product_name}
+                                            className="w-8 h-8 rounded border border-border object-cover"
+                                            iconSize="w-3 h-3"
+                                          />
                                         </button>
                                       </TooltipTrigger>
                                       <TooltipContent side="top" className="text-xs max-w-[200px]">
@@ -1192,13 +1215,12 @@ export default function WebOrders() {
                 <div className="space-y-2">
                   {selectedOrderItems.map((item) => (
                     <div key={item.id} className="flex items-center gap-3 p-2 rounded-lg bg-muted/40">
-                      {item.product_image ? (
-                        <img src={item.product_image} alt={item.product_name} className="w-10 h-10 rounded object-cover" />
-                      ) : (
-                        <div className="w-10 h-10 rounded bg-muted flex items-center justify-center">
-                          <Package className="w-4 h-4 text-muted-foreground" />
-                        </div>
-                      )}
+                      <ProductImgWithFallback
+                        src={item.product_image}
+                        alt={item.product_name}
+                        className="w-10 h-10 rounded border border-border object-cover"
+                        iconSize="w-4 h-4"
+                      />
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium line-clamp-1">{item.product_name}</p>
                         <p className="text-xs text-muted-foreground">৳{item.unit_price} × {item.quantity}</p>

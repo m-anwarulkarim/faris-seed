@@ -489,7 +489,10 @@ export default function Checkout() {
 
 
       const { error: itemsErr } = await supabase.from("order_items").insert(orderItems);
-      if (itemsErr) throw itemsErr;
+      if (itemsErr) {
+        await supabase.from("orders").delete().eq("id", order.id).then(() => {});
+        throw itemsErr;
+      }
 
       // Credit deduction removed
 

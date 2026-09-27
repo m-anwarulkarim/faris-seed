@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -121,31 +121,47 @@ export default function ProductList() {
     },
   });
 
+  const categoryMap = useMemo(() => {
+    const map: Record<string, string> = {};
+    categories?.forEach((c: any) => { map[c.id] = c.display_name || c.name; });
+    return map;
+  }, [categories]);
+
   const { data: tags } = useQuery({
     queryKey: ["tags"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("tags").select("*").order("name");
-      if (error) throw error;
-      return data;
+      try {
+        const { data } = await supabase.from("products").select("tag").not("tag", "is", null);
+        if (!data) return [];
+        const set = new Set<string>();
+        data.forEach((p: any) => { if (p.tag) set.add(p.tag); });
+        return Array.from(set).map((name) => ({ id: name, name }));
+      } catch {
+        return [];
+      }
     },
   });
 
   const { data: countData } = useQuery({
     queryKey: ["products-count", search, selectedCategory, selectedTag, visibilityFilter],
     queryFn: async () => {
-      let query = supabase
-        .from("products")
-        .select("*", { count: "exact", head: true });
+      try {
+        let query: any = supabase
+          .from("products")
+          .select("*", { count: "exact", head: true });
 
-      if (search) query = query.or(`name.ilike.%${search}%,sku.ilike.%${search}%`);
-      if (selectedCategory && selectedCategory !== "all") query = query.eq("category", selectedCategory);
-      if (selectedTag && selectedTag !== "all") query = query.ilike("tag", `%${selectedTag}%`);
-      if (visibilityFilter === "visible") query = query.eq("is_hidden", false);
-      else if (visibilityFilter === "hidden") query = query.eq("is_hidden", true);
+        if (search) query = query.ilike("name", `%${search}%`);
+        if (selectedCategory && selectedCategory !== "all") query = query.eq("category_id", selectedCategory);
+        if (selectedTag && selectedTag !== "all") query = query.ilike("tag", `%${selectedTag}%`);
+        if (visibilityFilter === "visible") query = query.eq("is_active", true);
+        else if (visibilityFilter === "hidden") query = query.eq("is_active", false);
 
-      const { count, error } = await query;
-      if (error) throw error;
-      return count || 0;
+        const { count, error } = await query;
+        if (error) return 0;
+        return count || 0;
+      } catch {
+        return 0;
+      }
     },
   });
 
@@ -155,25 +171,28 @@ export default function ProductList() {
   const {
     data: products,
     isLoading,
-  } = useQuery({
+  } = useQuery<any[]>({
     queryKey: ["products", search, selectedCategory, selectedTag, visibilityFilter, page],
     queryFn: async () => {
-      let query = supabase
-        .from("products")
-        .select("*")
-        .order("position", { ascending: true })
-        .order("created_at", { ascending: false })
-        .range(page * PAGE_SIZE, (page + 1) * PAGE_SIZE - 1);
+      try {
+        let query: any = supabase
+          .from("products")
+          .select("*")
+          .order("created_at", { ascending: false })
+          .range(page * PAGE_SIZE, (page + 1) * PAGE_SIZE - 1);
 
-      if (search) query = query.or(`name.ilike.%${search}%,sku.ilike.%${search}%`);
-      if (selectedCategory && selectedCategory !== "all") query = query.eq("category", selectedCategory);
-      if (selectedTag && selectedTag !== "all") query = query.ilike("tag", `%${selectedTag}%`);
-      if (visibilityFilter === "visible") query = query.eq("is_hidden", false);
-      else if (visibilityFilter === "hidden") query = query.eq("is_hidden", true);
+        if (search) query = query.ilike("name", `%${search}%`);
+        if (selectedCategory && selectedCategory !== "all") query = query.eq("category_id", selectedCategory);
+        if (selectedTag && selectedTag !== "all") query = query.ilike("tag", `%${selectedTag}%`);
+        if (visibilityFilter === "visible") query = query.eq("is_active", true);
+        else if (visibilityFilter === "hidden") query = query.eq("is_active", false);
 
-      const { data, error } = await query;
-      if (error) throw error;
-      return data || [];
+        const { data, error } = await query;
+        if (error) return [];
+        return data || [];
+      } catch {
+        return [];
+      }
     },
   });
 
@@ -320,8 +339,8 @@ export default function ProductList() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">{t("সব ক্যাটাগরি", "All Categories")}</SelectItem>
-                {categories?.map((cat) => (
-                  <SelectItem key={cat.id} value={cat.name}>{cat.name}</SelectItem>
+                {categories?.map((cat: any) => (
+                  <SelectItem key={cat.id} value={cat.id}>{cat.display_name || cat.name}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -425,17 +444,17 @@ export default function ProductList() {
                               {product.name}
                             </span>
                           </TableCell>
-                          <TableCell className="text-muted-foreground">{product.sku}</TableCell>
-                          <TableCell>{product.category && <Badge variant="outline">{product.category}</Badge>}</TableCell>
+                          <TableCell className="text-muted-foreground">{(product as any).sku || "—"}</TableCell>
+                          <TableCell>{categoryMap[product.category_id] && <Badge variant="outline">{categoryMap[product.category_id]}</Badge>}</TableCell>
                           <TableCell className="text-sm text-muted-foreground">{product.tag || "—"}</TableCell>
                           <TableCell className="text-right">
-                            {product.offer_price ? (
+                            {product.regular_price && product.regular_price > (product.price || product.discount_price || 0) ? (
                               <div>
                                 <span className="line-through text-muted-foreground text-xs mr-1">৳{product.regular_price}</span>
-                                <span className="text-primary font-semibold">৳{product.offer_price}</span>
+                                <span className="text-primary font-semibold">৳{product.price || product.discount_price}</span>
                               </div>
                             ) : (
-                              <span className="font-semibold">৳{product.regular_price}</span>
+                              <span className="font-semibold">৳{product.price || product.discount_price || product.regular_price || 0}</span>
                             )}
                           </TableCell>
                           <TableCell className="text-right">

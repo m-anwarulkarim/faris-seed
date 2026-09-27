@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
+import { checkFraudStatus } from "@/utils/fraudCheckerHelper";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -103,8 +104,8 @@ export function FraudCheckerDialog({ open, onOpenChange }: { open: boolean; onOp
     setTesting(true); setTestResult(null);
 
     try {
-      const { data, error } = await supabase.functions.invoke("fraud-checker", { body: { action: "check", phone: testPhone } });
-      if (!error) setTestResult(data?.data);
+      const data = await checkFraudStatus(testPhone);
+      setTestResult(data);
     } catch {}
 
     toast.success(t("চেক সম্পন্ন", "Check complete"));

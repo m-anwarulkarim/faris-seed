@@ -531,13 +531,10 @@ export default function CourierHandle() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("order_items")
-        .select("id, product_name, quantity, unit_price, product_image, products(product_image)")
+        .select("id, product_name, quantity, unit_price, product_image")
         .eq("order_id", courierPopup!.dbId);
       if (error) throw error;
-      return (data || []).map((i: any) => ({
-        ...i,
-        product_image: i.product_image || i.products?.product_image || null,
-      }));
+      return data || [];
     },
   });
 

@@ -307,12 +307,9 @@ async function deepInvestigate(
   let allItems: any[] = [];
   for (let i = 0; i < orderUuids.length; i += 200) {
     const batch = orderUuids.slice(i, i + 200);
-    const { data } = await supabase.from("order_items").select("*, products(product_image)").in("order_id", batch);
+    const { data } = await supabase.from("order_items").select("*").in("order_id", batch);
     if (data) {
-      allItems.push(...data.map((item: any) => ({
-        ...item,
-        product_image: item.product_image || item.products?.product_image || null,
-      })));
+      allItems.push(...data);
     }
   }
 
@@ -523,7 +520,7 @@ export default function OrderSearch() {
       const [ordersRes, incompleteRes] = await Promise.all([
         supabase
           .from("orders")
-          .select("*, order_items(id, product_name, product_image, unit_price, quantity, products(product_image))")
+          .select("*, order_items(id, product_name, product_image, unit_price, quantity)")
           .or(`order_id.ilike.%${trimmed}%,customer_facing_id.ilike.%${trimmed}%,phone.ilike.%${trimmed}%,alt_phone.ilike.%${trimmed}%,customer_name.ilike.%${trimmed}%`)
           .order("created_at", { ascending: false })
           .limit(50),

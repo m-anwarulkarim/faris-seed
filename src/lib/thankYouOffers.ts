@@ -134,7 +134,7 @@ export async function addOfferToOrder(
         .select("id, total_amount, subtotal")
         .eq("id", orderId)
         .maybeSingle();
-      if (data) targetOrder = data;
+      if (data) targetOrder = data as any;
     }
 
     if (!targetOrder) {
@@ -143,7 +143,7 @@ export async function addOfferToOrder(
         .select("id, total_amount, subtotal")
         .eq("order_id", orderId)
         .maybeSingle();
-      if (data) targetOrder = data;
+      if (data) targetOrder = data as any;
     }
 
     let offerObj: ThankYouOffer | undefined = typeof offerOrId === "object" ? offerOrId : undefined;
@@ -161,7 +161,7 @@ export async function addOfferToOrder(
         quantity: quantity,
         total_price: addAmount,
         image_url: offerObj.image || null,
-      });
+      } as any);
 
       const currentTotal = Number(targetOrder.total_amount || 0);
       const newTotal = currentTotal + addAmount;
@@ -170,7 +170,7 @@ export async function addOfferToOrder(
         .update({
           total_amount: newTotal,
           subtotal: Number(targetOrder.subtotal || 0) + addAmount,
-        })
+        } as any)
         .eq("id", targetOrder.id);
 
       return { ok: true, added_amount: addAmount, total_amount: newTotal };

@@ -196,7 +196,7 @@ export default function SalesReport() {
         const to = from + PAGE_SIZE - 1;
         const { data, error } = await supabase
           .from("orders")
-          .select("id, total_amount, discount, advance, delivery_charge, status, created_at, updated_at, order_items(quantity, unit_price, product_id, products(buying_price))")
+          .select("id, total_amount, discount, advance, delivery_charge, status, created_at, updated_at, order_items(quantity, unit_price, product_id)")
           .eq("is_deleted", false)
           .or("traffic_source.is.null,traffic_source.neq.ecomdrive")
           .order("created_at", { ascending: true })

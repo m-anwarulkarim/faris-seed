@@ -388,13 +388,13 @@ export default function OrderEdit() {
 
   useEffect(() => {
     if (orderItems) {
-      setItems(orderItems.map((i) => ({
+      setItems(orderItems.map((i, idx) => ({
         id: i.id,
-        product_id: i.product_id,
+        product_id: i.product_id || i.id || `item-${idx}`,
         product_name: i.product_name,
         product_image: i.product_image,
-        unit_price: Number(i.unit_price),
-        quantity: Number(i.quantity),
+        unit_price: Number(i.unit_price) || 0,
+        quantity: Number(i.quantity) || 1,
       })));
     }
   }, [orderItems]);
@@ -678,21 +678,25 @@ export default function OrderEdit() {
     }
   };
 
-  const updateItemQty = (productId: string, delta: number) => {
+  const updateItemQty = (itemKey: string, delta: number) => {
     setItems(items.map((i) => {
-      if (i.product_id !== productId) return i;
+      const key = i.product_id || i.id;
+      if (key !== itemKey) return i;
       const newQty = i.quantity + delta;
       return newQty > 0 ? { ...i, quantity: newQty } : i;
     }));
   };
 
-  const setItemQty = (productId: string, qty: number) => {
+  const setItemQty = (itemKey: string, qty: number) => {
     if (!Number.isFinite(qty) || qty < 1) qty = 1;
-    setItems(items.map((i) => i.product_id === productId ? { ...i, quantity: Math.floor(qty) } : i));
+    setItems(items.map((i) => {
+      const key = i.product_id || i.id;
+      return key === itemKey ? { ...i, quantity: Math.floor(qty) } : i;
+    }));
   };
 
-  const removeItem = (productId: string) => {
-    setItems(items.filter((i) => i.product_id !== productId));
+  const removeItem = (itemKey: string) => {
+    setItems(items.filter((i) => (i.product_id || i.id) !== itemKey));
   };
 
   const handleSave = async (newStatus?: string, goBack = false) => {
@@ -713,18 +717,16 @@ export default function OrderEdit() {
     }
 
     if (items.length === 0) {
-      toast.error(t("কমপক্ষে একটি পণ্য যোগ করুন", "Add at least one product"));
+      toast.error(t("কমপক্ষে একটি পণ্য সিলেক্ট করুন", "At least one product is required"));
       return;
     }
 
     setSaving(true);
-
     try {
-      if (isNew) {
-        const { data: session } = await supabase.auth.getSession();
-        const currentAdminId = session?.session?.user?.id || null;
+      const { data: currentSess } = await supabase.auth.getSession();
+      const currentAdminId = currentSess?.session?.user?.id || null;
 
-        // Let DB sequence auto-generate order_id via default: 'AB' || nextval('order_number_seq')
+      if (isNew) {
         const insertData: any = {
           customer_name: customerName.trim(),
           phone: phone.trim(),
@@ -733,8 +735,8 @@ export default function OrderEdit() {
           district: district || null,
           thana: thana || null,
           delivery_area: deliveryArea.trim() || null,
-           note: note.trim() || null,
-           print_note: printNote,
+          note: note.trim() || null,
+          print_note: printNote,
           status: finalStatus,
           total_amount: totalAmount,
           discount,
@@ -746,7 +748,13 @@ export default function OrderEdit() {
         if (customOrderId.trim()) {
           insertData.order_id = customOrderId.trim();
         }
-        const { data: newOrder, error } = await supabase.from("orders").insert(insertData).select().single();
+        let { data: newOrder, error } = await supabase.from("orders").insert(insertData).select().single();
+        if (error && (error.message?.includes("print_note") || (error as any).code === "PGRST204" || (error as any).code === "42703")) {
+          delete insertData.print_note;
+          const retry = await supabase.from("orders").insert(insertData).select().single();
+          newOrder = retry.data;
+          error = retry.error;
+        }
         if (error) throw error;
 
         // Insert items
@@ -794,7 +802,7 @@ export default function OrderEdit() {
       } else {
         // Update order
         const { data: { session } } = await supabase.auth.getSession();
-        const { error } = await supabase.from("orders").update({
+        const updatePayload: any = {
           customer_name: customerName.trim(),
           phone: phone.trim(),
           alt_phone: altPhone.trim() || null,
@@ -802,8 +810,8 @@ export default function OrderEdit() {
           district: district || null,
           thana: thana || null,
           delivery_area: deliveryArea.trim() || null,
-           note: note.trim() || null,
-           print_note: printNote,
+          note: note.trim() || null,
+          print_note: printNote,
           status: finalStatus,
           total_amount: totalAmount,
           discount,
@@ -811,7 +819,13 @@ export default function OrderEdit() {
           delivery_charge: deliveryChargeOverride,
           last_status_changed_by: session?.user?.id || null,
           ...(finalStatus === "pre" && preDateValue ? { pre_date: preDateValue } : {}),
-        } as any).eq("id", order!.id);
+        };
+        let { error } = await supabase.from("orders").update(updatePayload as any).eq("id", order!.id);
+        if (error && (error.message?.includes("print_note") || (error as any).code === "PGRST204" || (error as any).code === "42703")) {
+          delete updatePayload.print_note;
+          const retry = await supabase.from("orders").update(updatePayload as any).eq("id", order!.id);
+          error = retry.error;
+        }
         if (error) throw error;
 
         // Delete old items and re-insert
@@ -874,13 +888,13 @@ export default function OrderEdit() {
               phone: trimmedPhone,
               full_name: customerName.trim(),
               address: address.trim(),
-            });
+            } as any);
           } else {
             // Update existing profile with latest order info
             await supabase.from("customer_profiles").update({
               full_name: customerName.trim(),
               address: address.trim(),
-            }).eq("id", existingProfile.id);
+            } as any).eq("id", (existingProfile as any).id);
           }
         } catch (profileErr) {
           console.error("Auto-create customer profile error:", profileErr);
@@ -1548,80 +1562,84 @@ export default function OrderEdit() {
                     </div>
                   ) : (
                     <div className="divide-y divide-border">
-                      {items.map((item) => (
-                        <div key={item.product_id} className="flex items-center gap-3 p-3 group">
-                          {item.product_image ? (
-                            <img src={item.product_image} alt="" className="w-14 h-14 rounded-lg border border-border object-cover flex-shrink-0 cursor-pointer" onDoubleClick={() => setProductDetailId(item.product_id)} />
-                          ) : (
-                            <div className="w-14 h-14 rounded-lg border border-border bg-muted flex items-center justify-center flex-shrink-0 cursor-pointer" onDoubleClick={() => setProductDetailId(item.product_id)}>
-                              <Package className="w-5 h-5 text-muted-foreground" />
-                            </div>
-                          )}
-                          <div className="flex-1 min-w-0 mr-auto">
-                            <p className="text-sm font-medium line-clamp-2 leading-tight">{item.product_name}</p>
-                            {editingPriceId === item.product_id ? (
-                              <Input
-                                type="number"
-                                autoFocus
-                                className="h-5 w-20 text-[11px] px-1 py-0 border-primary"
-                                value={editingPriceValue}
-                                onChange={(e) => setEditingPriceValue(e.target.value)}
-                                onBlur={() => {
-                                  const val = parseFloat(editingPriceValue);
-                                  if (!isNaN(val) && val >= 0) {
-                                    setItems(items.map(i => i.product_id === item.product_id ? { ...i, unit_price: val } : i));
-                                  }
-                                  setEditingPriceId(null);
-                                }}
-                                onKeyDown={(e) => {
-                                  if (e.key === "Enter") (e.target as HTMLInputElement).blur();
-                                  if (e.key === "Escape") setEditingPriceId(null);
-                                }}
-                              />
+                      {items.map((item, idx) => {
+                        const itemKey = item.id || item.product_id || `item-${idx}`;
+                        const isEditingPrice = Boolean(editingPriceId) && editingPriceId === itemKey;
+                        return (
+                          <div key={itemKey} className="flex items-center gap-3 p-3 group">
+                            {item.product_image ? (
+                              <img src={item.product_image} alt="" className="w-14 h-14 rounded-lg border border-border object-cover flex-shrink-0 cursor-pointer" onDoubleClick={() => item.product_id && setProductDetailId(item.product_id)} />
                             ) : (
-                              <p
-                                className="text-[11px] text-muted-foreground cursor-pointer hover:text-primary hover:underline transition-colors"
-                                onDoubleClick={() => {
-                                  setEditingPriceId(item.product_id);
-                                  setEditingPriceValue(String(item.unit_price));
-                                }}
-                                title={t("ডাবল ক্লিক করে দাম পরিবর্তন করুন", "Double-click to edit price")}
-                              >
-                                ৳{item.unit_price}
-                              </p>
+                              <div className="w-14 h-14 rounded-lg border border-border bg-muted flex items-center justify-center flex-shrink-0 cursor-pointer" onDoubleClick={() => item.product_id && setProductDetailId(item.product_id)}>
+                                <Package className="w-5 h-5 text-muted-foreground" />
+                              </div>
                             )}
-                          </div>
-                          <div className="flex items-center bg-muted/60 rounded-full border border-border">
+                            <div className="flex-1 min-w-0 mr-auto">
+                              <p className="text-sm font-medium line-clamp-2 leading-tight">{item.product_name}</p>
+                              {isEditingPrice ? (
+                                <Input
+                                  type="number"
+                                  autoFocus
+                                  className="h-5 w-20 text-[11px] px-1 py-0 border-primary"
+                                  value={editingPriceValue}
+                                  onChange={(e) => setEditingPriceValue(e.target.value)}
+                                  onBlur={() => {
+                                    const val = parseFloat(editingPriceValue);
+                                    if (!isNaN(val) && val >= 0) {
+                                      setItems(items.map(i => (i.id || i.product_id) === itemKey ? { ...i, unit_price: val } : i));
+                                    }
+                                    setEditingPriceId(null);
+                                  }}
+                                  onKeyDown={(e) => {
+                                    if (e.key === "Enter") (e.target as HTMLInputElement).blur();
+                                    if (e.key === "Escape") setEditingPriceId(null);
+                                  }}
+                                />
+                              ) : (
+                                <p
+                                  className="text-[11px] text-muted-foreground cursor-pointer hover:text-primary hover:underline transition-colors"
+                                  onDoubleClick={() => {
+                                    setEditingPriceId(itemKey);
+                                    setEditingPriceValue(String(item.unit_price));
+                                  }}
+                                  title={t("ডাবল ক্লিক করে দাম পরিবর্তন করুন", "Double-click to edit price")}
+                                >
+                                  ৳{item.unit_price}
+                                </p>
+                              )}
+                            </div>
+                            <div className="flex items-center bg-muted/60 rounded-full border border-border">
+                              <button
+                                className="h-7 w-7 flex items-center justify-center rounded-full hover:bg-destructive/10 hover:text-destructive transition-colors"
+                                onClick={() => updateItemQty(itemKey, -1)}
+                              >
+                                <Minus className="w-3 h-3" />
+                              </button>
+                              <input
+                                type="number"
+                                min={1}
+                                value={item.quantity}
+                                onChange={(e) => setItemQty(itemKey, parseInt(e.target.value, 10))}
+                                onFocus={(e) => e.target.select()}
+                                className="text-xs font-bold w-9 text-center bg-transparent outline-none focus:ring-1 focus:ring-primary rounded [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                              />
+                              <button
+                                className="h-7 w-7 flex items-center justify-center rounded-full hover:bg-primary/10 hover:text-primary transition-colors"
+                                onClick={() => updateItemQty(itemKey, 1)}
+                              >
+                                <Plus className="w-3 h-3" />
+                              </button>
+                            </div>
+                            <span className="text-xs font-bold text-primary w-14 text-right">৳{item.unit_price * item.quantity}</span>
                             <button
-                              className="h-7 w-7 flex items-center justify-center rounded-full hover:bg-destructive/10 hover:text-destructive transition-colors"
-                              onClick={() => updateItemQty(item.product_id, -1)}
+                              className="h-6 w-6 flex items-center justify-center rounded-full text-muted-foreground hover:text-destructive hover:bg-destructive/10 opacity-0 group-hover:opacity-100 transition-all"
+                              onClick={() => removeItem(itemKey)}
                             >
-                              <Minus className="w-3 h-3" />
-                            </button>
-                            <input
-                              type="number"
-                              min={1}
-                              value={item.quantity}
-                              onChange={(e) => setItemQty(item.product_id, parseInt(e.target.value, 10))}
-                              onFocus={(e) => e.target.select()}
-                              className="text-xs font-bold w-9 text-center bg-transparent outline-none focus:ring-1 focus:ring-primary rounded [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                            />
-                            <button
-                              className="h-7 w-7 flex items-center justify-center rounded-full hover:bg-primary/10 hover:text-primary transition-colors"
-                              onClick={() => updateItemQty(item.product_id, 1)}
-                            >
-                              <Plus className="w-3 h-3" />
+                              <Trash2 className="w-3 h-3" />
                             </button>
                           </div>
-                          <span className="text-xs font-bold text-primary w-14 text-right">৳{item.unit_price * item.quantity}</span>
-                          <button
-                            className="h-6 w-6 flex items-center justify-center rounded-full text-muted-foreground hover:text-destructive hover:bg-destructive/10 opacity-0 group-hover:opacity-100 transition-all"
-                            onClick={() => removeItem(item.product_id)}
-                          >
-                            <Trash2 className="w-3 h-3" />
-                          </button>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   )}
                 </ScrollArea>

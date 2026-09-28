@@ -104,7 +104,7 @@ export default function ProductList() {
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>(searchParams.get("category") || "all");
   const [selectedTag, setSelectedTag] = useState<string>(searchParams.get("tag") || "all");
-  const [visibilityFilter, setVisibilityFilter] = useState<string>("visible");
+  const [visibilityFilter, setVisibilityFilter] = useState<string>("all");
   const [page, setPage] = useState(0);
 
   const sensors = useSensors(
@@ -153,8 +153,8 @@ export default function ProductList() {
         if (search) query = query.ilike("name", `%${search}%`);
         if (selectedCategory && selectedCategory !== "all") query = query.eq("category_id", selectedCategory);
         if (selectedTag && selectedTag !== "all") query = query.ilike("tag", `%${selectedTag}%`);
-        if (visibilityFilter === "visible") query = query.eq("is_active", true);
-        else if (visibilityFilter === "hidden") query = query.eq("is_active", false);
+        if (visibilityFilter === "visible") query = query.or("is_hidden.is.null,is_hidden.eq.false");
+        else if (visibilityFilter === "hidden") query = query.eq("is_hidden", true);
 
         const { count, error } = await query;
         if (error) return 0;
@@ -184,8 +184,8 @@ export default function ProductList() {
         if (search) query = query.ilike("name", `%${search}%`);
         if (selectedCategory && selectedCategory !== "all") query = query.eq("category_id", selectedCategory);
         if (selectedTag && selectedTag !== "all") query = query.ilike("tag", `%${selectedTag}%`);
-        if (visibilityFilter === "visible") query = query.eq("is_active", true);
-        else if (visibilityFilter === "hidden") query = query.eq("is_active", false);
+        if (visibilityFilter === "visible") query = query.or("is_hidden.is.null,is_hidden.eq.false");
+        else if (visibilityFilter === "hidden") query = query.eq("is_hidden", true);
 
         const { data, error } = await query;
         if (error) return [];

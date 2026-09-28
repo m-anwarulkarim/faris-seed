@@ -137,7 +137,7 @@ export default function OrderList() {
     queryFn: async () => {
       let query = supabase
         .from("orders")
-        .select("*, order_items(id, product_name, product_image, quantity, products(product_image)), visitors(traffic_source), connected_sites(site_name, site_slug)", { count: "exact" })
+        .select("*, order_items(id, product_name, product_image, quantity), visitors(traffic_source)", { count: "exact" })
         .eq("is_deleted", false)
         .or("notify_after.is.null,notify_after.lte." + new Date().toISOString())
         .order("created_at", { ascending: false })
@@ -254,13 +254,9 @@ export default function OrderList() {
     queryKey: ["order-items", selectedOrder?.id],
     enabled: !!selectedOrder,
     queryFn: async () => {
-      const { data, error } = await supabase.from("order_items").select("*, products(product_image)").eq("order_id", selectedOrder.id);
+      const { data, error } = await supabase.from("order_items").select("*").eq("order_id", selectedOrder.id);
       if (error) throw error;
-      return (data || []).map((i: any) => {
-        const snap = i.product_image as string | null;
-        const isBroken = !snap || /bij-bd\.com/i.test(snap);
-        return { ...i, product_image: (isBroken ? i.products?.product_image : snap) || i.products?.product_image || null };
-      });
+      return data || [];
     },
   });
 
@@ -438,7 +434,7 @@ export default function OrderList() {
       // 1. Fetch full order data with items for invoice
       const { data: printOrders, error: oErr } = await supabase
         .from("orders")
-        .select("*, order_items(id, product_name, product_image, products(short_description, tag), quantity, unit_price)")
+        .select("*, order_items(id, product_name, product_image, quantity, unit_price)")
         .in("id", ids);
       if (oErr) throw oErr;
       if (!printOrders?.length) throw new Error("No orders found");

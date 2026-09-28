@@ -102,16 +102,19 @@ export function MediaPickerDialog({
       const ctx = (titleContext || "").trim();
       const suffix = fileList.length > 1 ? `-${i + 1}` : "";
       const ctxWithSuffix = ctx ? `${ctx}${suffix}` : "";
+      const sanitizedCtx = ctxWithSuffix ? ctxWithSuffix.toLowerCase().replace(/[^\w-]+/g, "-").replace(/-+/g, "-").replace(/^-|-$/g, "") : "";
+      const prefix = sanitizedCtx ? `${sanitizedCtx}-` : "";
       const fileName = compressed.type === "image/webp"
         ? generateWebPFileName(file.name, ctxWithSuffix || undefined)
-        : `${ctxWithSuffix ? ctxWithSuffix.toLowerCase().replace(/[^\w-]+/g, "-").replace(/-+/g, "-").replace(/^-|-$/g, "") + "-" : ""}${Date.now()}-${Math.random().toString(36).substring(7)}.${file.name.split(".").pop()}`;
+        : `${prefix}${Date.now()}-${Math.random().toString(36).substring(7)}.${file.name.split(".").pop()}`;
 
       const { error } = await supabase.storage
         .from("product-images")
         .upload(fileName, compressed);
 
       if (error) {
-        toast.error(`আপলোড ব্যর্থ: ${file.name}`);
+        console.error("Upload error:", error);
+        toast.error(`আপলোড ব্যর্থ: ${file.name} - ${error.message}`);
         continue;
       }
 

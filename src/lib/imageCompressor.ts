@@ -120,7 +120,10 @@ export function generateWebPFileName(originalName?: string, contextName?: string
       .replace(/-+/g, "-")
       .substring(0, 60)
       .replace(/^-+|-+$/g, "");
-    return `${slug}-faris-seed-${rand}.webp`;
+    
+    if (slug) {
+      return `${slug}-faris-seed-${rand}.webp`;
+    }
   }
 
   return `faris-seed-${timestamp}-${rand}.webp`;

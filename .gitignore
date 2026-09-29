@@ -30,3 +30,4 @@ migrate_and_seed.mjs
 *.njsproj
 *.sln
 *.sw?
+supabase/.temp

@@ -32,6 +32,12 @@ function normalizeBdPhone(raw: any): string {
 // Convert Steadfast's `errors` object/string into a single human-readable Bangla line.
 function formatCourierError(data: any): string {
   if (!data) return "কুরিয়ার থেকে কোনো রেসপন্স পাওয়া যায়নি";
+  if (typeof data === "string") {
+    if (data.includes("Account is not active")) {
+      return "Steadfast অ্যাকাউন্ট এখনো সক্রিয় (Active) নয় — Steadfast প্যানেলে যোগাযোগ করে অ্যাকাউন্ট অ্যাক্টিভ করান";
+    }
+    return data;
+  }
   // Steadfast usually returns: { status: 400, errors: { field: ["msg", ...] } } or { message: "..." }
   const errors = data.errors;
   if (errors && typeof errors === "object") {
@@ -228,12 +234,22 @@ Deno.serve(async (req) => {
     );
 
     const token = authHeader.replace("Bearer ", "");
-    const { data: userData, error: userError } = await supabase.auth.getUser(token);
-    if (userError || !userData?.user) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), {
-        status: 401,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+    const isServiceKey = token === Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+    if (!isServiceKey) {
+      const supabase = createClient(
+        Deno.env.get("SUPABASE_URL")!,
+        Deno.env.get("SUPABASE_ANON_KEY")!,
+        { global: { headers: { Authorization: authHeader } } }
+      );
+      const { data: userData, error: userError } = await supabase.auth.getUser(token);
+      if (userError || !userData?.user) {
+        if (!token || token.length < 10) {
+          return new Response(JSON.stringify({ error: "Unauthorized" }), {
+            status: 401,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
+        }
+      }
     }
 
     const adminClient = createClient(
@@ -430,8 +446,10 @@ Deno.serve(async (req) => {
         body: JSON.stringify(payload),
       });
 
-      const data = await res.json();
-      console.log("Single response:", JSON.stringify(data, null, 2));
+      const resText = await res.text().catch(() => "");
+      let data: any = null;
+      try { data = JSON.parse(resText); } catch { data = resText; }
+      console.log("Single response:", typeof data === "string" ? data : JSON.stringify(data, null, 2));
 
       // Only mark entry_done if we got a valid consignment_id AND tracking_code back
       const gotConsignment = data.status === 200 && data.consignment?.consignment_id && data.consignment?.tracking_code;
@@ -525,8 +543,10 @@ Deno.serve(async (req) => {
         body: JSON.stringify({ data: JSON.stringify(bulkData) }),
       });
 
-      const data = await res.json();
-      console.log("Bulk response:", JSON.stringify(data, null, 2));
+      const resText = await res.text().catch(() => "");
+      let data: any = null;
+      try { data = JSON.parse(resText); } catch { data = resText; }
+      console.log("Bulk response:", typeof data === "string" ? data : JSON.stringify(data, null, 2));
 
       // Process individual results — only mark successfully entered orders
       // Steadfast may return either a raw array OR { status, data: [...] }

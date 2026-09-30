@@ -56,7 +56,7 @@ export function OrderForm({
         deliveryCharge,
         items: [
           {
-            productId: product.id,
+            productId: product.id || product.slug,
             productName: product.name,
             productImage: product.image || null,
             quantity,

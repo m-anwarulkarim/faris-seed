@@ -4,6 +4,7 @@ import portulaca from "@/assets/product-portulaca.webp";
 export type ProductTag = "bestseller" | "new" | "limited" | null;
 
 export interface Product {
+  id?: string;
   slug: string;
   name: string;
   nameEn: string;

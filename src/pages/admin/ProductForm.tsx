@@ -332,19 +332,24 @@ export default function ProductForm() {
     let error;
 
     if (isEdit) {
-      const { error: updateError, data: updated } = await supabase
-        .from("products")
-        .update(productData)
-        .eq("id", id!)
-        .select();
-      error = updateError;
-      if (!updateError && (!updated || updated.length === 0)) {
+      let res = await supabase.from("products").update(productData).eq("id", id!).select();
+      if (res.error && res.error.message?.includes("cash_back")) {
+        delete productData.cash_back;
+        res = await supabase.from("products").update(productData).eq("id", id!).select();
+      }
+      error = res.error;
+      if (!res.error && (!res.data || res.data.length === 0)) {
         setLoading(false);
         toast.error("আপডেট করা যায়নি। আপনি লগইন আছেন কিনা নিশ্চিত করুন।");
         return;
       }
     } else {
-      ({ error } = await supabase.from("products").insert([productData]));
+      let res = await supabase.from("products").insert([productData]);
+      if (res.error && res.error.message?.includes("cash_back")) {
+        delete productData.cash_back;
+        res = await supabase.from("products").insert([productData]);
+      }
+      error = res.error;
     }
 
     setLoading(false);

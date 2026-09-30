@@ -270,8 +270,8 @@ Deno.serve(async (req) => {
     const { apiKey, secretKey } = await getApiKeys(adminClient);
     if (!apiKey || !secretKey) {
       return new Response(
-        JSON.stringify({ error: "Steadfast API credentials not configured" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        JSON.stringify({ success: false, error: "Steadfast API credentials কনফিগার করা নেই — API Management সেটিংসে যান" }),
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
@@ -670,8 +670,9 @@ Deno.serve(async (req) => {
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown error";
-    return new Response(JSON.stringify({ error: message }), {
-      status: 500,
+    const isConfigErr = /credentials|API key|secret|not configured|সেটিংসে/i.test(message);
+    return new Response(JSON.stringify({ success: false, error: message }), {
+      status: isConfigErr ? 200 : 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }

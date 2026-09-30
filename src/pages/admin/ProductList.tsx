@@ -151,7 +151,7 @@ export default function ProductList() {
           .select("*", { count: "exact", head: true });
 
         if (search) query = query.ilike("name", `%${search}%`);
-        if (selectedCategory && selectedCategory !== "all") query = query.eq("category_id", selectedCategory);
+        if (selectedCategory && selectedCategory !== "all") query = query.eq("category", selectedCategory);
         if (selectedTag && selectedTag !== "all") query = query.ilike("tag", `%${selectedTag}%`);
         if (visibilityFilter === "visible") query = query.or("is_hidden.is.null,is_hidden.eq.false");
         else if (visibilityFilter === "hidden") query = query.eq("is_hidden", true);
@@ -182,7 +182,7 @@ export default function ProductList() {
           .range(page * PAGE_SIZE, (page + 1) * PAGE_SIZE - 1);
 
         if (search) query = query.ilike("name", `%${search}%`);
-        if (selectedCategory && selectedCategory !== "all") query = query.eq("category_id", selectedCategory);
+        if (selectedCategory && selectedCategory !== "all") query = query.eq("category", selectedCategory);
         if (selectedTag && selectedTag !== "all") query = query.ilike("tag", `%${selectedTag}%`);
         if (visibilityFilter === "visible") query = query.or("is_hidden.is.null,is_hidden.eq.false");
         else if (visibilityFilter === "hidden") query = query.eq("is_hidden", true);
@@ -445,16 +445,16 @@ export default function ProductList() {
                             </span>
                           </TableCell>
                           <TableCell className="text-muted-foreground">{(product as any).sku || "—"}</TableCell>
-                          <TableCell>{categoryMap[product.category_id] && <Badge variant="outline">{categoryMap[product.category_id]}</Badge>}</TableCell>
+                          <TableCell>{(categoryMap[product.category || ""] || product.category) && <Badge variant="outline">{categoryMap[product.category || ""] || product.category}</Badge>}</TableCell>
                           <TableCell className="text-sm text-muted-foreground">{product.tag || "—"}</TableCell>
                           <TableCell className="text-right">
-                            {product.regular_price && product.regular_price > (product.price || product.discount_price || 0) ? (
+                            {product.offer_price && product.offer_price < product.regular_price ? (
                               <div>
                                 <span className="line-through text-muted-foreground text-xs mr-1">৳{product.regular_price}</span>
-                                <span className="text-primary font-semibold">৳{product.price || product.discount_price}</span>
+                                <span className="text-primary font-semibold">৳{product.offer_price}</span>
                               </div>
                             ) : (
-                              <span className="font-semibold">৳{product.price || product.discount_price || product.regular_price || 0}</span>
+                              <span className="font-semibold">৳{product.regular_price || 0}</span>
                             )}
                           </TableCell>
                           <TableCell className="text-right">

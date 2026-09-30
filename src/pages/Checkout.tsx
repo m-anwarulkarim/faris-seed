@@ -188,14 +188,15 @@ export default function Checkout() {
       .filter((id) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id));
     if (baseIds.length === 0) { setCashbackMap({}); return; }
     supabase.from("products").select("id, cash_back").in("id", baseIds)
-      .then(({ data }) => {
-        if (!data) return;
+      .then(({ data, error }) => {
+        if (error || !data) return;
         const map: Record<string, number> = {};
         for (const p of data as any[]) {
           map[p.id] = Number(p.cash_back) || 0;
         }
         setCashbackMap(map);
-      });
+      })
+      .catch(() => {});
   }, [items.map((i) => i.id).join("|")]);
 
 

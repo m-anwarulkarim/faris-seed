@@ -422,11 +422,11 @@ export default function OrderEdit() {
   const { data: products } = useQuery<any[]>({
     queryKey: ["products-picker", pickerMode, productSearch, selectedCategory, selectedTag],
     queryFn: async () => {
-      let query: any = supabase.from("products").select("id, name, product_image, regular_price, price, discount_price, stock, tag").order("created_at", { ascending: false }).limit(50);
+      let query: any = supabase.from("products").select("id, name, product_image, regular_price, offer_price, stock, tag").order("created_at", { ascending: false }).limit(50);
       if (pickerMode === "search" && productSearch) {
         query = query.ilike("name", `%${productSearch}%`);
       } else if (pickerMode === "category" && selectedCategory) {
-        query = query.eq("category_id", selectedCategory);
+        query = query.eq("category", selectedCategory);
       } else if (pickerMode === "tag" && selectedTag) {
         query = query.eq("tag", selectedTag);
       }
@@ -664,7 +664,7 @@ export default function OrderEdit() {
   const addProduct = (product: any) => {
     const isFreeGift = Number(product.unlock_threshold || 0) > 0;
     const existing = items.find((i) => i.product_id === product.id);
-    const unitPrice = isFreeGift ? 0 : (product.price || product.discount_price || product.regular_price || 0);
+    const unitPrice = isFreeGift ? 0 : (product.offer_price || product.regular_price || 0);
     if (existing) {
       setItems(items.map((i) => i.product_id === product.id ? { ...i, quantity: i.quantity + 1 } : i));
     } else {
@@ -1727,7 +1727,7 @@ export default function OrderEdit() {
                 <ScrollArea className="h-[420px]">
                   <div className="divide-y divide-border">
                     {products?.map((product: any) => {
-                      const price = product.price || product.discount_price || product.regular_price || 0;
+                      const price = product.offer_price || product.regular_price || 0;
                       const inOrder = items.some((i) => i.product_id === product.id);
                       const orderQty = items.find((i) => i.product_id === product.id)?.quantity || 0;
                       return (

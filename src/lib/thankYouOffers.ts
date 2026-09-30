@@ -80,8 +80,8 @@ export async function loadThankYouOffers(): Promise<ThankYouOffer[]> {
       id: "offer-portulaca",
       name: "মিক্স কালার পর্তুলিকা বা টাইম ফুলের বীজ",
       image: portulaca,
-      price: 120,
-      oldPrice: 160,
+      price: 180,
+      oldPrice: 250,
       active: true,
     },
   ];

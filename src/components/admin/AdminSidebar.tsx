@@ -297,9 +297,29 @@ export function AdminSidebar() {
   const { data: sidebarCounts } = useQuery({
     queryKey: ["sidebar-counts"],
     queryFn: async () => {
-      const { data, error } = await supabase.rpc("get_sidebar_counts");
-      if (error) throw error;
-      return data as { pending: number; confirmed: number; deleted: number; pre_today: number; unread_inbox: number; pending_reports: number };
+      try {
+        const { data, error } = await supabase.rpc("get_sidebar_counts");
+        if (!error && data) return data as { pending: number; confirmed: number; deleted: number; pre_today: number; unread_inbox: number; pending_reports: number };
+      } catch {}
+
+      // Fallback: direct table queries if get_sidebar_counts RPC is missing in DB
+      try {
+        const [{ count: pending }, { count: confirmed }, { count: deleted }] = await Promise.all([
+          supabase.from("orders").select("*", { count: "exact", head: true }).eq("status", "pending").eq("is_deleted", false),
+          supabase.from("orders").select("*", { count: "exact", head: true }).in("status", ["entry_done", "shipped", "picked", "on_the_way", "delivered"]).eq("is_deleted", false),
+          supabase.from("orders").select("*", { count: "exact", head: true }).eq("is_deleted", true),
+        ]);
+        return {
+          pending: pending || 0,
+          confirmed: confirmed || 0,
+          deleted: deleted || 0,
+          pre_today: 0,
+          unread_inbox: 0,
+          pending_reports: 0,
+        };
+      } catch {
+        return null;
+      }
     },
     refetchInterval: isIdle ? false : 90_000,
   });

@@ -15,6 +15,13 @@ function stepPrice(basePrice: number) {
 }
 
 export function getPackOffers(basePrice: number): PackOffer[] {
+  if (basePrice === 180) {
+    return [
+      { quantity: 1, price: 180, regularPrice: 250, saving: 70, label: "১ প্যাক" },
+      { quantity: 2, price: 350, regularPrice: 500, saving: 150, label: "২ প্যাক", badge: "জনপ্রিয়" },
+      { quantity: 3, price: 440, regularPrice: 750, saving: 310, label: "৩ প্যাক", badge: "বেস্ট ভ্যালু" },
+    ];
+  }
   const step = stepPrice(basePrice);
   return [1, 2, 3].map((quantity) => {
     const price = basePrice + (quantity - 1) * step;

@@ -35,7 +35,7 @@ export const products: Product[] = [
     name: "মিক্স কালার পর্তুলিকা বা টাইম ফুলের বীজ",
     nameEn: "Mixed Color Portulaca / Time Flower Seeds",
     tagline: "রং-বেরঙের থোকা ফুল, কম পরিচর্যায় প্রচুর ফুটন্ত সৌন্দর্য, ছাদ ও ব্যালকনির জন্য সেরা",
-    price: 160,
+    price: 180,
     oldPrice: 250,
     image: portulaca,
     images: [portulaca],

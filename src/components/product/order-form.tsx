@@ -23,7 +23,7 @@ export function OrderForm({ product }: { product: Product }) {
   const offers = getPackOffers(product.price);
   const selectedOffer = getPackOffer(product.price, quantity);
   const unitPrice = Math.round((selectedOffer.price / quantity) * 100) / 100;
-  const deliveryCharge = quantity > 1 ? 0 : 50;
+  const deliveryCharge = quantity > 1 ? 0 : 70;
   const total = selectedOffer.price + deliveryCharge;
 
 

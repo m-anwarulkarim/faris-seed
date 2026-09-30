@@ -142,13 +142,74 @@ export function slugify(value: string) {
     .replace(/^-+|-+$/g, "");
 }
 
-/** Client-synced catalog; renders the seed list during SSR/first paint. */
+import { supabase } from "@/integrations/supabase/client";
+
+export function fromDbRow(p: any): ProductRecord {
+  const hasOffer = p.offer_price && Number(p.offer_price) < Number(p.regular_price);
+  const price = hasOffer ? Number(p.offer_price) : (Number(p.regular_price) || 0);
+  const oldPrice = hasOffer ? Number(p.regular_price) : undefined;
+  const rawGallery = Array.isArray(p.image_gallery) ? p.image_gallery : [];
+  const images = rawGallery.length > 0 ? rawGallery : [p.product_image].filter(Boolean);
+
+  return {
+    slug: p.slug || p.id,
+    name: p.name,
+    nameEn: p.name,
+    tagline: p.short_description || p.name,
+    price,
+    oldPrice,
+    image: p.product_image || (images[0] || ""),
+    inStock: (p.stock ?? 1) > 0,
+    tag: (p.tag || "bestseller") as any,
+    stock: p.stock ?? 10,
+    active: !p.is_hidden,
+    images: images.length > 0 ? images : [p.product_image || ""],
+    shortDescription: p.short_description || "",
+    descriptionHtml: p.full_description || "",
+  };
+}
+
+/** Client-synced catalog; renders the seed list during SSR/first paint, updates from DB. */
 export function useCatalog(): ProductRecord[] {
-  const [list, setList] = useState<ProductRecord[]>(seedCatalog);
+  const [list, setList] = useState<ProductRecord[]>(getCatalog());
+
   useEffect(() => {
-    setList(getCatalog());
-    return subscribeProducts(() => setList(getCatalog()));
+    let cancelled = false;
+    async function fetchFromDb() {
+      try {
+        const { data, error } = await supabase
+          .from("products")
+          .select("*")
+          .or("is_hidden.is.null,is_hidden.eq.false")
+          .order("position", { ascending: true })
+          .order("created_at", { ascending: false });
+
+        if (!cancelled && !error && data && data.length > 0) {
+          const dbProducts = data.map(fromDbRow);
+          setList(dbProducts);
+          snapshot = dbProducts;
+        }
+      } catch {}
+    }
+
+    void fetchFromDb();
+
+    const channel = supabase
+      .channel("public-products-rt")
+      .on("postgres_changes", { event: "*", schema: "public", table: "products" }, () => {
+        void fetchFromDb();
+      })
+      .subscribe();
+
+    const unsub = subscribeProducts(() => setList(getCatalog()));
+
+    return () => {
+      cancelled = true;
+      supabase.removeChannel(channel);
+      unsub();
+    };
   }, []);
+
   return list;
 }
 

@@ -1,6 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
 
 export interface PlaceOrderItem {
+  productId?: string;
   productName: string;
   productImage?: string | null;
   quantity: number;
@@ -83,7 +84,9 @@ export async function placeOrder(input: PlaceOrderInput) {
         delivery_charge: input.deliveryCharge,
         discount,
         total_amount: grandTotal,
+        product_ids: input.items.map((i) => i.productId).filter(Boolean),
         items: input.items.map((i) => ({
+          product_id: i.productId,
           product_name: i.productName,
           quantity: i.quantity,
           unit_price: i.unitPrice,

@@ -783,11 +783,13 @@ export default function ProductForm() {
           {/* Related Offer Products */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">{t("অর্ডার পপআপে অফার পণ্য (ঐচ্ছিক)", "Offer Products in Order Popup (Optional)")}</CardTitle>
+              <CardTitle className="text-lg">
+                {t("অর্ডার পরবর্তী সাজেস্টেড অফার পণ্য (Thank You Page / Upsell)", "Post-Order Suggested Products (Thank You Page)")}
+              </CardTitle>
               <p className="text-xs text-muted-foreground mt-1">
                 {t(
-                  "এই পণ্য অর্ডার করার সময় পপআপের 'এই অফারগুলোও দেখুন' সেকশনে কোন পণ্যগুলো দেখানো হবে নির্বাচন করুন। কিছু নির্বাচন না করলে অটো অফার পণ্য দেখানো হবে।",
-                  "Choose which products appear in the 'এই অফারগুলোও দেখুন' section of the order popup. If none selected, auto offer products are shown."
+                  "এই পণ্যটি কাস্টমার অর্ডার করার পর থ্যাংক-ইউ পেজে বা স্পেশাল অফারে কোন কোন পণ্যগুলো সাজেস্ট বা অফার হিসেবে দেখাবে তা সিলেক্ট করুন। (যে পণ্যটি অর্ডার করা হয়েছে তা স্বয়ংক্রিয়ভাবে বাদ যাবে)। প্রতিটি পণ্যের জন্য চাইলে কাস্টম অফার দামও সেট করতে পারেন।",
+                  "Select which products are suggested on the Thank You page after a customer orders this product. (The purchased product is automatically excluded). You can also set custom offer prices for each."
                 )}
               </p>
             </CardHeader>

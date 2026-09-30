@@ -30,6 +30,8 @@ import { useCatalogProduct } from "@/data/product-store";
 import { useLandingPage, type SectionKey } from "@/data/landing-store";
 import { bn } from "@/lib/format";
 import { trackViewContent } from "@/lib/metaEvents";
+import { supabase } from "@/integrations/supabase/client";
+import type { PackOptionRow } from "@/lib/pack-offers";
 
 /* ==== Theme (matches the /lp/pudina landing style) ==== */
 const PRIMARY = "#1b7a3e";
@@ -340,6 +342,22 @@ function ProductLandingPage() {
   const c = useLandingPage(product);
   const [openFaq, setOpenFaq] = useState<number | null>(0);
   const { h, m, s } = useMidnightCountdown();
+  const [packOptions, setPackOptions] = useState<PackOptionRow[] | null>(null);
+
+  useEffect(() => {
+    if (!product?.slug) return;
+    // Load pack_options from DB for this specific product
+    supabase
+      .from("products")
+      .select("pack_options")
+      .eq("slug", product.slug)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (data && Array.isArray((data as any).pack_options) && (data as any).pack_options.length > 0) {
+          setPackOptions((data as any).pack_options as PackOptionRow[]);
+        }
+      });
+  }, [product?.slug]);
 
   const location = useLocation();
 
@@ -596,7 +614,7 @@ function ProductLandingPage() {
               className="rounded-3xl p-1 md:p-2"
               style={{ border: `2px solid ${PRIMARY}`, boxShadow: "0 20px 60px -20px rgba(27,122,62,0.4)" }}
             >
-              <OrderForm product={product} />
+              <OrderForm product={product} packOptions={packOptions} />
             </div>
           </Reveal>
         </div>

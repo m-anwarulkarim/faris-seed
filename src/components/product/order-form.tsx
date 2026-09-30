@@ -11,19 +11,25 @@ import { Textarea } from "@/components/ui/textarea";
 import { placeOrder } from "@/lib/placeOrder";
 import type { Product } from "@/data/products";
 import { bn, formatBDPhone } from "@/lib/format";
-import { getPackOffer, getPackOffers } from "@/lib/pack-offers";
+import { getPackOffersFromDb, getPackOffers, type PackOptionRow } from "@/lib/pack-offers";
 
 
-export function OrderForm({ product }: { product: Product }) {
+export function OrderForm({
+  product,
+  packOptions,
+}: {
+  product: Product;
+  packOptions?: PackOptionRow[] | null;
+}) {
   const [quantity, setQuantity] = useState(1);
   const [submitting, setSubmitting] = useState(false);
   const [form, setForm] = useState({ customerName: "", phone: "", altPhone: "", address: "", note: "" });
   const navigate = useNavigate();
 
-  const offers = getPackOffers(product.price);
-  const selectedOffer = getPackOffer(product.price, quantity);
+  const offers = getPackOffersFromDb(product.price, packOptions);
+  const selectedOffer = offers.find((o) => o.quantity === quantity) ?? offers[0]!;
   const unitPrice = Math.round((selectedOffer.price / quantity) * 100) / 100;
-  const deliveryCharge = quantity > 1 ? 0 : 70;
+  const deliveryCharge = selectedOffer.delivery_charge ?? (quantity > 1 ? 0 : 70);
   const total = selectedOffer.price + deliveryCharge;
 
 
@@ -134,7 +140,7 @@ export function OrderForm({ product }: { product: Product }) {
             </div>
             {selectedOffer.saving > 0 ? (
               <p className="text-xs font-medium text-primary">
-                আপনি সেভ করছেন {bn(selectedOffer.saving)} ৳ + ডেলিভারি ফ্রি
+                আপনি সেভ করছেন {bn(selectedOffer.saving)} ৳{deliveryCharge === 0 ? " + ডেলিভারি ফ্রি" : ""}
               </p>
             ) : (
               <p className="text-xs text-muted-foreground">

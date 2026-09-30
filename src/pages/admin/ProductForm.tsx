@@ -14,7 +14,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { ArrowLeft, Upload, X, Loader2, Check, FolderOpen, Copy, EyeOff, Eye } from "lucide-react";
+import { ArrowLeft, Upload, X, Loader2, Check, FolderOpen, Copy, EyeOff, Eye, Plus, Trash2, Package } from "lucide-react";
 import { MediaPickerDialog } from "@/components/admin/MediaPickerDialog";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -78,6 +78,15 @@ export default function ProductForm() {
   const [relatedOfferIds, setRelatedOfferIds] = useState<string[]>([]);
   const [relatedOfferDiscounts, setRelatedOfferDiscounts] = useState<Record<string, { type: "flat" | "percent"; value: number }>>({});
   const [offerPickerSearch, setOfferPickerSearch] = useState("");
+  
+  // Pack options state (1 pack, 2 packs, 3 packs with custom prices & delivery)
+  const [packOptions, setPackOptions] = useState<Array<{
+    quantity: number;
+    label: string;
+    price: number;
+    delivery_charge: number;
+    badge: string;
+  }>>([]);
 
   const { data: allProducts = [] } = useQuery({
     queryKey: ["all-products-picker"],
@@ -204,6 +213,14 @@ export default function ProductForm() {
       setRelatedOfferIds(Array.isArray((data as any).related_offer_product_ids) ? (data as any).related_offer_product_ids : []);
       const rawDiscounts = (data as any).related_offer_discounts;
       setRelatedOfferDiscounts(rawDiscounts && typeof rawDiscounts === "object" ? rawDiscounts : {});
+      // Load pack_options
+      const rawPackOptions = (data as any).pack_options;
+      if (Array.isArray(rawPackOptions) && rawPackOptions.length > 0) {
+        setPackOptions(rawPackOptions);
+      } else {
+        // Default: empty (will auto-calculate from price)
+        setPackOptions([]);
+      }
       // Parse comma-separated tags
       if (data.tag) {
         setSelectedTags(data.tag.split(",").map((t: string) => t.trim()).filter(Boolean));
@@ -326,6 +343,13 @@ export default function ProductForm() {
         });
         return Object.keys(filtered).length > 0 ? filtered : null;
       })(),
+      pack_options: packOptions.length > 0 ? packOptions.map((o) => ({
+        quantity: Number(o.quantity),
+        label: o.label || `${o.quantity} প্যাক`,
+        price: Number(o.price),
+        delivery_charge: Number(o.delivery_charge),
+        badge: o.badge || null,
+      })) : null,
     };
 
 
@@ -881,6 +905,169 @@ export default function ProductForm() {
                   </p>
                 )}
               </div>
+            </CardContent>
+          </Card>
+
+          {/* Pack Options / Variant Pricing */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Package className="w-5 h-5" />
+                {t("প্যাকেজ অফার (এক/দুই/তিন প্যাক)", "Pack Options (1/2/3 packs)")}
+              </CardTitle>
+              <p className="text-xs text-muted-foreground mt-1">
+                {t(
+                  "প্রতিটি প্যাক অপশনের আলাদা দাম ও ডেলিভারি চার্জ সেট করুন। খালি রাখলে পণ্যের মূল দাম থেকে অটো হিসাব করা হবে।",
+                  "Set custom price and delivery charge for each pack option. Leave empty to auto-calculate from base price."
+                )}
+              </p>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {/* Header row */}
+              {packOptions.length > 0 && (
+                <div className="grid grid-cols-12 gap-2 px-1 text-xs font-semibold text-muted-foreground">
+                  <div className="col-span-1">প্যাক</div>
+                  <div className="col-span-3">লেবেল</div>
+                  <div className="col-span-3">দাম (৳)</div>
+                  <div className="col-span-3">ডেলিভারি (৳)</div>
+                  <div className="col-span-2">ব্যাজ</div>
+                </div>
+              )}
+
+              {packOptions.map((opt, i) => (
+                <div key={i} className="grid grid-cols-12 gap-2 items-center p-2 bg-muted/30 border border-border rounded-lg">
+                  <div className="col-span-1">
+                    <span className="text-sm font-bold text-primary">{opt.quantity}</span>
+                  </div>
+                  <div className="col-span-3">
+                    <Input
+                      value={opt.label}
+                      placeholder={`${opt.quantity} প্যাক`}
+                      className="h-8 text-xs"
+                      onChange={(e) => {
+                        const next = [...packOptions];
+                        next[i] = { ...next[i]!, label: e.target.value };
+                        setPackOptions(next);
+                      }}
+                    />
+                  </div>
+                  <div className="col-span-3">
+                    <Input
+                      type="number"
+                      value={opt.price || ""}
+                      placeholder="০"
+                      className="h-8 text-xs"
+                      onChange={(e) => {
+                        const next = [...packOptions];
+                        next[i] = { ...next[i]!, price: parseFloat(e.target.value) || 0 };
+                        setPackOptions(next);
+                      }}
+                    />
+                  </div>
+                  <div className="col-span-3">
+                    <Input
+                      type="number"
+                      value={opt.delivery_charge ?? ""}
+                      placeholder="০"
+                      className="h-8 text-xs"
+                      onChange={(e) => {
+                        const next = [...packOptions];
+                        next[i] = { ...next[i]!, delivery_charge: parseFloat(e.target.value) || 0 };
+                        setPackOptions(next);
+                      }}
+                    />
+                  </div>
+                  <div className="col-span-1">
+                    <Input
+                      value={opt.badge || ""}
+                      placeholder="যেমন: জনপ্রিয়"
+                      className="h-8 text-[10px]"
+                      onChange={(e) => {
+                        const next = [...packOptions];
+                        next[i] = { ...next[i]!, badge: e.target.value };
+                        setPackOptions(next);
+                      }}
+                    />
+                  </div>
+                  <div className="col-span-1 flex justify-end">
+                    <button
+                      type="button"
+                      onClick={() => setPackOptions((prev) => prev.filter((_, idx) => idx !== i))}
+                      className="p-1 hover:text-destructive"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+
+              {packOptions.length === 0 && (
+                <p className="text-xs text-muted-foreground text-center py-3 bg-muted/20 rounded-lg border border-dashed border-border">
+                  {t("এখনো কোনো প্যাক অপশন নেই। নিচে থেকে যোগ করুন। খালি রাখলে দাম থেকে অটো হিসাব হবে।", "No pack options yet. Add below. Leave empty for auto-calculation.")}
+                </p>
+              )}
+
+              {/* Add pack buttons */}
+              <div className="flex flex-wrap gap-2 pt-1">
+                {[1, 2, 3].map((qty) => {
+                  const exists = packOptions.some((o) => o.quantity === qty);
+                  const basePrice = form.watch("offer_price") || form.watch("regular_price") || 0;
+                  const autoPrice = qty === 1 ? Number(basePrice) : qty === 2 ? Math.round(Number(basePrice) * 1.7) : Math.round(Number(basePrice) * 2.2);
+                  return (
+                    <Button
+                      key={qty}
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      disabled={exists}
+                      onClick={() => {
+                        const label = qty === 1 ? "১ প্যাক" : qty === 2 ? "২ প্যাক" : "৩ প্যাক";
+                        const badge = qty === 2 ? "জনপ্রিয়" : qty === 3 ? "বেস্ট ভ্যালু" : "";
+                        const delivery = qty > 1 ? 0 : 70;
+                        setPackOptions((prev) =>
+                          [...prev, { quantity: qty, label, price: autoPrice, delivery_charge: delivery, badge }]
+                            .sort((a, b) => a.quantity - b.quantity)
+                        );
+                      }}
+                      className="text-xs gap-1"
+                    >
+                      <Plus className="w-3 h-3" />
+                      {qty === 1 ? "১ প্যাক" : qty === 2 ? "২ প্যাক" : "৩ প্যাক"} {exists && "✓"}
+                    </Button>
+                  );
+                })}
+                {packOptions.length > 0 && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="text-xs text-destructive hover:text-destructive"
+                    onClick={() => setPackOptions([])}
+                  >
+                    <Trash2 className="w-3 h-3 mr-1" />
+                    {t("সব মুছুন", "Clear all")}
+                  </Button>
+                )}
+              </div>
+
+              {/* Live preview */}
+              {packOptions.length > 0 && (
+                <div className="mt-3 p-3 bg-primary/5 rounded-lg border border-primary/20">
+                  <p className="text-xs font-semibold text-primary mb-2">📦 {t("প্রিভিউ (কাস্টমার যা দেখবে)", "Preview (what customers will see)")}</p>
+                  <div className="flex flex-wrap gap-2">
+                    {packOptions.map((o) => (
+                      <div key={o.quantity} className="text-center bg-white border border-border rounded-xl p-2 min-w-[90px]">
+                        {o.badge && <span className="text-[9px] font-bold text-primary block">{o.badge}</span>}
+                        <p className="text-xs font-bold">{o.label}</p>
+                        <p className="text-sm font-extrabold text-primary">৳{o.price}</p>
+                        <p className="text-[10px] text-muted-foreground">
+                          {o.delivery_charge === 0 ? "ডেলিভারি ফ্রি" : `+৳${o.delivery_charge} ডেলিভারি`}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </CardContent>
           </Card>
 

@@ -778,12 +778,12 @@ function ProductLandingPage() {
           <div className="flex items-center gap-1.5 font-medium">
             <span>Developed by</span>
             <a
-              href="https://wa.me/8801560007230?text=Hello%20HAQPLUS%20IT"
+              href="https://wa.me/8801560007230?text=Hello%20HQ%20IT"
               target="_blank"
               rel="noopener noreferrer"
               className="group inline-flex items-center gap-1.5 rounded-full bg-emerald-600 px-3 py-1 text-xs font-black text-white shadow-md shadow-emerald-600/30 transition-all duration-300 hover:scale-105 hover:bg-emerald-500 hover:shadow-lg hover:shadow-emerald-500/40"
             >
-              <span>HAQPLUS IT</span>
+              <span>HQ IT</span>
               <span className="inline-block transition-transform duration-300 group-hover:translate-x-0.5">🚀</span>
             </a>
           </div>

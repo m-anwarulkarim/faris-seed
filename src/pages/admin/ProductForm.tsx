@@ -38,8 +38,6 @@ const productSchema = z.object({
   preorder_note: z.string().optional().nullable(),
   position: z.coerce.number().int().min(0).default(0),
   full_description: z.string().optional(),
-  variant_label: z.string().optional(),
-  variants_text: z.string().optional(),
   video_url: z
     .string()
     .optional()
@@ -138,8 +136,6 @@ export default function ProductForm() {
       preorder_advance: 0,
       preorder_note: "",
       full_description: "",
-      variant_label: "",
-      variants_text: "",
       video_url: "",
     },
   });
@@ -203,8 +199,6 @@ export default function ProductForm() {
         preorder_note: (data as any).preorder_note || "",
         position: data.position || 0,
         full_description: data.full_description || "",
-        variant_label: (data as any).variant_label || "",
-        variants_text: Array.isArray((data as any).variants) ? (data as any).variants.join("\n") : "",
         video_url: (data as any).video_url || "",
       });
       setProductImage(data.product_image);
@@ -325,10 +319,6 @@ export default function ProductForm() {
       preorder_note: values.is_preorder ? (values.preorder_note?.trim() || null) : null,
       position: values.position,
       full_description: values.full_description || null,
-      variant_label: values.variant_label?.trim() || null,
-      variants: values.variants_text?.trim()
-        ? values.variants_text.split("\n").map((s) => s.trim()).filter(Boolean)
-        : null,
       video_url: values.video_url?.trim() || null,
       cash_back: values.cash_back || 0,
       product_image: productImage,
@@ -559,20 +549,6 @@ export default function ProductForm() {
                 <FormItem className="md:col-span-2">
                    <FormLabel>{t("সংক্ষিপ্ত বিবরণ", "Short Description")}</FormLabel>
                   <FormControl><Textarea placeholder={t("পণ্যের সংক্ষিপ্ত বিবরণ", "Short product description")} rows={3} {...field} /></FormControl>
-                  <FormMessage />
-                </FormItem>
-              )} />
-              <FormField control={form.control} name="variant_label" render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("ভ্যারিয়েন্ট লেবেল (যেমন: সাইজ, কালার)", "Variant Label")}</FormLabel>
-                  <FormControl><Input placeholder="সাইজ" {...field} /></FormControl>
-                  <FormMessage />
-                </FormItem>
-              )} />
-              <FormField control={form.control} name="variants_text" render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("ভ্যারিয়েন্ট অপশন (প্রতি লাইনে একটি)", "Variant Options (one per line)")}</FormLabel>
-                  <FormControl><Textarea placeholder={"M\nL\nXL\nXXL"} rows={4} {...field} /></FormControl>
                   <FormMessage />
                 </FormItem>
               )} />

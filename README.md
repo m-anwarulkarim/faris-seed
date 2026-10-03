@@ -1,3 +1,10 @@
-# Welcome to your project
+# Faris Seed E-Commerce Application
 
-TODO: Document your project here
+Faris Seed - Premium E-Commerce & Seed Store Admin Panel.
+
+## Features
+- Complete Product & Order Management System
+- Courier Integration & Tracking
+- Dynamic Page Builder & Analytics
+- Supabase Database Integration
+

@@ -37,6 +37,7 @@ import { PaymentBadge } from "@/components/admin/PaymentBadge";
 import { CreatedByBadge } from "@/components/admin/CreatedByBadge";
 import { PhoneVerifiedBadge } from "@/components/PhoneVerifiedBadge";
 import { usePhoneVerificationMap } from "@/hooks/usePhoneVerification";
+import { dispatchSteadfastEntry } from "@/services/steadfastService";
 
 const PAGE_SIZE = 50;
 import { formatDistanceToNow } from "date-fns";
@@ -234,35 +235,55 @@ export default function ConfirmedOrders() {
     for (const o of selectedOrders) {
       setEntryProgress((prev) => ({ ...prev, current: o.order_id }));
       try {
-        const { data, error } = await supabase.functions.invoke(courier === "pathao" ? "pathao-courier" : "steadfast-courier", {
-          body: {
-            action: "create_order",
-            orders: [{
-              id: o.id,
-              order_id: o.order_id,
-              customer_facing_id: o.customer_facing_id,
-              customer_name: o.customer_name,
-              phone: o.phone,
-              alt_phone: o.alt_phone,
-              address: o.address,
-              total_amount: o.total_amount,
-              note: o.note,
-            }],
-          },
-        });
-        if (error) {
-          // Try to pull the real reason out of FunctionsHttpError
-          let reason = error.message || "Courier entry failed";
-          try {
-            const ctxBody = (error as any)?.context?.body;
-            if (ctxBody) {
-              const parsed = typeof ctxBody === "string" ? JSON.parse(ctxBody) : ctxBody;
-              if (parsed?.error) reason = parsed.error;
-            }
-          } catch { /* ignore */ }
-          throw new Error(reason);
+        if (courier === "steadfast") {
+          await dispatchSteadfastEntry({
+            id: o.id,
+            order_id: o.order_id,
+            customer_facing_id: o.customer_facing_id,
+            customer_name: o.customer_name,
+            phone: o.phone,
+            alt_phone: o.alt_phone,
+            address: o.address,
+            total_amount: o.total_amount,
+            note: o.note,
+            payment_method: o.payment_method,
+            payment_status: o.payment_status,
+            courier_note: o.courier_note,
+            total_lot: o.courier_total_lot,
+            delivery_type: o.courier_delivery_type,
+          }, false);
+        } else {
+          const { data, error } = await supabase.functions.invoke("pathao-courier", {
+            body: {
+              action: "create_order",
+              orders: [{
+                id: o.id,
+                order_id: o.order_id,
+                customer_facing_id: o.customer_facing_id,
+                customer_name: o.customer_name,
+                phone: o.phone,
+                alt_phone: o.alt_phone,
+                address: o.address,
+                total_amount: o.total_amount,
+                note: o.note,
+              }],
+            },
+          });
+          if (error) {
+            // Try to pull the real reason out of FunctionsHttpError
+            let reason = error.message || "Courier entry failed";
+            try {
+              const ctxBody = (error as any)?.context?.body;
+              if (ctxBody) {
+                const parsed = typeof ctxBody === "string" ? JSON.parse(ctxBody) : ctxBody;
+                if (parsed?.error) reason = parsed.error;
+              }
+            } catch { /* ignore */ }
+            throw new Error(reason);
+          }
+          if (data?.error || data?.success === false) throw new Error(data.error || "Courier entry failed");
         }
-        if (data?.error || data?.success === false) throw new Error(data.error || "Courier entry failed");
+
         doneCount++;
         results.push({ id: o.id, orderId: o.order_id, success: true });
       } catch (err: any) {

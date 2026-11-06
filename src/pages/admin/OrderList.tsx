@@ -29,6 +29,7 @@ import { SourceBadge } from "@/components/admin/SourceBadge";
 import { format, formatDistanceToNow } from "date-fns";
 import { DateRangeFilter, DateRangeValue, getDateRangeISO } from "@/components/admin/DateRangeFilter";
 import { OrderExportButton } from "@/components/admin/OrderExportButton";
+import { dispatchSteadfastEntry } from "@/services/steadfastService";
 
 
 const PAGE_SIZE = 50;
@@ -524,36 +525,55 @@ export default function OrderList() {
     for (const order of selectedOrders) {
       setEntryProgress((prev) => ({ ...prev, current: order.customer_facing_id || order.order_id }));
       try {
-        const { data, error } = await supabase.functions.invoke(courier === "pathao" ? "pathao-courier" : "steadfast-courier", {
-          body: {
-            action: "create_order",
-            defer_status_update: false,
-            orders: [{
-              id: order.id,
-              order_id: order.order_id,
-              customer_facing_id: order.customer_facing_id,
-              customer_name: order.customer_name,
-              phone: order.phone,
-              alt_phone: order.alt_phone,
-              address: order.address,
-              total_amount: order.total_amount,
-              note: order.note,
-            }],
-          },
-        });
+        if (courier === "steadfast") {
+          await dispatchSteadfastEntry({
+            id: order.id,
+            order_id: order.order_id,
+            customer_facing_id: order.customer_facing_id,
+            customer_name: order.customer_name,
+            phone: order.phone,
+            alt_phone: order.alt_phone,
+            address: order.address,
+            total_amount: order.total_amount,
+            note: order.note,
+            payment_method: order.payment_method,
+            payment_status: order.payment_status,
+            courier_note: order.courier_note,
+            total_lot: order.courier_total_lot,
+            delivery_type: order.courier_delivery_type,
+          }, false);
+        } else {
+          const { data, error } = await supabase.functions.invoke("pathao-courier", {
+            body: {
+              action: "create_order",
+              defer_status_update: false,
+              orders: [{
+                id: order.id,
+                order_id: order.order_id,
+                customer_facing_id: order.customer_facing_id,
+                customer_name: order.customer_name,
+                phone: order.phone,
+                alt_phone: order.alt_phone,
+                address: order.address,
+                total_amount: order.total_amount,
+                note: order.note,
+              }],
+            },
+          });
 
-        if (error) {
-          let reason = error.message || "Courier entry failed";
-          try {
-            const ctxBody = (error as any)?.context?.body;
-            if (ctxBody) {
-              const parsed = typeof ctxBody === "string" ? JSON.parse(ctxBody) : ctxBody;
-              if (parsed?.error) reason = parsed.error;
-            }
-          } catch { /* ignore */ }
-          throw new Error(reason);
+          if (error) {
+            let reason = error.message || "Courier entry failed";
+            try {
+              const ctxBody = (error as any)?.context?.body;
+              if (ctxBody) {
+                const parsed = typeof ctxBody === "string" ? JSON.parse(ctxBody) : ctxBody;
+                if (parsed?.error) reason = parsed.error;
+              }
+            } catch { /* ignore */ }
+            throw new Error(reason);
+          }
+          if (data?.error || data?.success === false) throw new Error(data.error || "Courier entry failed");
         }
-        if (data?.error || data?.success === false) throw new Error(data.error || "Courier entry failed");
 
         doneCount++;
         results.push({ id: order.id, orderId: order.customer_facing_id || order.order_id, success: true });

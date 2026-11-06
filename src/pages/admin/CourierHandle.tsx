@@ -31,6 +31,7 @@ import { formatDistanceToNow } from "date-fns";
 import { PhoneVerifiedBadge } from "@/components/PhoneVerifiedBadge";
 import { usePhoneVerificationMap } from "@/hooks/usePhoneVerification";
 import { bn } from "date-fns/locale";
+import { checkSteadfastStatus, fetchSteadfastReturnRequests } from "@/services/steadfastService";
 
 const SYNC_COOLDOWN_MS = 4 * 60 * 60 * 1000;
 const SYNCABLE_STATUSES = [
@@ -333,22 +334,23 @@ export default function CourierHandle() {
 
       for (let i = 0; i < queue.length; i += 1) {
         const item = queue[i];
-        const fnName = item.courier_provider === "pathao" ? "pathao-courier" : "steadfast-courier";
-        await supabase.functions.invoke(fnName, {
-          body: {
-            action: "check_single_status",
-            order_id: item.id,
-            consignment_id: item.consignment_id,
-          },
-        });
+        if (item.courier_provider === "pathao") {
+          await supabase.functions.invoke("pathao-courier", {
+            body: {
+              action: "check_single_status",
+              order_id: item.id,
+              consignment_id: item.consignment_id,
+            },
+          });
+        } else {
+          await checkSteadfastStatus(item.id, item.consignment_id);
+        }
         setSyncIndex(i + 1);
       }
 
       // Also fetch return requests during sync
       try {
-        await supabase.functions.invoke("steadfast-courier", {
-          body: { action: "fetch_return_requests" },
-        });
+        await fetchSteadfastReturnRequests();
       } catch (e) {
         console.error("Return fetch during sync failed:", e);
       }
@@ -386,10 +388,7 @@ export default function CourierHandle() {
     setFetchingReturns(true);
     setReturnFetchResult(null);
     try {
-      const { data, error } = await supabase.functions.invoke("steadfast-courier", {
-        body: { action: "fetch_return_requests" },
-      });
-      if (error) throw error;
+      const data = await fetchSteadfastReturnRequests();
       const msg = data?.updated > 0
         ? t(`${data.updated}টি অর্ডার C-AP তে আপডেট হয়েছে (মোট: ${data.total || 0})`, `${data.updated} orders moved to C-AP (total: ${data.total || 0})`)
         : data?.total === 0

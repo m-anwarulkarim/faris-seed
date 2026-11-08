@@ -743,6 +743,7 @@ export default function OrderEdit() {
           advance,
           delivery_charge: Number(deliveryCharge) || 0,
           created_by_admin_id: currentAdminId,
+          traffic_source: "manual",
           ...(finalStatus === "pre" && preDateValue ? { pre_date: preDateValue } : {}),
         };
         if (customOrderId.trim()) {

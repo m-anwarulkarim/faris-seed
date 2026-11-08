@@ -1,7 +1,9 @@
 import { Badge } from "@/components/ui/badge";
-import { Globe, Facebook, Instagram, Youtube, Search, MessageCircle, Send, Twitter, Linkedin } from "lucide-react";
+import { Globe, Facebook, Instagram, Youtube, Search, MessageCircle, Send, Twitter, Linkedin, UserCheck } from "lucide-react";
 
 const SOURCE_CONFIG: Record<string, { label: string; icon: React.ElementType; color: string }> = {
+  manual: { label: "Manual", icon: UserCheck, color: "bg-amber-100 text-amber-800 border-amber-300" },
+  admin: { label: "Manual", icon: UserCheck, color: "bg-amber-100 text-amber-800 border-amber-300" },
   facebook: { label: "Facebook", icon: Facebook, color: "bg-blue-100 text-blue-700 border-blue-200" },
   instagram: { label: "Instagram", icon: Instagram, color: "bg-pink-100 text-pink-700 border-pink-200" },
   google: { label: "Google", icon: Search, color: "bg-emerald-100 text-emerald-700 border-emerald-200" },
@@ -22,11 +24,14 @@ interface SourceBadgeProps {
   className?: string;
 }
 
-export function SourceBadge({ source, className }: SourceBadgeProps) {
-  let key = (source || "direct").toLowerCase();
+export function SourceBadge({ source, createdByAdminId, className }: SourceBadgeProps) {
+  // If created by an admin or source is explicitly manual/admin, mark as Manual
+  const isManual = !!createdByAdminId || source === "manual" || source === "admin";
+  let key = isManual ? "manual" : (source || "direct").toLowerCase();
   if (key === "fb") key = "facebook";
   if (key === "ig") key = "instagram";
   if (key === "mina_ai") key = "direct";
+  if (key === "web") key = "direct";
   const config = SOURCE_CONFIG[key] || SOURCE_CONFIG.direct;
   const Icon = config.icon;
 

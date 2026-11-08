@@ -187,16 +187,17 @@ export default function Checkout() {
     const baseIds = Array.from(new Set(paidItems.map((i) => i.id.split("::")[0])))
       .filter((id) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id));
     if (baseIds.length === 0) { setCashbackMap({}); return; }
-    supabase.from("products").select("id, cash_back").in("id", baseIds)
-      .then(({ data, error }) => {
+    (async () => {
+      try {
+        const { data, error } = await supabase.from("products").select("id, cash_back").in("id", baseIds);
         if (error || !data) return;
         const map: Record<string, number> = {};
         for (const p of data as any[]) {
           map[p.id] = Number(p.cash_back) || 0;
         }
         setCashbackMap(map);
-      })
-      .catch(() => {});
+      } catch {}
+    })();
   }, [items.map((i) => i.id).join("|")]);
 
 

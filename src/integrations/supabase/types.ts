@@ -4063,6 +4063,10 @@ export type Database = {
       }
     }
     Functions: {
+      get_next_invoice_number: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
       delete_app_setting: {
         Args: { p_key: string }
         Returns: undefined

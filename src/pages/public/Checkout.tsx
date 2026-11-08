@@ -59,7 +59,7 @@ function CheckoutPage() {
         note: form.note.trim() || null,
         deliveryCharge: delivery,
         items: items.map((item) => ({
-          productId: item.id.split("::")[0],
+          productId: (item.id || item.slug || "").split("::")[0],
           productName: item.name,
           productImage: item.image || null,
           quantity: item.quantity,

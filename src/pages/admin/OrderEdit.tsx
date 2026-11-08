@@ -741,7 +741,7 @@ export default function OrderEdit() {
           total_amount: totalAmount,
           discount,
           advance,
-          delivery_charge: deliveryChargeOverride,
+          delivery_charge: Number(deliveryCharge) || 0,
           created_by_admin_id: currentAdminId,
           ...(finalStatus === "pre" && preDateValue ? { pre_date: preDateValue } : {}),
         };
@@ -750,7 +750,7 @@ export default function OrderEdit() {
           insertData.customer_facing_id = customOrderId.trim();
         } else {
           try {
-            const { data: seqNo } = await supabase.rpc("get_next_invoice_number");
+            const { data: seqNo } = await supabase.rpc("get_next_invoice_number" as any);
             if (seqNo) {
               insertData.order_id = String(seqNo);
               insertData.customer_facing_id = String(seqNo);
@@ -827,7 +827,7 @@ export default function OrderEdit() {
           total_amount: totalAmount,
           discount,
           advance,
-          delivery_charge: deliveryChargeOverride,
+          delivery_charge: Number(deliveryCharge) || 0,
           last_status_changed_by: session?.user?.id || null,
           ...(finalStatus === "pre" && preDateValue ? { pre_date: preDateValue } : {}),
         };

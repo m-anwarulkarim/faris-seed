@@ -31,7 +31,7 @@ export async function placeOrder(input: PlaceOrderInput) {
   // 1. Generate sequential numeric invoice number (e.g. 103, 104...)
   let orderNumber: string | null = null;
   try {
-    const { data: seqNo } = await supabase.rpc("get_next_invoice_number");
+    const { data: seqNo } = await supabase.rpc("get_next_invoice_number" as any);
     if (seqNo) orderNumber = String(seqNo);
   } catch {
     // If RPC fails, the PostgreSQL trigger trg_set_order_invoice_id will automatically assign it

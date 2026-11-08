@@ -225,7 +225,7 @@ export async function createSteadfastOrderDirect(order: CreateOrderParams, defer
       updateData.last_status_changed_by = adminInfo.id;
     }
 
-    const { error: updateErr } = await supabase.from("orders").update(updateData).eq("id", order.id);
+    const { error: updateErr } = await supabase.from("orders").update(updateData as any).eq("id", order.id);
     if (updateErr) {
       console.error("Order DB update failed after Steadfast entry:", updateErr);
     }
@@ -345,7 +345,7 @@ export async function checkSteadfastStatus(orderId: string, consignmentId: strin
   if (mappedStatus) {
     const updateData: Record<string, any> = { delivery_status: mappedStatus, status: mappedStatus };
     if (courierNote) updateData.courier_remarks = courierNote;
-    await supabase.from("orders").update(updateData).eq("id", orderId);
+    await supabase.from("orders").update(updateData as any).eq("id", orderId);
   } else if (courierNote) {
     await supabase.from("orders").update({ courier_remarks: courierNote }).eq("id", orderId);
   }

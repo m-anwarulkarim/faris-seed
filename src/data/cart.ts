@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 
 export interface CartItem {
+  id?: string;
   slug: string;
   name: string;
   price: number;

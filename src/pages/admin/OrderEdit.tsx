@@ -200,10 +200,10 @@ export default function OrderEdit() {
   const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
   const isUuid = !!id && UUID_REGEX.test(id);
 
-  // Fetch order data if editing (by order_id like FS-385136, customer_facing_id, or UUID id)
+  // Fetch order data if editing (by order_id like 101, customer_facing_id, or UUID id)
   const { data: order, isLoading: orderLoading } = useQuery({
     queryKey: ["order-edit", id],
-    enabled: !!id,
+    enabled: !!id && id !== "null" && id !== "undefined",
     queryFn: async () => {
       let query = supabase.from("orders").select("*");
       if (isUuid) {
@@ -700,8 +700,8 @@ export default function OrderEdit() {
   };
 
   const handleSave = async (newStatus?: string, goBack = false) => {
-    // Determine final status: Save button (no newStatus, goBack=false) keeps DB status unchanged
-    const finalStatus = newStatus || (goBack ? status : savedStatus) || savedStatus || status;
+    // Determine final status
+    const finalStatus = newStatus !== undefined ? newStatus : (status || savedStatus);
 
     // Confirm requires name, phone, and address (district/thana/area optional)
     if (finalStatus === "confirmed") {
@@ -747,6 +747,17 @@ export default function OrderEdit() {
         };
         if (customOrderId.trim()) {
           insertData.order_id = customOrderId.trim();
+          insertData.customer_facing_id = customOrderId.trim();
+        } else {
+          try {
+            const { data: seqNo } = await supabase.rpc("get_next_invoice_number");
+            if (seqNo) {
+              insertData.order_id = String(seqNo);
+              insertData.customer_facing_id = String(seqNo);
+            }
+          } catch {
+            // DB trigger trg_set_order_invoice_id will automatically assign it
+          }
         }
         let { data: newOrder, error } = await supabase.from("orders").insert(insertData).select().single();
         if (error && (error.message?.includes("print_note") || (error as any).code === "PGRST204" || (error as any).code === "42703")) {
@@ -798,7 +809,7 @@ export default function OrderEdit() {
           navigate(-1);
           return;
         }
-        navigate(`/admin/orders/edit/${newOrder.order_id}`, { replace: true });
+        navigate(`/admin/orders/edit/${newOrder.order_id || newOrder.id}`, { replace: true });
       } else {
         // Update order
         const { data: { session } } = await supabase.auth.getSession();
@@ -906,8 +917,10 @@ export default function OrderEdit() {
       queryClient.invalidateQueries({ queryKey: ["web-orders"] });
       queryClient.invalidateQueries({ queryKey: ["customers"] });
       queryClient.invalidateQueries({ queryKey: ["confirmed-orders"] });
-      queryClient.invalidateQueries({ queryKey: ["order-edit", id] });
-      queryClient.invalidateQueries({ queryKey: ["order-edit-items", id] });
+      queryClient.invalidateQueries({ queryKey: ["order-edit"] });
+      queryClient.invalidateQueries({ queryKey: ["order-edit-items"] });
+      queryClient.invalidateQueries({ queryKey: ["orders"] });
+      queryClient.invalidateQueries({ queryKey: ["courier-orders"] });
 
       if (goBack) {
         navigate(-1);
@@ -1119,67 +1132,82 @@ export default function OrderEdit() {
         );
       })()}
       {/* Header */}
-      <div className="flex items-center gap-3">
-        <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
-          <ArrowLeft className="w-5 h-5" />
-        </Button>
-        <h1 className="text-xl font-display font-bold text-foreground">
-          {isNew ? (
-            <span className="flex items-center gap-2">
-              {t("নতুন অর্ডার", "New Order")}
-              <Input
-                value={customOrderId}
-                onChange={(e) => setCustomOrderId(e.target.value)}
-                placeholder={t("ইনভয়েস (ঐচ্ছিক)", "Invoice (optional)")}
-                className="h-7 w-32 text-xs font-mono inline-block"
-              />
-            </span>
-          ) : editingInvoice ? (
-            <span className="flex items-center gap-2">
-              {t("অর্ডার", "Order")}:
-              <Input
-                autoFocus
-                value={editingInvoiceValue}
-                onChange={(e) => setEditingInvoiceValue(e.target.value)}
-                onKeyDown={async (e) => {
-                  if (e.key === "Enter" && editingInvoiceValue.trim() && order) {
-                    const newVal = editingInvoiceValue.trim();
-                    const { error } = await supabase.from("orders").update({ order_id: newVal, customer_facing_id: newVal } as any).eq("id", order.id);
-                    if (error) { toast.error(error.message); return; }
-                    toast.success(t("ইনভয়েস আপডেট হয়েছে", "Invoice updated"));
-                    queryClient.invalidateQueries({ queryKey: ["order-edit", id] });
-                    navigate(`/admin/orders/edit/${editingInvoiceValue.trim()}`, { replace: true });
-                    setEditingInvoice(false);
-                  }
-                  if (e.key === "Escape") setEditingInvoice(false);
+      <div className="flex items-center justify-between gap-3 flex-wrap">
+        <div className="flex items-center gap-3">
+          <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
+            <ArrowLeft className="w-5 h-5" />
+          </Button>
+          <h1 className="text-xl font-display font-bold text-foreground">
+            {isNew ? (
+              <span className="flex items-center gap-2">
+                {t("নতুন অর্ডার", "New Order")}
+                <Input
+                  value={customOrderId}
+                  onChange={(e) => setCustomOrderId(e.target.value)}
+                  placeholder={t("ইনভয়েস (ঐচ্ছিক)", "Invoice (optional)")}
+                  className="h-7 w-32 text-xs font-mono inline-block"
+                />
+              </span>
+            ) : editingInvoice ? (
+              <span className="flex items-center gap-2">
+                {t("অর্ডার", "Order")}:
+                <Input
+                  autoFocus
+                  value={editingInvoiceValue}
+                  onChange={(e) => setEditingInvoiceValue(e.target.value)}
+                  onKeyDown={async (e) => {
+                    if (e.key === "Enter" && editingInvoiceValue.trim() && order) {
+                      const newVal = editingInvoiceValue.trim();
+                      const { error } = await supabase.from("orders").update({ order_id: newVal, customer_facing_id: newVal } as any).eq("id", order.id);
+                      if (error) { toast.error(error.message); return; }
+                      toast.success(t("ইনভয়েস আপডেট হয়েছে", "Invoice updated"));
+                      queryClient.invalidateQueries({ queryKey: ["order-edit", id] });
+                      navigate(`/admin/orders/edit/${editingInvoiceValue.trim()}`, { replace: true });
+                      setEditingInvoice(false);
+                    }
+                    if (e.key === "Escape") setEditingInvoice(false);
+                  }}
+                  onBlur={() => setEditingInvoice(false)}
+                  className="h-7 w-32 text-sm font-mono"
+                />
+              </span>
+            ) : (
+              <span
+                onDoubleClick={() => {
+                  setEditingInvoiceValue(order?.customer_facing_id || order?.order_id || "");
+                  setEditingInvoice(true);
                 }}
-                onBlur={() => setEditingInvoice(false)}
-                className="h-7 w-32 text-sm font-mono"
-              />
-            </span>
-          ) : (
-            <span
-              onDoubleClick={() => {
-                setEditingInvoiceValue(order?.customer_facing_id || order?.order_id || "");
-                setEditingInvoice(true);
-              }}
-              className="cursor-pointer"
-              title={t("ডাবল ক্লিক করে ইনভয়েস এডিট করুন", "Double click to edit invoice")}
-            >
-              {`${t("অর্ডার", "Order")}: ${order?.customer_facing_id || order?.order_id}`}
-            </span>
-          )}
-        </h1>
-        {!isNew && order && (() => {
-          const si = getStatusInfo(order.status);
-          const SI = si.icon;
-          return (
-            <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium border ${si.color}`}>
-              <SI className="w-3 h-3" />
-              {si.label}
-            </span>
-          );
-        })()}
+                className="cursor-pointer"
+                title={t("ডাবল ক্লিক করে ইনভয়েস এডিট করুন", "Double click to edit invoice")}
+              >
+                {`${t("অর্ডার", "Order")}: ${order?.customer_facing_id || order?.order_id}`}
+              </span>
+            )}
+          </h1>
+          {!isNew && order && (() => {
+            const si = getStatusInfo(order.status);
+            const SI = si.icon;
+            return (
+              <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium border ${si.color}`}>
+                <SI className="w-3 h-3" />
+                {si.label}
+              </span>
+            );
+          })()}
+        </div>
+
+        {/* Top Header Save Button */}
+        <div className="flex items-center gap-2">
+          <Button
+            size="sm"
+            className="h-9 px-4 font-semibold gap-1.5 shadow-sm"
+            disabled={saving}
+            onClick={() => handleSave(status, false)}
+          >
+            {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+            {isNew ? t("অর্ডার তৈরি করুন", "Create Order") : t("সেভ করুন", "Save Changes")}
+          </Button>
+        </div>
       </div>
 
       <div className={cn("grid grid-cols-1 gap-4", sidebarCollapsed ? "lg:grid-cols-1" : "lg:grid-cols-[1fr_280px]")}>
@@ -1893,7 +1921,15 @@ export default function OrderEdit() {
                   </Button>
                 )}
 
-                {/* Manual Save button removed — auto-save handles all field changes silently */}
+                {/* Dedicated Manual Save Changes button */}
+                <Button
+                  className="h-11 px-6 text-sm font-bold gap-2 rounded-xl bg-primary text-primary-foreground shadow-sm hover:opacity-90 transition-all"
+                  disabled={saving}
+                  onClick={() => handleSave(status, false)}
+                >
+                  {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                  {isNew ? t("অর্ডার তৈরি করুন", "Create Order") : t("সেভ করুন", "Save Changes")}
+                </Button>
 
                 <CourierEntrySettingsPopover order={order} />
 
@@ -1997,7 +2033,7 @@ export default function OrderEdit() {
                     <div
                       key={o.id}
                       className={`flex items-center justify-between rounded-lg px-2.5 py-1.5 border cursor-pointer transition-colors ${o.order_id === id ? "border-primary bg-primary/5 ring-1 ring-primary/20" : "hover:bg-muted/50"}`}
-                      onClick={() => navigate(`/admin/orders/edit/${o.order_id}`)}
+                      onClick={() => navigate(`/admin/orders/edit/${o.order_id || o.id}`)}
                     >
                       <div className="flex items-center gap-2 text-[11px]">
                         <span className="font-mono font-bold">{o.order_id}</span>
@@ -2358,7 +2394,7 @@ export default function OrderEdit() {
                             className={`flex items-center gap-2 p-2 rounded-lg text-[11px] transition-colors ${isCurrent ? 'bg-primary/5 border border-primary/20' : 'bg-muted/30'} ${isLocked ? 'opacity-70 cursor-not-allowed' : 'cursor-pointer hover:bg-muted/50'}`}
                             onClick={() => {
                               if (isCurrent || isLocked) return;
-                              navigate(`/admin/orders/edit/${o.order_id}`);
+                              navigate(`/admin/orders/edit/${o.order_id || o.id}`);
                             }}
                             title={isLocked ? t('এই অর্ডার এডিট করা যাবে না', 'This order cannot be edited') : ''}
                           >

@@ -852,7 +852,7 @@ export default function CourierHandle() {
                             effectiveStatus,
                           });
                         } else {
-                          navigate(`/admin/orders/edit/${order.order_id}`);
+                          navigate(`/admin/orders/edit/${order.order_id || order.id}`);
                         }
                       }}
                     >
@@ -886,7 +886,7 @@ export default function CourierHandle() {
                           className="h-7 w-7"
                           onClick={(e) => {
                             e.stopPropagation();
-                            navigate(`/admin/orders/edit/${order.order_id}`);
+                            navigate(`/admin/orders/edit/${order.order_id || order.id}`);
                           }}
                         >
                           <Eye className="w-3.5 h-3.5" />
@@ -1195,7 +1195,7 @@ export default function CourierHandle() {
 
               {/* View Order */}
               <a
-                href={`${window.location.origin}/admin/orders/edit/${courierPopup?.orderId}`}
+                href={`${window.location.origin}/admin/orders/edit/${courierPopup?.orderId || courierPopup?.dbId}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => setCourierPopup(null)}

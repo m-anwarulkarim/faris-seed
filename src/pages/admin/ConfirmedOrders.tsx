@@ -698,7 +698,7 @@ export default function ConfirmedOrders() {
                             <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setSelectedOrder(order)}>
                               <Eye className="w-4 h-4" />
                             </Button>
-                            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => navigate(`/admin/orders/edit/${order.order_id}`)}>
+                            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => navigate(`/admin/orders/edit/${order.order_id || order.id}`)}>
                               <Pencil className="w-4 h-4" />
                             </Button>
                           </div>
@@ -733,8 +733,16 @@ export default function ConfirmedOrders() {
       <Dialog open={!!selectedOrder} onOpenChange={() => setSelectedOrder(null)}>
         <DialogContent className="max-w-lg">
           <DialogHeader>
-            <DialogTitle className="font-display">
-              {t("অর্ডার", "Order")}: <span className="text-primary">{selectedOrder?.customer_facing_id || selectedOrder?.order_id}</span>
+            <DialogTitle className="font-display flex items-center justify-between">
+              <span>{t("অর্ডার", "Order")}: <span className="text-primary">{selectedOrder?.customer_facing_id || selectedOrder?.order_id}</span></span>
+              <Button size="sm" variant="outline" className="h-8 text-xs gap-1.5 mr-6" onClick={() => {
+                const oId = selectedOrder?.order_id || selectedOrder?.id;
+                setSelectedOrder(null);
+                navigate(`/admin/orders/edit/${oId}`);
+              }}>
+                <Pencil className="w-3.5 h-3.5" />
+                {t("এডিট করুন", "Edit Order")}
+              </Button>
             </DialogTitle>
           </DialogHeader>
           {selectedOrder && (

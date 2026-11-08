@@ -25,7 +25,7 @@ export const CONFIRMED_STATUS_OPTIONS = [
   { value: "pending_return", label: "Pending Return", labelBn: "পেন্ডিং রিটার্ন", color: "bg-orange-100 text-orange-800 border-orange-200", icon: RotateCcw },
   { value: "return", label: "Return", labelBn: "রিটার্ন", color: "bg-rose-100 text-rose-800 border-rose-200", icon: Undo2 },
   { value: "rtn_received", label: "RTN Received", labelBn: "RTN রিসিভড", color: "bg-lime-100 text-lime-800 border-lime-200", icon: PackageCheck },
-  { value: "order_cancelled", label: "Cancel", labelBn: "বাতিল", color: "bg-red-100 text-red-800 border-red-200", icon: XCircle },
+  { value: "cancelled", label: "Cancel", labelBn: "বাতিল", color: "bg-red-100 text-red-800 border-red-200", icon: XCircle },
   { value: "missing", label: "Missing", labelBn: "মিসিং", color: "bg-gray-100 text-gray-800 border-gray-200", icon: HelpCircle },
 ];
 

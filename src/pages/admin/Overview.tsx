@@ -713,7 +713,7 @@ export default function Overview() {
                 <div
                   key={order.id}
                   className="flex items-center justify-between px-4 py-2.5 hover:bg-muted/40 cursor-pointer transition-colors"
-                  onClick={() => navigate(`/admin/orders/edit/${order.order_id}`)}
+                  onClick={() => navigate(`/admin/orders/edit/${order.order_id || order.id}`)}
                 >
                   <div className="flex items-center gap-2 min-w-0">
                     {statusIcon(order.status)}

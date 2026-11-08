@@ -28,24 +28,35 @@ export async function placeOrder(input: PlaceOrderInput) {
   const discount = input.discount ?? 0;
   const grandTotal = subtotal + input.deliveryCharge - discount;
 
-  const orderNumber = `FS-${Math.floor(100000 + Math.random() * 900000)}`;
+  // 1. Generate sequential numeric invoice number (e.g. 103, 104...)
+  let orderNumber: string | null = null;
+  try {
+    const { data: seqNo } = await supabase.rpc("get_next_invoice_number");
+    if (seqNo) orderNumber = String(seqNo);
+  } catch {
+    // If RPC fails, the PostgreSQL trigger trg_set_order_invoice_id will automatically assign it
+  }
 
-  // 1. Insert into orders table
+  // 2. Insert into orders table
+  const insertPayload: any = {
+    customer_name: input.customerName.trim(),
+    phone: input.phone.trim(),
+    alt_phone: input.altPhone?.trim() || null,
+    address: input.address.trim(),
+    total_amount: grandTotal,
+    delivery_charge: input.deliveryCharge,
+    discount: discount,
+    status: "pending",
+    note: input.note?.trim() || null,
+  };
+  if (orderNumber) {
+    insertPayload.order_id = orderNumber;
+    insertPayload.customer_facing_id = orderNumber;
+  }
+
   const { data: order, error: orderErr } = await supabase
     .from("orders")
-    .insert({
-      order_id: orderNumber,
-      customer_facing_id: orderNumber,
-      customer_name: input.customerName.trim(),
-      phone: input.phone.trim(),
-      alt_phone: input.altPhone?.trim() || null,
-      address: input.address.trim(),
-      total_amount: grandTotal,
-      delivery_charge: input.deliveryCharge,
-      discount: discount,
-      status: "pending",
-      note: input.note?.trim() || null,
-    } as any)
+    .insert(insertPayload as any)
     .select()
     .single();
 

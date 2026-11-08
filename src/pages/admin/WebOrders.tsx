@@ -529,7 +529,7 @@ export default function WebOrders() {
       queryClient.invalidateQueries({ queryKey: ["incomplete-orders"] });
       queryClient.invalidateQueries({ queryKey: ["web-orders"] });
       toast.success(t("অর্ডারে রূপান্তর হয়েছে", "Converted to order"));
-      navigate(`/admin/orders/edit/${newOrder.order_id}`);
+      navigate(`/admin/orders/edit/${newOrder.order_id || newOrder.id}`);
     },
     onError: (err: Error) => toast.error(err.message),
   });
@@ -937,7 +937,7 @@ export default function WebOrders() {
                         {/* Edit + Delete */}
                         <TableCell className="text-center">
                           <div className="flex items-center justify-center gap-0.5">
-                            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => navigate(`/admin/orders/edit/${order.order_id}`)}>
+                            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => navigate(`/admin/orders/edit/${order.order_id || order.id}`)}>
                               <Pencil className="w-4 h-4" />
                             </Button>
                             <Button
@@ -1118,8 +1118,16 @@ export default function WebOrders() {
       <Dialog open={!!selectedOrder} onOpenChange={() => setSelectedOrder(null)}>
         <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="font-display">
-              {t("অর্ডার", "Order")}: <span className="text-primary">{selectedOrder?.order_id}</span>
+            <DialogTitle className="font-display flex items-center justify-between">
+              <span>{t("অর্ডার", "Order")}: <span className="text-primary">{selectedOrder?.customer_facing_id || selectedOrder?.order_id}</span></span>
+              <Button size="sm" variant="outline" className="h-8 text-xs gap-1.5 mr-6" onClick={() => {
+                const oId = selectedOrder?.order_id || selectedOrder?.id;
+                setSelectedOrder(null);
+                navigate(`/admin/orders/edit/${oId}`);
+              }}>
+                <Pencil className="w-3.5 h-3.5" />
+                {t("এডিট করুন", "Edit Order")}
+              </Button>
             </DialogTitle>
           </DialogHeader>
           {selectedOrder && (

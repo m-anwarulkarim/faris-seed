@@ -287,10 +287,25 @@ export default function OrderEdit() {
 
   // Sync order items to items state when orderItems query finishes
   const itemsLoadedRef = useRef(false);
+
+  // Reset loaded ref whenever navigated to another order
   useEffect(() => {
-    if (orderItems) {
+    itemsLoadedRef.current = false;
+  }, [id, order?.id]);
+
+  useEffect(() => {
+    if (orderItems && !itemsLoadedRef.current) {
       itemsLoadedRef.current = true;
-      setItems(orderItems);
+      setItems(
+        orderItems.map((i: any, idx: number) => ({
+          id: i.id,
+          product_id: i.product_id || i.id || `item-${idx}`,
+          product_name: i.product_name,
+          product_image: i.product_image,
+          unit_price: Number(i.unit_price) || 0,
+          quantity: Number(i.quantity) || 1,
+        }))
+      );
     }
   }, [orderItems]);
 
@@ -386,18 +401,7 @@ export default function OrderEdit() {
   const isConfirmedPipeline = order && CONFIRMED_STATUS_VALUES.includes(order.status);
   const activeStatusOptions = isConfirmedPipeline ? CONFIRMED_STATUS_OPTIONS : WEB_STATUS_OPTIONS;
 
-  useEffect(() => {
-    if (orderItems) {
-      setItems(orderItems.map((i, idx) => ({
-        id: i.id,
-        product_id: i.product_id || i.id || `item-${idx}`,
-        product_name: i.product_name,
-        product_image: i.product_image,
-        unit_price: Number(i.unit_price) || 0,
-        quantity: Number(i.quantity) || 1,
-      })));
-    }
-  }, [orderItems]);
+
 
   // Fetch categories and tags for picker
   const { data: pickerCategories } = useQuery({
@@ -678,25 +682,53 @@ export default function OrderEdit() {
     }
   };
 
+  const isItemMatch = (item: OrderItem, targetKey: string, idx?: number) => {
+    if (item.id && item.id === targetKey) return true;
+    if (item.product_id && item.product_id === targetKey) return true;
+    if (idx !== undefined && `item-${idx}` === targetKey) return true;
+    return false;
+  };
+
   const updateItemQty = (itemKey: string, delta: number) => {
-    setItems(items.map((i) => {
-      const key = i.product_id || i.id;
-      if (key !== itemKey) return i;
-      const newQty = i.quantity + delta;
-      return newQty > 0 ? { ...i, quantity: newQty } : i;
-    }));
+    const target = items.find((i, idx) => isItemMatch(i, itemKey, idx));
+    if (!target) return;
+
+    if (delta < 0 && target.quantity <= 1) {
+      if (items.length <= 1) {
+        toast.error(t("অর্ডারে কমপক্ষে একটি পণ্য থাকতে হবে", "Order must have at least one product"));
+        return;
+      }
+      setItems((prev) => prev.filter((i, idx) => !isItemMatch(i, itemKey, idx)));
+      toast.info(t("পণ্য মুছে ফেলা হয়েছে", "Product removed from order"));
+      return;
+    }
+
+    setItems((prev) =>
+      prev.map((i, idx) => {
+        if (!isItemMatch(i, itemKey, idx)) return i;
+        const newQty = i.quantity + delta;
+        return newQty > 0 ? { ...i, quantity: newQty } : i;
+      })
+    );
   };
 
   const setItemQty = (itemKey: string, qty: number) => {
-    if (!Number.isFinite(qty) || qty < 1) qty = 1;
-    setItems(items.map((i) => {
-      const key = i.product_id || i.id;
-      return key === itemKey ? { ...i, quantity: Math.floor(qty) } : i;
-    }));
+    const targetQty = !Number.isFinite(qty) || qty < 1 ? 1 : Math.floor(qty);
+    setItems((prev) =>
+      prev.map((i, idx) => {
+        if (!isItemMatch(i, itemKey, idx)) return i;
+        return { ...i, quantity: targetQty };
+      })
+    );
   };
 
   const removeItem = (itemKey: string) => {
-    setItems(items.filter((i) => (i.product_id || i.id) !== itemKey));
+    if (items.length <= 1) {
+      toast.error(t("অর্ডারে কমপক্ষে একটি পণ্য থাকতে হবে", "Order must have at least one product"));
+      return;
+    }
+    setItems((prev) => prev.filter((i, idx) => !isItemMatch(i, itemKey, idx)));
+    toast.success(t("পণ্য মুছে ফেলা হয়েছে", "Product removed"));
   };
 
   const handleSave = async (newStatus?: string, goBack = false) => {
@@ -915,6 +947,7 @@ export default function OrderEdit() {
 
       setStatus(finalStatus);
       setSavedStatus(finalStatus);
+      itemsLoadedRef.current = false;
       queryClient.invalidateQueries({ queryKey: ["web-orders"] });
       queryClient.invalidateQueries({ queryKey: ["customers"] });
       queryClient.invalidateQueries({ queryKey: ["confirmed-orders"] });
@@ -1615,7 +1648,7 @@ export default function OrderEdit() {
                                   onBlur={() => {
                                     const val = parseFloat(editingPriceValue);
                                     if (!isNaN(val) && val >= 0) {
-                                      setItems(items.map(i => (i.id || i.product_id) === itemKey ? { ...i, unit_price: val } : i));
+                                      setItems((prev) => prev.map((i, iIdx) => isItemMatch(i, itemKey, iIdx) ? { ...i, unit_price: val } : i));
                                     }
                                     setEditingPriceId(null);
                                   }}
@@ -1639,8 +1672,11 @@ export default function OrderEdit() {
                             </div>
                             <div className="flex items-center bg-muted/60 rounded-full border border-border">
                               <button
-                                className="h-7 w-7 flex items-center justify-center rounded-full hover:bg-destructive/10 hover:text-destructive transition-colors"
+                                type="button"
+                                className="h-7 w-7 flex items-center justify-center rounded-full hover:bg-destructive/10 hover:text-destructive transition-colors disabled:opacity-40"
                                 onClick={() => updateItemQty(itemKey, -1)}
+                                title={item.quantity <= 1 ? t("পণ্য মুছুন", "Remove item") : t("১ কমান", "Decrease 1")}
+                                aria-label={item.quantity <= 1 ? t("পণ্য মুছুন", "Remove item") : t("১ কমান", "Decrease 1")}
                               >
                                 <Minus className="w-3 h-3" />
                               </button>
@@ -1653,18 +1689,24 @@ export default function OrderEdit() {
                                 className="text-xs font-bold w-9 text-center bg-transparent outline-none focus:ring-1 focus:ring-primary rounded [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                               />
                               <button
+                                type="button"
                                 className="h-7 w-7 flex items-center justify-center rounded-full hover:bg-primary/10 hover:text-primary transition-colors"
                                 onClick={() => updateItemQty(itemKey, 1)}
+                                title={t("১ বাড়ান", "Increase 1")}
+                                aria-label={t("১ বাড়ান", "Increase 1")}
                               >
                                 <Plus className="w-3 h-3" />
                               </button>
                             </div>
                             <span className="text-xs font-bold text-primary w-14 text-right">৳{item.unit_price * item.quantity}</span>
                             <button
-                              className="h-6 w-6 flex items-center justify-center rounded-full text-muted-foreground hover:text-destructive hover:bg-destructive/10 opacity-0 group-hover:opacity-100 transition-all"
+                              type="button"
+                              className="h-7 w-7 flex items-center justify-center rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
                               onClick={() => removeItem(itemKey)}
+                              title={t("পণ্যটি বাদ দিন", "Remove item")}
+                              aria-label={t("পণ্যটি বাদ দিন", "Remove item")}
                             >
-                              <Trash2 className="w-3 h-3" />
+                              <Trash2 className="w-4 h-4" />
                             </button>
                           </div>
                         );

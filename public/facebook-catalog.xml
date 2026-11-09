@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:g="http://base.google.com/ns/1.0">
+  <channel>
+    <title>Faris Seed Catalog</title>
+    <link>https://farisshop.com</link>
+    <description>Product catalog for Faris Seed (Facebook / Meta Commerce)</description>
+    <item>
+      <g:id>SKU-MUO3S34L</g:id>
+      <g:title>মিক্স কালার পর্তুলিকা বা টাইম ফুলের বীজ</g:title>
+      <g:description>রং-বেরঙের থোকা ফুল, কম পরিচর্যায় প্রচুর ফুটন্ত সৌন্দর্য, ছাদ ও ব্যালকনির জন্য সেরা</g:description>
+      <g:availability>in stock</g:availability>
+      <g:condition>new</g:condition>
+      <g:price>180.00 BDT</g:price>
+      <g:link>https://farisshop.com/products/mixed-color-portulaca-seeds</g:link>
+      <g:image_link>https://nubvbenwbrytvzqeysxr.supabase.co/storage/v1/object/public/product-images/3-faris-seed-d44pm.webp</g:image_link>
+      <g:brand>Faris Seed</g:brand>
+      <g:product_type>Flower Seeds</g:product_type>
+      <g:google_product_category>Home &amp; Garden &gt; Plants &gt; Seeds</g:google_product_category>
+    </item>
+    <item>
+      <g:id>122</g:id>
+      <g:title>মাল্টি কালার জিনিয়া ফুলের বীজ</g:title>
+      <g:description>উচ্চ প্রিমিয়াম কোয়ালিটির দেশি ও বিদেশি জিনিয়া ফুলের বীজ।</g:description>
+      <g:availability>in stock</g:availability>
+      <g:condition>new</g:condition>
+      <g:price>180.00 BDT</g:price>
+      <g:link>https://farisshop.com/products/multi-color-zinnia-seeds</g:link>
+      <g:image_link>https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSNyvBLH2N30uiS5q6qMcYeTy6-ERj4-5JRuLiCj404FG9jlWxk4imKNrfr&amp;s=10</g:image_link>
+      <g:brand>Faris Seed</g:brand>
+      <g:product_type>Flower Seeds</g:product_type>
+      <g:google_product_category>Home &amp; Garden &gt; Plants &gt; Seeds</g:google_product_category>
+    </item>
+  </channel>
+</rss>

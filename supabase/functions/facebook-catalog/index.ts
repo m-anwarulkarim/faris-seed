@@ -71,8 +71,8 @@ Deno.serve(async (req) => {
       link,
       image_link: image,
       brand: "Faris Seed",
-      product_type: p.category || "General",
-      google_product_category: "Apparel & Accessories",
+      product_type: p.category || "Flower Seeds",
+      google_product_category: "Home & Garden > Plants > Seeds",
     };
   });
 

@@ -3,6 +3,7 @@
 import { supabase } from "@/integrations/supabase/client";
 import { getActivePixelId, isDuplicateEvent, dlPush as sharedDlPush, fbqTrackSingle } from "@/components/TrackingScripts";
 import { ttFire } from "@/components/TikTokPixel";
+import { trackEvent } from "@/hooks/useAnalyticsTracker";
 
 type UserData = { ph?: string; em?: string; fn?: string; ln?: string };
 
@@ -58,6 +59,11 @@ function fire(
 
 /** Product details page open */
 export function trackViewContent(productId: string, productName?: string, value?: number, currency = "BDT") {
+  trackEvent("product_view", {
+    productId,
+    productName,
+    metadata: { value, currency },
+  });
   fire("ViewContent", `vc_${productId}_${Math.floor(Date.now() / 30000)}`, {
     value,
     currency,

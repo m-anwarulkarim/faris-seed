@@ -3,6 +3,8 @@ import { useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { ttFire } from "@/components/TikTokPixel";
+import { trackEvent } from "@/hooks/useAnalyticsTracker";
+import { ensureVisitorTracked } from "@/lib/visitorTracking";
 
 // Prevent duplicate script injection across re-renders
 let pixelInitialized = false;
@@ -98,6 +100,13 @@ export default function TrackingScripts() {
   // duplicate commerce events when the container also has a Meta Pixel tag.
   const isLandingPage = location.pathname.startsWith("/lp/");
 
+  // Ensure visitor session is tracked on public site visits
+  useEffect(() => {
+    if (!isAdmin) {
+      ensureVisitorTracked().catch(() => {});
+    }
+  }, [isAdmin]);
+
   // Fetch dashboard-controlled tracking IDs with retry. A transient settings
   // request must not disable browser events for the rest of the page session.
   useEffect(() => {
@@ -171,14 +180,20 @@ export default function TrackingScripts() {
 
   // Track PageView on mount + every route change (with retry until fbq ready)
   useEffect(() => {
-    if (!pixelId || isAdmin) return;
+    if (isAdmin) return;
     prevPathRef.current = location.pathname;
     // Module-level path survives component remounts, preventing a remount on the
     // same URL from being misread as a new navigation and double-counted.
     if (lastPageViewPath === location.pathname) return;
     const isInitialPageView = lastPageViewPath === "";
     lastPageViewPath = location.pathname;
-    fireFbqTrack('PageView', {}, createEventId('pv'));
+
+    // Track internal funnel event
+    trackEvent("page_view", { pagePath: location.pathname });
+
+    if (pixelId) {
+      fireFbqTrack('PageView', {}, createEventId('pv'));
+    }
     if (!isInitialPageView) {
       dlPush('page_view', { page_path: location.pathname, page_location: window.location.href });
     }

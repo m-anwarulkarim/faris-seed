@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Check, Loader2, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { placeOrder } from "@/lib/placeOrder";
+import { saveIncompleteOrder } from "@/lib/incompleteOrders";
 import type { Product } from "@/data/products";
 import { bn, formatBDPhone } from "@/lib/format";
 import { getPackOffersFromDb, getPackOffers, type PackOptionRow } from "@/lib/pack-offers";
@@ -31,6 +32,31 @@ export function OrderForm({
   const unitPrice = Math.round((selectedOffer.price / quantity) * 100) / 100;
   const deliveryCharge = selectedOffer.delivery_charge ?? (quantity > 1 ? 0 : 70);
   const total = selectedOffer.price + deliveryCharge;
+
+  // Auto-capture incomplete order as soon as customer enters 11-digit mobile number
+  useEffect(() => {
+    const cleanPhone = form.phone.replace(/[\s-]/g, "").trim();
+    if (!/^01[3-9]\d{8}$/.test(cleanPhone)) return;
+
+    const timer = setTimeout(() => {
+      saveIncompleteOrder({
+        phone: cleanPhone,
+        customerName: form.customerName,
+        address: form.address,
+        items: [
+          {
+            id: product.id || product.slug,
+            name: `${product.name} (${quantity} প্যাকেট)`,
+            image: product.image || null,
+            price: selectedOffer.price,
+            quantity: 1,
+          },
+        ],
+      });
+    }, 800);
+
+    return () => clearTimeout(timer);
+  }, [form.phone, form.customerName, form.address, quantity, product.id, product.name, product.image, selectedOffer.price]);
 
 
 

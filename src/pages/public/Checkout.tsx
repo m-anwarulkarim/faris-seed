@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Check, Download, Loader2, ShieldCheck, ShoppingCart } from "lucide-react";
 import { toast } from "sonner";
@@ -15,6 +15,7 @@ import { Section, SectionHeading } from "@/components/pub/section";
 import { Textarea } from "@/components/ui/textarea";
 import { cartDeliveryCharge, cartSubtotal, clearCart, useCart } from "@/data/cart";
 import { placeOrder } from "@/lib/placeOrder";
+import { saveIncompleteOrder } from "@/lib/incompleteOrders";
 import { bn, formatBDPhone } from "@/lib/format";
 
 
@@ -37,6 +38,29 @@ function CheckoutPage() {
     const sanitizedValue = (key === "phone" || key === "altPhone") ? formatBDPhone(value) : value;
     setForm((f) => ({ ...f, [key]: sanitizedValue }));
   }
+
+  // Auto-capture incomplete order as soon as customer types 11-digit phone number
+  useEffect(() => {
+    const cleanPhone = form.phone.replace(/[\s-]/g, "").trim();
+    if (!/^01[3-9]\d{8}$/.test(cleanPhone) || items.length === 0) return;
+
+    const timer = setTimeout(() => {
+      saveIncompleteOrder({
+        phone: cleanPhone,
+        customerName: form.customerName,
+        address: form.address,
+        items: items.map((item) => ({
+          id: (item.id || item.slug || "").split("::")[0],
+          name: item.name,
+          image: item.image || null,
+          price: item.price,
+          quantity: item.quantity,
+        })),
+      });
+    }, 800);
+
+    return () => clearTimeout(timer);
+  }, [form.phone, form.customerName, form.address, items]);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();

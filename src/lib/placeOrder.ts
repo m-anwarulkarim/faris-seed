@@ -81,6 +81,12 @@ export async function placeOrder(input: PlaceOrderInput) {
     throw itemsErr;
   }
 
+  // Clear any incomplete order for this phone
+  void supabase
+    .from("incomplete_orders")
+    .delete()
+    .eq("phone", input.phone.trim());
+
   // 3. Save local snapshot for thank-you page / invoice
   try {
     localStorage.setItem(
